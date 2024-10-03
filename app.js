@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const bcrypt = require('bcrypt'); // For password hashing
+const User = require('./models/User'); // Import the User model
 
 const app = express();
 const port = 3000;
@@ -12,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 // Mongoose connection (replace with your MongoDB connection string)
-mongoose.connect('mongodb+srv://rojerojer24:CN2g2iOQ6dSB4bkQ@relate.qorzo.mongodb.net/', {
+mongoose.connect('mongodb+srv://rojerojer24:HkKpUYxLCi7syrsL@relate.qorzo.mongodb.net/', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
@@ -26,12 +28,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-
-// In app.js
-
+// Route to handle user registration
 // Route to handle user registration
 app.post('/register', async (req, res) => {
   try {
@@ -54,4 +51,10 @@ app.post('/register', async (req, res) => {
     console.error('Error registering user:', err);
     res.status(500).send('Error registering user');
   }
+});
+
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
