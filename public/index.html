@@ -27,16 +27,16 @@
         <div id="result"></div>
     </div>
 
-    <a href="/about.html" class="btn btn-secondary mt-3">About Section</a> <!-- Updated Link -->
+    <a href="/about.html" class="btn btn-secondary mt-3">About Section</a> 
 
     <script>
         document.getElementById('registrationForm').addEventListener('submit', async function (event) {
             event.preventDefault();
-
+    
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const email = document.getElementById('email').value;
-
+    
             // Send POST request to the server
             const response = await fetch('/register', {
                 method: 'POST',
@@ -45,9 +45,14 @@
                 },
                 body: JSON.stringify({ username, password, email })
             });
-
-            const result = await response.text();
-            document.getElementById('result').innerText = result;
+    
+            if (response.ok) {
+                // If registration is successful, redirect to the generate page
+                window.location.href = 'generate.html';
+            } else {
+                const result = await response.text();
+                document.getElementById('result').innerText = result;
+            }
         });
     </script>
 </body>
