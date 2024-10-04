@@ -1,8 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
-const bcrypt = require('bcrypt'); // For password hashing
-const User = require('./models/User'); // Import the User model
+const bcrypt = require('bcrypt');
+const User = require('./models/User');
+const Resume = require('./models/Resume'); // Import the Resume model
 
 const app = express();
 const port = 3000;
@@ -29,19 +30,19 @@ app.get('/', (req, res) => {
 });
 
 // Route to handle user registration
-// Route to handle user registration
 app.post('/register', async (req, res) => {
   try {
     const { username, password, email } = req.body;
 
     // Check if the username already exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).send('Username already exists');
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).send('Email already exists');
     }
 
-    // Create a new user
-    const newUser = new User({ username, password, email });
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, password: hashedPassword, email });
 
     // Save the user to the database
     await newUser.save();
@@ -53,6 +54,29 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Route to handle resume data submission (without authentication)
+app.post('/submit-resume', async (req, res) => {
+  try {
+    const { phone, profession, firstJob, school, gpa } = req.body;
+
+    // Create a new Resume document with the form data
+    const newResume = new Resume({
+      phone,
+      profession,
+      firstJob,
+      school,
+      gpa
+    });
+
+    // Save the resume data to the database
+    await newResume.save();
+
+    res.status(200).send('Resume data saved successfully');
+  } catch (err) {
+    console.error('Error saving resume data:', err);
+    res.status(500).send('Error saving resume data');
+  }
+});
 
 // Start the server
 app.listen(port, () => {
