@@ -15,14 +15,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 // Mongoose connection (replace with your MongoDB connection string)
-mongoose.connect('mongodb+srv://rojerojer24:HkKpUYxLCi7syrsL@relate.qorzo.mongodb.net/', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch(err => {
-  console.error('MongoDB connection error:', err);
-});
+// mongoose.connect('mongodb+srv://rojerojer24:HkKpUYxLCi7syrsL@relate.qorzo.mongodb.net/', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// }).then(() => {
+//   console.log('Connected to MongoDB');
+// }).catch(err => {
+//   console.error('MongoDB connection error:', err);
+// });
 
 // Route to serve the index.html file
 app.get('/', (req, res) => {
