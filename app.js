@@ -78,7 +78,35 @@ app.post('/submit-resume', async (req, res) => {
   }
 });
 
+// Get existing resume data for the logged-in user (simplified for demonstration)
+app.get('/get-resume', async (req, res) => {
+  try {
+      const resume = await Resume.findOne();  // Modify this query to use actual user logic
+      res.json(resume || {});
+  } catch (err) {
+      console.error('Error fetching resume:', err);
+      res.status(500).send('Error fetching resume');
+  }
+});
+
+// Update resume data
+app.post('/update-resume', async (req, res) => {
+  try {
+      const { phone, profession, firstJob, school, gpa } = req.body;
+
+      // Assuming user-specific resume update logic here
+      await Resume.findOneAndUpdate({}, { phone, profession, firstJob, school, gpa });
+
+      res.status(200).send('Resume updated successfully');
+  } catch (err) {
+      console.error('Error updating resume:', err);
+      res.status(500).send('Error updating resume');
+  }
+});
+
+
+
 // Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}/index.html`);
 });
