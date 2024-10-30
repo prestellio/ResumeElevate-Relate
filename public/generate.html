@@ -85,47 +85,44 @@
         </div>
     </nav>
 
-    <div class="container mt-5" >
-        <h1 class="text-center">Generate Your Resume</h1>
-        <form id="resumeForm">
+    <div class="container mt-5">
+        <h1 class="text-center">Edit Your Resume</h1>
+        <form id="resumeEditorForm">
             <div class="mb-3">
                 <label for="phone" class="form-label">Phone Number</label>
-                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" required>
+                <input type="text" class="form-control" id="phone" name="phone" required>
             </div>
-            <!-- Old Profession option
+            <!-- Old Profession textbox
             <div class="mb-3">
-                <label for="profession" class="form-label">New Profession</label>
-                <input type="text" class="form-control" id="profession" name="profession" placeholder="Enter your profession" required>
+                <label for="profession" class="form-label">Profession</label>
+                <input type="text" class="form-control" id="profession" name="profession" required>
             </div> -->
-            <label for="profession" class="form-label">New Profession</label>
-            <select name="Profession" id="profession">
-                <option value="CS">Computer Science</option>
-                <option value="CE">Computer Engineering</option>
-                <option value="Chef">Chef</option>
-                <option value="Therapist">Therapist</option>
-            </select>
+                <select name="Professions" id="profess">
+                    <option value="STEM">STEM</option>
+                    <option value="Med">Medical</option>
+                    <option value="Art">Fine Arts</option>
+                    <option value="Physical">Audi</option>
+                </select>
+            <table>
+                <tr>
+                  <th><label for="firstJob" class="form-label">First Job Description</label></th>
+                  <th><button type="submit" class="btn btn-primary w-100">Add</button></th>
+                </tr>
+              </table>
             <div class="mb-3">
-                <table>
-                    <tr>
-                        <th><label for="firstJob" class="form-label">Description of First Job</label></th>
-                        <th><button type="add" class="btn btn-primary w-100">Add</button></th>
-                    </tr>
-                </table>
-
-                <textarea class="form-control" id="firstJob" name="firstJob" placeholder="Describe your first job" rows="3" required></textarea>
-
+                
+                <textarea class="form-control" id="firstJob" name="firstJob" rows="3" required></textarea>
             </div>
             <div class="mb-3">
-                <label for="school" class="form-label">Recent School Attended</label>
-                <input type="text" class="form-control" id="school" name="school" placeholder="Enter your school name" required>
+                <label for="school" class="form-label">School</label>
+                <input type="text" class="form-control" id="school" name="school" required>
             </div>
             <div class="mb-3">
                 <label for="gpa" class="form-label">GPA</label>
-                <input type="text" class="form-control" id="gpa" name="gpa" placeholder="Enter your GPA" required>
+                <input type="text" class="form-control" id="gpa" name="gpa" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Submit</button>
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
         </form>
-        <div id="result"></div>
     </div>
 
     <script>
