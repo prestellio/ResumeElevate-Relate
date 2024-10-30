@@ -57,20 +57,63 @@
 </head>
 
 <body>
-    <div class="container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Resume Builder</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="generate.html">Generate Resume</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Login.html">Login page</a> <!-- Add active or not, decide later-->
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="editor.html">Edit Resume</a>
+                    </li>                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5" >
         <h1 class="text-center">Generate Your Resume</h1>
         <form id="resumeForm">
             <div class="mb-3">
                 <label for="phone" class="form-label">Phone Number</label>
                 <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" required>
             </div>
+            <!-- Old Profession option
             <div class="mb-3">
                 <label for="profession" class="form-label">New Profession</label>
                 <input type="text" class="form-control" id="profession" name="profession" placeholder="Enter your profession" required>
-            </div>
+            </div> -->
+            <label for="profession" class="form-label">New Profession</label>
+            <select name="Profession" id="profession">
+                <option value="CS">Computer Science</option>
+                <option value="CE">Computer Engineering</option>
+                <option value="Chef">Chef</option>
+                <option value="Therapist">Therapist</option>
+            </select>
             <div class="mb-3">
-                <label for="firstJob" class="form-label">Description of First Job</label>
+                <table>
+                    <tr>
+                        <th><label for="firstJob" class="form-label">Description of First Job</label></th>
+                        <th><button type="add" class="btn btn-primary w-100">Add</button></th>
+                    </tr>
+                </table>
+
                 <textarea class="form-control" id="firstJob" name="firstJob" placeholder="Describe your first job" rows="3" required></textarea>
+
             </div>
             <div class="mb-3">
                 <label for="school" class="form-label">Recent School Attended</label>
