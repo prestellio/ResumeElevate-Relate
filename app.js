@@ -78,10 +78,10 @@ app.post('/submit-resume', async (req, res) => {
   }
 });
 
-// Get existing resume data for the logged-in user (simplified for demonstration)
+// Route to get the resume data
 app.get('/get-resume', async (req, res) => {
   try {
-      const resume = await Resume.findOne();  // Modify this query to use actual user logic
+      const resume = await Resume.findOne(); // Use proper user logic in production
       res.json(resume || {});
   } catch (err) {
       console.error('Error fetching resume:', err);
@@ -89,13 +89,13 @@ app.get('/get-resume', async (req, res) => {
   }
 });
 
-// Update resume data
+// Route to update the resume data
 app.post('/update-resume', async (req, res) => {
   try {
-      const { phone, profession, firstJob, school, gpa } = req.body;
+      const { content } = req.body;
 
-      // Assuming user-specific resume update logic here
-      await Resume.findOneAndUpdate({}, { phone, profession, firstJob, school, gpa });
+      // Update resume content in MongoDB (modify for user-specific logic)
+      await Resume.findOneAndUpdate({}, { content });
 
       res.status(200).send('Resume updated successfully');
   } catch (err) {

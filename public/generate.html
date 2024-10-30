@@ -108,6 +108,59 @@
             document.getElementById('result').innerText = result;
         });
     </script>
+    <script>
+        // Handle dynamic job description addition
+        document.getElementById('addJobDescriptionButton').addEventListener('click', function () {
+            const jobDescriptionsDiv = document.getElementById('jobDescriptions');
+
+            // Create a new text area for another job description
+            const newJobDiv = document.createElement('div');
+            newJobDiv.classList.add('job-description');
+
+            const newLabel = document.createElement('label');
+            newLabel.classList.add('form-label');
+            newLabel.textContent = 'Description of Another Job';
+
+            const newTextarea = document.createElement('textarea');
+            newTextarea.classList.add('form-control');
+            newTextarea.setAttribute('placeholder', 'Describe your job');
+            newTextarea.setAttribute('rows', '3');
+            newTextarea.required = true;
+
+            // Append the new elements to the div
+            newJobDiv.appendChild(newLabel);
+            newJobDiv.appendChild(newTextarea);
+
+            jobDescriptionsDiv.appendChild(newJobDiv);
+        });
+
+        // Handle form submission
+        document.getElementById('resumeForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const phone = document.getElementById('phone').value;
+            const profession = document.getElementById('profession').value;
+            const school = document.getElementById('school').value;
+            const gpa = document.getElementById('gpa').value;
+
+            // Collect all job descriptions
+            const jobDescriptions = Array.from(document.querySelectorAll('#jobDescriptions textarea')).map(
+                textarea => textarea.value
+            );
+
+            // Send POST request to the server
+            const response = await fetch('/submit-resume', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ phone, profession, school, gpa, jobDescriptions })
+            });
+
+            const result = await response.text();
+            document.getElementById('result').innerText = result;
+        });
+    </script>
 </body>
 
 </html>
