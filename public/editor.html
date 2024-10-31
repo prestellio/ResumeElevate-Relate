@@ -1,109 +1,120 @@
-<!-- editor.html -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Editor</title>
+    <title>User's Resume</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
 
+    <style>
+        nav {
+            background-color: #326BD6;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .resume-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .section-title {
+            font-weight: 700;
+            margin-top: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        .info {
+            margin-bottom: 10px;
+        }
+
+        .info h6 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">Resume Builder</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="generate.html">Generate Resume</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.html">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Login.html">Login page</a> <!-- Add active or not, decide later-->
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="editor.html">Edit Resume</a>
-                    </li>                    
-                </ul>
-            </div>
+
+    <div class="resume-container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1 id="name">Full Name</h1>
+            <p id="email">Email: user@example.com | Phone: <span id="phone"></span></p>
         </div>
-    </nav>
-    <div class="container mt-5">
-        <h1 class="text-center">Edit Your Resume</h1>
-        <form id="resumeEditorForm">
-            <div class="mb-3">
-                <label for="phone" class="form-label">Phone Number</label>
-                <input type="text" class="form-control" id="phone" name="phone" required>
-            </div>
-            <div class="mb-3">
-                <label for="profession" class="form-label">Profession</label>
-                <input type="text" class="form-control" id="profession" name="profession" required>
-            </div>
-            <div class="mb-3">
-                <label for="firstJob" class="form-label">First Job Description</label>
-                <textarea class="form-control" id="firstJob" name="firstJob" rows="3" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="school" class="form-label">School</label>
-                <input type="text" class="form-control" id="school" name="school" required>
-            </div>
-            <div class="mb-3">
-                <label for="gpa" class="form-label">GPA</label>
-                <input type="text" class="form-control" id="gpa" name="gpa" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-        </form>
+
+        <!-- Profession Section -->
+        <div class="section-title">Professional Summary</div>
+        <p id="profession">A brief summary of the user's professional experience and aspirations.</p>
+
+        <!-- Work Experience Section -->
+        <div class="section-title">Work Experience</div>
+        <div class="info">
+            <h6 id="firstJobTitle">First Job Title</h6>
+            <p id="firstJobDescription">Description of the user's first job and achievements.</p>
+        </div>
+
+        <!-- Education Section -->
+        <div class="section-title">Education</div>
+        <div class="info">
+            <h6 id="school">School Name</h6>
+            <p id="gpa">GPA: </p>
+        </div>
     </div>
 
     <script>
-        // Fetch existing resume data to pre-fill the form
+        // Fetch resume data and populate the resume template
         async function loadResumeData() {
-            const response = await fetch('/get-resume');
-            const data = await response.json();
-            
-            if (data) {
-                document.getElementById('phone').value = data.phone;
-                document.getElementById('profession').value = data.profession;
-                document.getElementById('firstJob').value = data.firstJob;
-                document.getElementById('school').value = data.school;
-                document.getElementById('gpa').value = data.gpa;
+            try {
+                const response = await fetch('/get-resume');
+                const data = await response.json();
+
+                if (data) {
+                    document.getElementById('name').innerText = data.name || 'Full Name';
+                    document.getElementById('email').innerText = 'Email: ' + data.email || 'Email: user@example.com';
+                    document.getElementById('phone').innerText = data.phone || 'N/A';
+                    document.getElementById('profession').innerText = data.profession || 'Professional summary not available.';
+                    document.getElementById('firstJobTitle').innerText = data.firstJobTitle || 'First Job Title';
+                    document.getElementById('firstJobDescription').innerText = data.firstJob || 'Job description not available.';
+                    document.getElementById('school').innerText = data.school || 'School name not available.';
+                    document.getElementById('gpa').innerText = 'GPA: ' + (data.gpa || 'N/A');
+                }
+            } catch (error) {
+                console.error('Error fetching resume data:', error);
             }
         }
 
         document.addEventListener('DOMContentLoaded', loadResumeData);
-
-        // Handle form submission to save changes
-        document.getElementById('resumeEditorForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
-
-            const phone = document.getElementById('phone').value;
-            const profession = document.getElementById('profession').value;
-            const firstJob = document.getElementById('firstJob').value;
-            const school = document.getElementById('school').value;
-            const gpa = document.getElementById('gpa').value;
-
-            const response = await fetch('/update-resume', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, profession, firstJob, school, gpa })
-            });
-
-            if (response.ok) {
-                alert('Resume updated successfully!');
-            } else {
-                alert('Error updating resume.');
-            }
-        });
     </script>
-</body>
 
+</body>
 </html>
