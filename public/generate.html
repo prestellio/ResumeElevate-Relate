@@ -69,6 +69,14 @@
             font-weight: 600;
             color: #28a745;
         }
+        footer {
+            background-color: #06203C;
+            color: white;
+            padding-top: 10px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
     </style>
 </head>
 
@@ -311,7 +319,14 @@
                 newJobDiv.remove();
             });
         });
-
+        <footer>
+            <p>&copy; 2024 Resume Elevate</p>
+            <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="careers.html">Careers</a></li>
+            </ul>
+        </footer>
         // Handle form submission
         document.getElementById('resumeForm').addEventListener('submit', async function (event) {
             event.preventDefault();
@@ -334,13 +349,6 @@
             document.getElementById('result').innerText = result;
         });
     </script>
-    footer {
-        background-color: #06203C;
-        color: white;
-        padding-top: 10px;
-        padding-left: 20px;
-        padding-right: 20px;
-    }
 </body>
 
 </html>

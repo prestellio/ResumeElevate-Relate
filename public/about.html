@@ -10,6 +10,20 @@
             font-family: 'Arial', sans-serif;
             background-color: #f8f9fa;
         }
+
+        nav {
+            background-color: #326BD6;
+            background-image: url('../Wichita_City_Rip.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            
+        }
+        h1 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #326BD6;
+        }
         .hero {
             background-color: #343a40;
             color: white;
@@ -38,10 +52,45 @@
             padding: 20px;
             margin-bottom: 20px;
         }
+        footer {
+            background-color: #06203C;
+            color: white;
+            padding-top: 10px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <img src="../Resume_Elevate_Logo.png" style="width:30%" alt="Resume Elevate">            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:white;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="generate.html">Generate Resume</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Login.html">Login page</a> <!-- Add active or not, decide later-->
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="editor.html">Edit Resume</a>
+                    </li>                    
+                </ul>
+            </div>
+        </div>
+    </nav>
     <!-- Hero Section -->
+    
     <section class="hero">
         <div class="container">
             <h1>About ResumeElevate</h1>
@@ -97,18 +146,17 @@
     </section>
 
     <!-- Footer Section -->
-    <footer class="bg-dark text-light text-center py-3">
-        <p>&copy; 2024 ResumeElevate. All Rights Reserved.</p>
+    <footer>
+        <p>&copy; 2024 Resume Elevate. All Rights Reserved.</p>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="careers.html">Careers</a></li>
+        </ul>
     </footer>
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
-    footer {
-        background-color: #06203C;
-        color: white;
-        padding-top: 10px;
-        padding-left: 20px;
-        padding-right: 20px;
-    }
+    
 </body>
 </html>
