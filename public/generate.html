@@ -9,10 +9,15 @@
     <style>
         nav {
             background-color: #326BD6;
+            background-image: url('../Wichita_City_Rip.png')
         }
         body {
             background-color: #f8f9fa;
             font-family: 'Roboto', sans-serif;
+        }
+
+        div {
+            padding-left: 2%;
         }
 
         .container {
@@ -27,6 +32,9 @@
             font-weight: 700;
             margin-bottom: 1.5rem;
             color: #326BD6;
+        }
+        h4 {
+            font-weight: 700;
         }
 
         label {
@@ -60,7 +68,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#326BD6;">
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
             <img src="../Resume_Elevate_Logo.png" style="width:30%" alt="Resume Elevate">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -100,6 +108,11 @@
                 <label for="phone" class="form-label">Phone Number</label>
                 <input type="text" class="form-control" id="phone" name="phone" required>
             </div>
+            <div id="goal" class="mb-3">
+                <label class="form-label">Objective goal</label>
+                <textarea class="form-control" name="goal" rows="3" placeholder="Describe the goal you plan to achieve with getting this job"></textarea>
+            </div>
+            <h4>Residence</h3>
             <table>
                 <tr>
                     <th>
@@ -163,33 +176,13 @@
                     </th>
                     <th>
                         <div class="mb-3">
-                            <label for="gradyear" class="form-label">Graduation Year</label>
-                            <input type="text" class="form-control" id="gradyear" name="gradyear" >
-                        </div>
-                    </th>
-                </tr>
-                <tr>
-                    <th>
-                        <div class="mb-3">
-                            <label for="major" class="form-label">Level of education</label>
-                            <select type="text" class="form-control" id="major" name="major" required>
-                                <option>- Select -</option>
-                                <option>High School Diploma</option>
-                                <option>General Education Devlopment</option>
-                                <option>Associates</option>
-                                <option>Bachelors</option>
-                                <option>Masters</option>
-                                <option>Doctorate</option>
-                                <option>Hero</option>
-                                <option>Legend</option>
-                                <option>God</option>
-                                <option>Mythic</option>
-                            </select>
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" >
                         </div>
                     </th>
                 </tr>
             </table>
-
+            <h4>Career Information</h4>
             <div class="mb-3">
                 <label for="profess" class="form-label">Profession</label>
                 <select name="Professions" id="profess" class="form-control" required>
@@ -205,7 +198,10 @@
                 <textarea class="form-control" name="jobDescription" rows="3" placeholder="Describe your job"></textarea>
             </div>
             <button type="button" class="btn btn-secondary mb-3" id="addJobButton">Add Job Description</button>
+            
 
+            <!-- Should add an additional school+table -->
+            <h4>Education</h4>
             <div class="mb-3">
                 <label for="school" class="form-label">School</label>
                 <input type="text" class="form-control" id="school" name="school" required>
@@ -248,7 +244,7 @@
                     </th>
                 </tr>
             </table>
-
+            <h4>Achievements</h4>
             <div id="skills-certifications" class="mb-3">
                 <label class="form-label">Skills and Certifications</label>
                 <input type="text" class="form-control" id="skillcerts" name="skillcerts" placeholder="Skill/Certification" required>
@@ -260,10 +256,25 @@
                 <input class="form-control" name="awards" id="awards" placeholder="Award">
             </div>
             <button type="button" class="btn btn-secondary mb-3" id="addJobButton">Hassan you need to change this</button>
-
+            <!-- Projects adder -->
             <div id="projects" class="mb-3">
                 <label class="form-label">Projects</label>
                 <input class="form-control" name="projects" id="awards" placeholder="Award">
+            </div>
+            <button type="button" class="btn btn-secondary mb-3" id="addJobButton">Hassan you need to change this</button>
+            
+            <h4>Additional Information</h4>
+            <div id="refs" class="mb-3">
+                <label class="form-label">References</label>
+                <input class="form-control" name="refs" id="refs" placeholder="Reference">
+            </div>
+            <button type="button" class="btn btn-secondary mb-3" id="addJobButton">Hassan you need to change this</button>
+
+
+            <!-- Links adder -->
+            <div id="links" class="mb-3">
+                <label class="form-label">Hyperlinks and URLs</label>
+                <input class="form-control" name="links" id="links" placeholder="Link">
             </div>
             <button type="button" class="btn btn-secondary mb-3" id="addJobButton">Hassan you need to change this</button>
 
