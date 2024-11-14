@@ -8,9 +8,10 @@ const axios = require('axios');
 
 const app = express();
 const port = 3000;
+require('dotenv').config(); // Load environment variables from .env file
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 // Middleware to serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
-
 // Middleware to parse JSON data from requests
 app.use(express.json());
 
@@ -24,36 +25,38 @@ app.use(express.json());
 //   console.error('MongoDB connection error:', err);
 // });
 
+require('dotenv').config(); // Load environment variables from .env file
+
 app.post('/generate-objective', async (req, res) => {
   const { phone, profession, jobDesc, school, gpa } = req.body;
 
   try {
-    // Use the inputs to generate an objective statement
     const response = await axios.post(
-      'https://api.openai.com/v1/completions',
+      'https://api.openai.com/v1/chat/completions',
       {
-        model: 'text-davinci-003',
-        prompt: `Create an objective statement based on the following user input:\n
-                 Profession: ${profession}\n
-                 Job Description: ${jobDesc}\n
-                 School Attended: ${school}\n
-                 GPA: ${gpa}\n`,
-        max_tokens: 60,
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: 'You are a helpful resume assistant.' },
+          { role: 'user', content: `Create an objective statement based on the following user input:\nProfession: ${profession}\nJob Description: ${jobDesc}\nSchool Attended: ${school}\nGPA: ${gpa}\n` }
+        ],
+        max_tokens: 100, // Optional: Adjust if the response is too short
       },
       {
         headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
           'Content-Type': 'application/json'
         }
       }
     );
 
-    res.json({ objective: response.data.choices[0].text.trim() });
+    res.json({ objective: response.data.choices[0].message.content.trim() });
   } catch (error) {
-    console.error('Error generating objective statement:', error);
+    console.error('Error generating objective statement:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Failed to generate objective statement' });
   }
 });
+
+
 
 
 // Route to serve the index.html file
