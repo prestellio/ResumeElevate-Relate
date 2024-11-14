@@ -8,7 +8,6 @@ const axios = require('axios');
 
 const app = express();
 const port = 3000;
-//const OPENAI_API_KEY = "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";
 // Middleware to serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
