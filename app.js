@@ -4,10 +4,11 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const User = require('./models/User');
 const Resume = require('./models/Resume'); // Import the Resume model
+const axios = require('axios');
 
 const app = express();
 const port = 3000;
-
+const OPENAI_API_KEY = "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";
 // Middleware to serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -23,6 +24,38 @@ app.use(express.json());
 // }).catch(err => {
 //   console.error('MongoDB connection error:', err);
 // });
+
+app.post('/generate-objective', async (req, res) => {
+  const { phone, profession, jobDesc, school, gpa } = req.body;
+
+  try {
+    // Use the inputs to generate an objective statement
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        model: 'text-davinci-003',
+        prompt: `Create an objective statement based on the following user input:\n
+                 Profession: ${profession}\n
+                 Job Description: ${jobDesc}\n
+                 School Attended: ${school}\n
+                 GPA: ${gpa}\n`,
+        max_tokens: 60,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    res.json({ objective: response.data.choices[0].text.trim() });
+  } catch (error) {
+    console.error('Error generating objective statement:', error);
+    res.status(500).json({ error: 'Failed to generate objective statement' });
+  }
+});
+
 
 // Route to serve the index.html file
 app.get('/', (req, res) => {

@@ -9,7 +9,15 @@ const userSchema = new mongoose.Schema({
   profession: { type: String },
   jobDesc: { type: String },
   school: { type: String },
-  gpa: { type: String }
+  gpa: { type: String },
+  skills: { type: String },
+  awards: { type: String },
+  education: { type: String },
+  projects: { type: String },
+  address: { type: String },
+  links: { type: String },
+  references: { type: String },
+  objective: { type: String }
 });
 
 const User = mongoose.model('User', userSchema);
