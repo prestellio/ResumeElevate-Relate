@@ -9,23 +9,13 @@ const axios = require('axios');
 const app = express();
 const port = 3000;
 require('dotenv').config(); // Load environment variables from .env file
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+console.log('Loaded API Key:', process.env.OPENAI_API_KEY); // For testing purposes only; remove in production
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Reference the key securely
 // Middleware to serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 // Middleware to parse JSON data from requests
 app.use(express.json());
 
-// Mongoose connection (replace with your MongoDB connection string)
-// mongoose.connect('mongodb+srv://rojerojer24:HkKpUYxLCi7syrsL@relate.qorzo.mongodb.net/', {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// }).then(() => {
-//   console.log('Connected to MongoDB');
-// }).catch(err => {
-//   console.error('MongoDB connection error:', err);
-// });
-
-require('dotenv').config(); // Load environment variables from .env file
 
 app.post('/generate-objective', async (req, res) => {
   const { phone, profession, jobDesc, school, gpa } = req.body;
