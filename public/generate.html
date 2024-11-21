@@ -9,8 +9,8 @@
     <style>
         
         body {
+            font-family: 'Arial', sans-serif;
             background-color: #f8f9fa;
-            font-family: 'Roboto', sans-serif;
         }
 
         nav {
@@ -19,6 +19,9 @@
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
+            color: aliceblue;
+            font-size: large;
+            font-weight: 1000;
         }
         
         div {
@@ -69,23 +72,49 @@
             font-weight: 600;
             color: #28a745;
         }
+
+        .padding {
+            padding-block: 40px;
+        }
+
         footer {
             background-color: #06203C;
             color: white;
             padding-top: 10px;
             padding-left: 20px;
             padding-right: 20px;
+            padding-bottom: 10px;
+            font-size: small;
+            
+        }
+        
+        .copyright {
+            font-size: smaller;
+        }
+
+        a:link {
+            color: #326BD6;
+        }
+        a:visited {
+            color: #109C2C;
+        }
+
+        a:hover {
+            color: #4e7ed8;
+        }
+
+        a:active {
+            color: #309c46;
         }
 
     </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <img src="../Resume_Elevate_Logo.png" style="width:30%" alt="Resume Elevate">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:white;">
+            <img src="../Resume_Elevate_Logo.png" style="width:30%; min-width: 150px;" alt="Resume Elevate">      
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:white;">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -100,11 +129,11 @@
                         <a class="nav-link" href="about.html">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="Login.html">Login</a>
+                        <a class="nav-link" href="Login.html">Login page</a> <!-- Add active or not, decide later-->
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="editor.html">Edit Resume</a>
-                    </li>
+                    </li>                    
                 </ul>
             </div>
         </div>
@@ -298,6 +327,27 @@
         <div id="result"></div>
     </div>
 
+    <div class = "padding"><div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+    <!-- Footer Section -->
+    <footer>
+        <p class="copyright">&copy; 2024 Resume Elevate. All Rights Reserved.</p>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="generate.html">Generator</a></li>
+        </ul>
+    </footer>
+
+
+
+
+
     <script>
         const jobDescriptionsContainer = document.getElementById('job-descriptions');
         const addJobButton = document.getElementById('addJobButton');
@@ -319,14 +369,6 @@
                 newJobDiv.remove();
             });
         });
-        <footer>
-            <p>&copy; 2024 Resume Elevate</p>
-            <ul>
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="privacy.html">Privacy Policy</a></li>
-            <li><a href="careers.html">Careers</a></li>
-            </ul>
-        </footer>
         // Handle form submission
         document.getElementById('resumeForm').addEventListener('submit', async function (event) {
             event.preventDefault();
