@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Resume Template</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .name {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .contact-info {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .contact-info span {
+            display: block;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .resume-section {
+            margin-top: 20px;
+        }
+        .resume-section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .resume-section li {
+            margin: 5px 0;
+        }
+        .resume-section li:before {
+            content: "•";
+            margin-right: 10px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="name" id="name">[Name]</div>
+        <div class="contact-info" id="contact-info">
+            <span id="address">[Address]</span>
+            <span id="phone">[Phone]</span>
+            <span id="email">[Email]</span>
+        </div>
+    </div>
+
+    <!-- Objective -->
+    <div class="resume-section">
+        <div class="section-title">Objective</div>
+        <p id="objective">[Objective]</p>
+    </div>
+
+    <!-- Education -->
+    <div class="resume-section">
+        <div class="section-title">Education</div>
+        <ul id="education">
+            <!-- Education details will be dynamically populated here -->
+        </ul>
+    </div>
+
+    <!-- Work History -->
+    <div class="resume-section">
+        <div class="section-title">Work History</div>
+        <ul id="work-history">
+            <!-- Work history will be dynamically populated here -->
+        </ul>
+    </div>
+
+    <!-- Volunteer Experience -->
+    <div class="resume-section">
+        <div class="section-title">Volunteer Experience</div>
+        <ul id="volunteer-experience">
+            <!-- Volunteer experiences will be dynamically populated here -->
+        </ul>
+    </div>
+
+    <!-- Computer Skills -->
+    <div class="resume-section">
+        <div class="section-title">Computer Skills</div>
+        <ul id="computer-skills">
+            <!-- Computer skills will be dynamically populated here -->
+        </ul>
+    </div>
+
+    <!-- Activities & Honors -->
+    <div class="resume-section">
+        <div class="section-title">Activities & Honors</div>
+        <ul id="activities-honors">
+            <!-- Activities & honors will be dynamically populated here -->
+        </ul>
+    </div>
+</div>
+
+<script>
+    // On page load, get the data from localStorage (or server if using a backend)
+    window.onload = function() {
+        const resumeData = JSON.parse(localStorage.getItem('resumeData'));
+
+        if (resumeData) {
+            // Populate Name and Contact Info
+            document.getElementById('name').innerText = resumeData.name;
+            document.getElementById('address').innerText = resumeData.address;
+            document.getElementById('phone').innerText = resumeData.phone;
+            document.getElementById('email').innerText = resumeData.email;
+
+            // Populate Objective
+            document.getElementById('objective').innerText = resumeData.objective;
+
+            // Populate Education
+            const educationList = document.getElementById('education');
+            resumeData.education.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                educationList.appendChild(li);
+            });
+
+            // Populate Work History
+            const workHistoryList = document.getElementById('work-history');
+            resumeData.workHistory.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${item.jobTitle}</strong>, ${item.company} (${item.dates})
+                                <ul>
+                                    ${item.tasks.map(task => `<li>${task}</li>`).join('')}
+                                </ul>`;
+                workHistoryList.appendChild(li);
+            });
+
+            // Populate Volunteer Experience
+            const volunteerList = document.getElementById('volunteer-experience');
+            resumeData.volunteerExperience.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                volunteerList.appendChild(li);
+            });
+
+            // Populate Computer Skills
+            const computerSkillsList = document.getElementById('computer-skills');
+            resumeData.computerSkills.forEach(skill => {
+                const li = document.createElement('li');
+                li.innerText = skill;
+                computerSkillsList.appendChild(li);
+            });
+
+            // Populate Activities & Honors
+            const activitiesHonorsList = document.getElementById('activities-honors');
+            resumeData.activitiesHonors.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                activitiesHonorsList.appendChild(li);
+            });
+        } else {
+            console.error('No resume data found');
+        }
+    };
+</script>
+
+</body>
+</html>

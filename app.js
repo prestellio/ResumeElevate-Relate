@@ -8,17 +8,19 @@ const axios = require('axios');
 
 const app = express();
 const port = 3000;
-require('dotenv').config(); // Load environment variables from .env file
-console.log('Loaded API Key:', process.env.OPENAI_API_KEY); // For testing purposes only; remove in production
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Reference the key securely
+
 // Middleware to serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 // Middleware to parse JSON data from requests
 app.use(express.json());
 
-
+// Route to handle generating objective statement using OpenAI
 app.post('/generate-objective', async (req, res) => {
-  const { phone, profession, jobDesc, school, gpa } = req.body;
+  const { profession, jobDescriptions, school, gpa } = req.body;
+
+  // Combine all job descriptions into a single string
+  const combinedJobDesc = jobDescriptions.join(' ');
 
   try {
     const response = await axios.post(
@@ -27,13 +29,13 @@ app.post('/generate-objective', async (req, res) => {
         model: 'gpt-3.5-turbo',
         messages: [
           { role: 'system', content: 'You are a helpful resume assistant.' },
-          { role: 'user', content: `Create an objective statement based on the following user input:\nProfession: ${profession}\nJob Description: ${jobDesc}\nSchool Attended: ${school}\nGPA: ${gpa}\n` }
+          { role: 'user', content: `Create an objective statement based on the following user input:\nProfession: ${profession}\nJob Descriptions: ${combinedJobDesc}\nSchool Attended: ${school}\nGPA: ${gpa}\n` }
         ],
         max_tokens: 100, // Optional: Adjust if the response is too short
       },
       {
         headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json'
         }
       }
@@ -46,9 +48,6 @@ app.post('/generate-objective', async (req, res) => {
   }
 });
 
-
-
-
 // Route to serve the index.html file
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -59,7 +58,7 @@ app.post('/register', async (req, res) => {
   try {
     const { username, password, email } = req.body;
 
-    // Check if the username already exists
+    // Check if the email already exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).send('Email already exists');
@@ -79,16 +78,16 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Route to handle resume data submission (without authentication)
+// Route to handle resume data submission
 app.post('/submit-resume', async (req, res) => {
   try {
-    const { phone, profession, firstJob, school, gpa } = req.body;
+    const { phone, profession, jobDescriptions, school, gpa } = req.body;
 
     // Create a new Resume document with the form data
     const newResume = new Resume({
       phone,
       profession,
-      firstJob,
+      jobDescriptions,  // Ensure job descriptions are handled as an array
       school,
       gpa
     });
@@ -106,32 +105,30 @@ app.post('/submit-resume', async (req, res) => {
 // Route to get the resume data
 app.get('/get-resume', async (req, res) => {
   try {
-      const resume = await Resume.findOne(); // Use proper user logic in production
-      res.json(resume || {});
+    const resume = await Resume.findOne(); // Add user-specific logic in production
+    res.json(resume || {});
   } catch (err) {
-      console.error('Error fetching resume:', err);
-      res.status(500).send('Error fetching resume');
+    console.error('Error fetching resume:', err);
+    res.status(500).send('Error fetching resume');
   }
 });
 
 // Route to update the resume data
 app.post('/update-resume', async (req, res) => {
   try {
-      const { content } = req.body;
+    const { content } = req.body;
 
-      // Update resume content in MongoDB (modify for user-specific logic)
-      await Resume.findOneAndUpdate({}, { content });
+    // Update resume content in MongoDB (modify for user-specific logic)
+    await Resume.findOneAndUpdate({}, { content });
 
-      res.status(200).send('Resume updated successfully');
+    res.status(200).send('Resume updated successfully');
   } catch (err) {
-      console.error('Error updating resume:', err);
-      res.status(500).send('Error updating resume');
+    console.error('Error updating resume:', err);
+    res.status(500).send('Error updating resume');
   }
 });
 
-
-
 // Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/index.html`);
+  console.log(`Server running at http://localhost:${port}`);
 });
