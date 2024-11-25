@@ -7,17 +7,13 @@ const Resume = require('./models/Resume'); // Import the Resume model
 
 const app = express();
 const port = 3000;
-<<<<<<< HEAD
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Reference the key securely
-=======
->>>>>>> parent of 8bb7478 (good job)
 
 // Middleware to serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 // Middleware to parse JSON data from requests
 app.use(express.json());
 
-<<<<<<< HEAD
 // Route to handle generating objective statement using OpenAI
 app.post('/generate-objective', async (req, res) => {
   const { profession, jobDescriptions, school, gpa } = req.body;
@@ -50,17 +46,6 @@ app.post('/generate-objective', async (req, res) => {
     res.status(500).json({ error: 'Failed to generate objective statement' });
   }
 });
-=======
-// Mongoose connection (replace with your MongoDB connection string)
-// mongoose.connect('mongodb+srv://rojerojer24:HkKpUYxLCi7syrsL@relate.qorzo.mongodb.net/', {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// }).then(() => {
-//   console.log('Connected to MongoDB');
-// }).catch(err => {
-//   console.error('MongoDB connection error:', err);
-// });
->>>>>>> parent of 8bb7478 (good job)
 
 // Route to serve the index.html file
 app.get('/', (req, res) => {
