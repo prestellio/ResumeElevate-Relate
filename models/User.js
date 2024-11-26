@@ -5,11 +5,11 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   email: { type: String, required: true },
   // Add resume fields here
-  phone: { type: String },
-  profession: { type: String },
-  jobDesc: { type: String },
-  school: { type: String },
-  gpa: { type: String }
+  // phone: { type: String },
+  // profession: { type: String },
+  // jobDesc: { type: String },
+  // school: { type: String },
+  // gpa: { type: String }
 });
 
 const User = mongoose.model('User', userSchema);
