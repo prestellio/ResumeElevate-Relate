@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User's Resume</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        nav {
+            background-color: #326BD6;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #728fb4;
+            padding: 20px;
+        }
+
+        .resume-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .section-title {
+            font-weight: 700;
+            margin-top: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        .info {
+            margin-bottom: 10px;
+        }
+
+        .info h6 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .toolbar {
+            width: 100%;
+            height: 10%;
+            background-color: #f8f8f8;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="resume-container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1 id="name">Full Name</h1>
+            <p id="email">Email: user@example.com | Phone: <span id="phone"></span></p>
+        </div>
+
+        <!-- Profession Section -->
+        <div class="section-title">Professional Summary</div>
+        <p id="profession">A brief summary of the user's professional experience and aspirations.</p>
+
+        <!-- Work Experience Section -->
+        <div class="section-title">Work Experience</div>
+        <div class="info">
+            <h6 id="firstJobTitle">First Job Title</h6>
+            <p id="firstJobDescription">Description of the user's first job and achievements.</p>
+        </div>
+
+        <!-- Education Section -->
+        <div class="section-title">Education</div>
+        <div class="info">
+            <h6 id="school">School Name</h6>
+            <p id="gpa">GPA: </p>
+        </div>
+    </div>
+    <div class="toolbar">
+        <p></p>
+    
+    </div>
+    <table>
+        <row>
+            <col></col>
+            <col style="width:160px;"><textarea></textarea></col>
+            <col></col>
+        </row>
+    </table>
+
+    
+
+    <script>
+        // Fetch resume data and populate the resume template
+        async function loadResumeData() {
+            try {
+                const response = await fetch('/get-resume');
+                const data = await response.json();
+
+                if (data) {
+                    document.getElementById('name').innerText = data.name || 'Full Name';
+                    document.getElementById('email').innerText = 'Email: ' + data.email || 'Email: user@example.com';
+                    document.getElementById('phone').innerText = data.phone || 'N/A';
+                    document.getElementById('profession').innerText = data.profession || 'Professional summary not available.';
+                    document.getElementById('firstJobTitle').innerText = data.firstJobTitle || 'First Job Title';
+                    document.getElementById('firstJobDescription').innerText = data.firstJob || 'Job description not available.';
+                    document.getElementById('school').innerText = data.school || 'School name not available.';
+                    document.getElementById('gpa').innerText = 'GPA: ' + (data.gpa || 'N/A');
+                }
+            } catch (error) {
+                console.error('Error fetching resume data:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadResumeData);
+    </script>
+
+</body>
+</html>
