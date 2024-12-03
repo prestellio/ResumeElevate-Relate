@@ -1,12 +1,16 @@
 const mongoose = require('mongoose');
 
-const ResumeSchema = new mongoose.Schema({
-    phone: String,
-    profession: String,
-    firstJob: String,
+const resumeSchema = new mongoose.Schema({
+  name: String,
+  phone: String,
+  goal: String,
+  location: String,
+  profession: String,
+  education: {
     school: String,
     gpa: String,
-    content: String // Store the HTML content of the resume
+  },
 });
 
-module.exports = mongoose.model('Resume', ResumeSchema);
+module.exports = mongoose.model('Resume', resumeSchema);
+

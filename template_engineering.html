@@ -118,66 +118,43 @@
 </div>
 
 <script>
-    // On page load, get the data from localStorage (or server if using a backend)
-    window.onload = function() {
-        const resumeData = JSON.parse(localStorage.getItem('resumeData'));
+    // On page load, fetch data from the backend
+window.onload = async function () {
+    try {
+        const response = await fetch('/get-resume');
+        const resumeData = await response.json();
 
         if (resumeData) {
-            // Populate Name and Contact Info
             document.getElementById('name').innerText = resumeData.name;
-            document.getElementById('address').innerText = resumeData.address;
             document.getElementById('phone').innerText = resumeData.phone;
-            document.getElementById('email').innerText = resumeData.email;
-
-            // Populate Objective
-            document.getElementById('objective').innerText = resumeData.objective;
-
-            // Populate Education
-            const educationList = document.getElementById('education');
-            resumeData.education.forEach(item => {
-                const li = document.createElement('li');
-                li.innerText = item;
-                educationList.appendChild(li);
-            });
-
-            // Populate Work History
-            const workHistoryList = document.getElementById('work-history');
-            resumeData.workHistory.forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${item.jobTitle}</strong>, ${item.company} (${item.dates})
-                                <ul>
-                                    ${item.tasks.map(task => `<li>${task}</li>`).join('')}
-                                </ul>`;
-                workHistoryList.appendChild(li);
-            });
-
-            // Populate Volunteer Experience
-            const volunteerList = document.getElementById('volunteer-experience');
-            resumeData.volunteerExperience.forEach(item => {
-                const li = document.createElement('li');
-                li.innerText = item;
-                volunteerList.appendChild(li);
-            });
-
-            // Populate Computer Skills
-            const computerSkillsList = document.getElementById('computer-skills');
-            resumeData.computerSkills.forEach(skill => {
-                const li = document.createElement('li');
-                li.innerText = skill;
-                computerSkillsList.appendChild(li);
-            });
-
-            // Populate Activities & Honors
-            const activitiesHonorsList = document.getElementById('activities-honors');
-            resumeData.activitiesHonors.forEach(item => {
-                const li = document.createElement('li');
-                li.innerText = item;
-                activitiesHonorsList.appendChild(li);
-            });
+            document.getElementById('objective').innerText = resumeData.goal;
+            document.getElementById('address').innerText = resumeData.location;
+            document.getElementById('education').innerHTML = `<li>${resumeData.education.school} - GPA: ${resumeData.education.gpa}</li>`;
         } else {
-            console.error('No resume data found');
+            alert('No resume data available');
         }
-    };
+    } catch (error) {
+        console.error('Error fetching resume data:', error);
+    }
+};
+    document.getElementById('resumeForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+  const formData = Object.fromEntries(new FormData(event.target).entries());
+  const response = await fetch('/submit-resume', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData),
+  });
+
+  const result = await response.json();
+
+  if (result.redirect) {
+    window.location.href = result.redirect;
+  } else {
+    alert(result.message || 'Error occurred');
+  }
+});
 </script>
 
 </body>

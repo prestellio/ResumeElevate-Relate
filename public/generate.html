@@ -276,46 +276,56 @@
     <script>
         const jobDescriptionsContainer = document.getElementById('job-descriptions');
         const addJobButton = document.getElementById('addJobButton');
-
+    
         // Add new job description field
         addJobButton.addEventListener('click', () => {
             const newJobDiv = document.createElement('div');
             newJobDiv.classList.add('job-description', 'mb-3');
-
+    
             newJobDiv.innerHTML = `
                 <textarea class="form-control" name="jobDescription" rows="3" placeholder="Describe your job" required></textarea>
                 <button type="button" class="remove-button btn btn-link text-danger">Remove</button>
             `;
-
+    
             jobDescriptionsContainer.appendChild(newJobDiv);
-
+    
             // Add event listener to remove button
             newJobDiv.querySelector('.remove-button').addEventListener('click', () => {
                 newJobDiv.remove();
             });
         });
+    
         // Handle form submission
         document.getElementById('resumeForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
+  event.preventDefault();
 
-            const phone = document.getElementById('phone').value;
-            const profession = document.getElementById('profess').value;
-            const school = document.getElementById('school').value;
-            const gpa = document.getElementById('gpa').value;
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData.entries());
 
-            const jobDescriptions = Array.from(document.querySelectorAll('textarea[name="jobDescription"]'))
-                .map(textarea => textarea.value);
+  // Fetch request to save data in the backend
+  try {
+    const response = await fetch('/submit-resume', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-            const response = await fetch('/submit-resume', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, profession, school, gpa, jobDescriptions })
-            });
+    const result = await response.json();
 
-            const result = await response.text();
-            document.getElementById('result').innerText = result;
-        });
+    if (result.redirect) {
+      // Redirect to the template page
+      window.location.href = result.redirect;
+    } else {
+      alert(result.message || 'Error occurred while submitting');
+    }
+  } catch (error) {
+    console.error('Error submitting data:', error);
+    alert('Failed to submit data');
+  }
+});
+
     </script>
+    
 </body>
 
 </html>

@@ -4,33 +4,30 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const Resume = require('./models/Resume'); // Import the Resume model
-const axios = require('axios');
-
-
 const app = express();
 const port = 3000;
-require('dotenv').config(); // Load environment variables from .env file
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+app.use(express.json());
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Reference the key securely
+
 // Middleware to serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 // Middleware to parse JSON data from requests
-app.use(express.json());
+
+const DB_URI = 'mongodb+srv://rojerojer24:Limosine1@cluster.mongodb.net/';
+
+mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => {
+        console.log('Connected to MongoDB');
+        process.exit(0);
+    })
+    .catch(err => {
+        console.error('Failed to connect to MongoDB', err);
+        process.exit(1);
+    });
 
 
-// Mongoose connection (replace with your MongoDB connection string)
-mongoose.connect('mongodb+srv://rojerojer24:HkKpUYxLCi7syrsL@relate.qorzo.mongodb.net/', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch(err => {
-  console.error('MongoDB connection error:', err);
-});
 
-
-require('dotenv').config(); // Load environment variables from .env file
-
-
+// Route to handle generating objective statement using OpenAI
 app.post('/generate-objective', async (req, res) => {
   const { phone, profession, jobDesc, school, gpa } = req.body;
 
@@ -108,27 +105,37 @@ app.post('/register', async (req, res) => {
 // Route to handle resume data submission (without authentication)
 app.post('/submit-resume', async (req, res) => {
   try {
-    const { phone, profession, firstJob, school, gpa } = req.body;
+    const { name, phone, goal, state, city, Professions, school, gpa } = req.body;
 
-
-    // Create a new Resume document with the form data
     const newResume = new Resume({
+      name,
       phone,
-      profession,
-      firstJob,
-      school,
-      gpa
+      goal,
+      location: `${city}, ${state}`,
+      profession: Professions,
+      education: { school, gpa },
     });
 
-
-    // Save the resume data to the database
     await newResume.save();
 
+    res.status(200).json({ message: 'Resume submitted', redirect: '/template-engineering' });
+  } catch (error) {
+    console.error('Error submitting resume:', error);
+    res.status(500).json({ error: 'Failed to save resume data' });
+  }
+});
 
-    res.status(200).send('Resume data saved successfully');
-  } catch (err) {
-    console.error('Error saving resume data:', err);
-    res.status(500).send('Error saving resume data');
+// Route to fetch and display resume in `template_engineering.html`
+app.get('/template-engineering', async (req, res) => {
+  try {
+    const resume = await Resume.findOne(); // Modify logic for user-specific data
+    if (!resume) {
+      return res.status(404).send('No resume data found');
+    }
+    res.sendFile(path.join(__dirname, 'public', 'template_engineering.html')); // Serve the file
+  } catch (error) {
+    console.error('Error fetching resume:', error);
+    res.status(500).send('Error fetching resume');
   }
 });
 
@@ -146,26 +153,19 @@ app.get('/get-resume', async (req, res) => {
 
 
 // Route to update the resume data
-app.post('/update-resume', async (req, res) => {
-  try {
-      const { content } = req.body;
+// app.post('/update-resume', async (req, res) => {
+//   try {
+//     const { content } = req.body;
 
+//     // Update resume content in MongoDB (modify for user-specific logic)
+//     await Resume.findOneAndUpdate({}, { content });
 
-      // Update resume content in MongoDB (modify for user-specific logic)
-      await Resume.findOneAndUpdate({}, { content });
-
-
-      res.status(200).send('Resume updated successfully');
-  } catch (err) {
-      console.error('Error updating resume:', err);
-      res.status(500).send('Error updating resume');
-  }
-});
-
-
-
-
-
+//     res.status(200).send('Resume updated successfully');
+//   } catch (err) {
+//     console.error('Error updating resume:', err);
+//     res.status(500).send('Error updating resume');
+//   }
+// });
 
 // Start the server
 app.listen(port, () => {
