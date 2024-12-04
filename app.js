@@ -13,16 +13,15 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Reference the key securely
 app.use(express.static(path.join(__dirname, 'public')));
 // Middleware to parse JSON data from requests
 
-const DB_URI = 'mongodb+srv://rojerojer24:Limosine1@cluster.mongodb.net/';
+const DB_URI = 'mongodb+srv://rojerojer24:Limosine1@relate.qorzo.mongodb.net/Relate?retryWrites=true&w=majority';
+
 
 mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB');
-        process.exit(0);
     })
     .catch(err => {
         console.error('Failed to connect to MongoDB', err);
-        process.exit(1);
     });
 
 
@@ -118,7 +117,8 @@ app.post('/submit-resume', async (req, res) => {
 
     await newResume.save();
 
-    res.status(200).json({ message: 'Resume submitted', redirect: '/template-engineering' });
+    // Redirect with a success response and the saved resume ID
+    res.status(200).json({ redirect: `/template-engineering?id=${newResume._id}` });
   } catch (error) {
     console.error('Error submitting resume:', error);
     res.status(500).json({ error: 'Failed to save resume data' });
@@ -126,28 +126,25 @@ app.post('/submit-resume', async (req, res) => {
 });
 
 // Route to fetch and display resume in `template_engineering.html`
-app.get('/template-engineering', async (req, res) => {
-  try {
-    const resume = await Resume.findOne(); // Modify logic for user-specific data
-    if (!resume) {
-      return res.status(404).send('No resume data found');
-    }
-    res.sendFile(path.join(__dirname, 'public', 'template_engineering.html')); // Serve the file
-  } catch (error) {
-    console.error('Error fetching resume:', error);
-    res.status(500).send('Error fetching resume');
-  }
+app.get('/template-engineering', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'template_engineering.html'));
 });
 
 
 // Route to get the resume data
 app.get('/get-resume', async (req, res) => {
   try {
-      const resume = await Resume.findOne(); // Use proper user logic in production
-      res.json(resume || {});
+    const { id } = req.query;
+    const resume = await Resume.findById(id);
+
+    if (!resume) {
+      return res.status(404).send('Resume not found');
+    }
+
+    res.json(resume);
   } catch (err) {
-      console.error('Error fetching resume:', err);
-      res.status(500).send('Error fetching resume');
+    console.error('Error fetching resume:', err);
+    res.status(500).send('Error fetching resume');
   }
 });
 

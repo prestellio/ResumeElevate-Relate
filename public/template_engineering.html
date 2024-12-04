@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grace Hopper - Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header .name {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .header .contact {
+            margin-top: 0.5rem;
+            color: #555;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Spectral', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+        }
+
+        .flex-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .list-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .experience-item, .project-item, .leadership-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .experience-title, .project-title, .leadership-title {
+            font-weight: 600;
+        }
+
+        .description {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-left: 1rem; /* Indent bullet points */
+        }
+
+        ul.bulleted {
+            list-style-type: disc;
+            margin: 0.5rem 0 1rem 1.5rem;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="name">Grace Hopper</div>
+            <div class="contact">gracehopper123@gmail.com • (919) 123-1234 • linkedin.com/in/grace-hopper-123 • github.com/gracehopper123</div>
+        </div>
+
+        <!-- Education Section -->
+        <div class="section" id="education">
+            <div class="section-title">Education</div>
+            <div class="list-item">
+                <div class="flex-header">
+                    <div>The University of North Carolina at Chapel Hill | Chapel Hill, NC</div>
+                    <div>May 2025</div>
+                </div>
+                <div>B.S. in Computer Science | GPA: 3.7/4.0</div>
+                <ul class="bulleted">
+                    <li>Relevant Courses: Computer Organization, Data Structures, Algorithms & Analysis</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Technical Skills Section -->
+        <div class="section" id="technical-skills">
+            <div class="section-title">Technical Skills</div>
+            <ul class="list">
+                <li class="list-item">Programming Languages: Java (Advanced), Python (Advanced), C (Intermediate), C# (Intermediate), C++ (Beginner)</li>
+                <li class="list-item">Operating Systems: Windows XP/Vista/7/8/10, Linux</li>
+            </ul>
+        </div>
+
+        <!-- Relevant Experience Section -->
+        <div class="section" id="relevant-experience">
+            <div class="section-title">Relevant Experience</div>
+            <div class="experience-item">
+                <div class="flex-header">
+                    <div>Teaching Assistant | UNC Department of Computer Science | Chapel Hill, NC</div>
+                    <div>Aug 2022 - Present</div>
+                </div>
+                <ul class="bulleted">
+                    <li>Mentor over 275 students, explaining challenging concepts.</li>
+                    <li>Coordinate office hours with other teaching assistants.</li>
+                </ul>
+            </div>
+            <div class="experience-item">
+                <div class="flex-header">
+                    <div>Software Test Engineer Intern | Qualtrics | Seattle, WA</div>
+                    <div>May 2023 - August 2023</div>
+                </div>
+                <ul class="bulleted">
+                    <li>Implemented Python scripts to automate tests.</li>
+                    <li>Improved testing stability and speed by 400% across teams.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Projects Section -->
+        <div class="section" id="projects">
+            <div class="section-title">Projects</div>
+            <div class="project-item">
+                <div class="flex-header">
+                    <div>RESTroom Yelp | Pearl Hacks Project</div>
+                    <div>Apr 2023</div>
+                </div>
+                <ul class="bulleted">
+                    <li>Collaborated with a team to develop a dynamic web application.</li>
+                    <li>Won multiple awards for innovation.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Leadership Section -->
+        <div class="section" id="leadership">
+            <div class="section-title">Leadership Experience</div>
+            <div class="leadership-item">
+                <div class="flex-header">
+                    <div>Director of Promotion | Pearl Hacks | UNC-Chapel Hill</div>
+                    <div>Apr 2023 - Present</div>
+                </div>
+                <ul class="bulleted">
+                    <li>Managed a marketing branch to increase event turnout.</li>
+                    <li>Boosted registrations globally.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
