@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const fs = require ('fs');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const Resume = require('./models/Resume'); // Import the Resume model
@@ -102,17 +103,62 @@ app.post('/register', async (req, res) => {
 
 
 // Route to handle resume data submission (without authentication)
+// Route to handle resume data submission
 app.post('/submit-resume', async (req, res) => {
   try {
-    const { name, phone, goal, state, city, Professions, school, gpa } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      university,
+      universityLocation,
+      degree,
+      gpa,
+      relevantCourse,
+      graduationDate,
+      programmingLanguages,
+      operatingSystems,
+      relevantExperiences,
+      projects,
+      leadershipExperiences,
+    } = req.body;
 
     const newResume = new Resume({
       name,
+      email,
       phone,
-      goal,
-      location: `${city}, ${state}`,
-      profession: Professions,
-      education: { school, gpa },
+      education: {
+        university,
+        location: universityLocation,
+        degree,
+        gpa,
+        relevantCourses: relevantCourse.split(',').map(course => course.trim()), // Convert to array
+        graduationDate,
+      },
+      technicalSkills: {
+        programmingLanguages: programmingLanguages.split(',').map(lang => lang.trim()), // Convert to array
+        operatingSystems: operatingSystems.split(',').map(os => os.trim()), // Convert to array
+      },
+      relevantExperiences: relevantExperiences.map(exp => ({
+        companyName: exp.companyName,
+        position: exp.position,
+        location: exp.location,
+        responsibilities: exp.responsibilities.split('\n').map(task => task.trim()), // Convert to array
+        startDate: exp.startDate,
+        endDate: exp.endDate,
+      })),
+      projects: projects.map(proj => ({
+        projectName: proj.projectName,
+        projectDescription: proj.projectDescription.split('\n').map(desc => desc.trim()), // Convert to array
+        startDate: proj.startDate,
+      })),
+      leadershipExperiences: leadershipExperiences.map(lead => ({
+        positionName: lead.positionName,
+        groupName: lead.groupName,
+        location: lead.location,
+        startDate: lead.startDate,
+        endDate: lead.endDate,
+      })),
     });
 
     await newResume.save();
@@ -125,9 +171,83 @@ app.post('/submit-resume', async (req, res) => {
   }
 });
 
+
 // Route to fetch and display resume in `template_engineering.html`
-app.get('/template-engineering', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'template_engineering.html'));
+app.get('/template-engineering', async (req, res) => {
+  try {
+      const { id } = req.query; // Get resume ID from query params
+      const resume = await Resume.findById(id);
+
+      if (!resume) {
+          return res.status(404).send('Resume not found');
+      }
+
+      // Read the HTML template file
+      const templatePath = path.join(__dirname, 'public', 'template_engineering.html');
+      let html = fs.readFileSync(templatePath, 'utf8');
+
+      // Replace placeholders with dynamic data
+      html = html
+          .replace('{{name}}', resume.name)
+          .replace('{{contact}}', `${resume.email} • ${resume.phone}`)
+          .replace('{{education}}', `
+              <div class="list-item">
+                  <div class="flex-header">
+                      <div>${resume.education.university} | ${resume.education.location}</div>
+                      <div>${resume.education.graduationDate}</div>
+                  </div>
+                  <div>${resume.education.degree} | GPA: ${resume.education.gpa}</div>
+                  <ul class="bulleted">
+                      <li>Relevant Courses: ${resume.education.relevantCourses.join(', ')}</li>
+                  </ul>
+              </div>
+          `)
+          .replace('{{technicalSkills}}', `
+              <ul class="list">
+                  <li class="list-item">Programming Languages: ${resume.technicalSkills.programmingLanguages.join(', ')}</li>
+                  <li class="list-item">Operating Systems: ${resume.technicalSkills.operatingSystems.join(', ')}</li>
+              </ul>
+          `)
+          .replace('{{relevantExperience}}', resume.relevantExperiences.map(exp => `
+              <div class="experience-item">
+                  <div class="flex-header">
+                      <div>${exp.position} | ${exp.companyName} | ${exp.location}</div>
+                      <div>${exp.startDate} - ${exp.endDate || 'Present'}</div>
+                  </div>
+                  <ul class="bulleted">
+                      ${exp.responsibilities.map(task => `<li>${task}</li>`).join('')}
+                  </ul>
+              </div>
+          `).join(''))
+          .replace('{{projects}}', resume.projects.map(proj => `
+              <div class="project-item">
+                  <div class="flex-header">
+                      <div>${proj.projectName}</div>
+                      <div>${proj.startDate}</div>
+                  </div>
+                  <ul class="bulleted">
+                      ${proj.projectDescription.map(desc => `<li>${desc}</li>`).join('')}
+                  </ul>
+              </div>
+          `).join(''))
+          .replace('{{leadership}}', resume.leadershipExperiences.map(lead => `
+              <div class="leadership-item">
+                  <div class="flex-header">
+                      <div>${lead.positionName} | ${lead.groupName} | ${lead.location}</div>
+                      <div>${lead.startDate} - ${lead.endDate || 'Present'}</div>
+                  </div>
+                  <ul class="bulleted">
+                      <li>${lead.description}</li>
+                  </ul>
+              </div>
+          `).join(''));
+
+      // Send the populated HTML to the client
+      res.send(html);
+  } catch (error) {
+      console.error('Error rendering resume template:', error);
+      res.status(500).send('Error rendering resume template');
+  }
 });
 
 
