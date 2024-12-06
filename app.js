@@ -1,290 +1,216 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
-const fs = require ('fs');
-const bcrypt = require('bcryptjs');
-const User = require('./models/User');
+const ejs = require('ejs'); // Template engine for dynamic HTML
 const Resume = require('./models/Resume'); // Import the Resume model
+
 const app = express();
 const port = 3000;
-app.use(express.json());
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Reference the key securely
 
-// Middleware to serve static files from 'public' directory
+// Middleware to serve static files and parse form data
 app.use(express.static(path.join(__dirname, 'public')));
-// Middleware to parse JSON data from requests
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const DB_URI = 'mongodb+srv://rojerojer24:Limosine1@relate.qorzo.mongodb.net/Relate?retryWrites=true&w=majority';
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-
+// MongoDB Connection
+const DB_URI = 'mongodb+srv://rojerojer24:Limosine1@relate.qorzo.mongodb.net';
 mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch(err => {
-        console.error('Failed to connect to MongoDB', err);
-    });
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('Failed to connect to MongoDB:', err));
 
-
-
-// Route to handle generating objective statement using OpenAI
-app.post('/generate-objective', async (req, res) => {
-  const { phone, profession, jobDesc, school, gpa } = req.body;
-
-
-  try {
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        messages: [
-          { role: 'system', content: 'You are a helpful resume assistant.' },
-          { role: 'user', content: `Create an objective statement based on the following user input:\nProfession: ${profession}\nJob Description: ${jobDesc}\nSchool Attended: ${school}\nGPA: ${gpa}\n` }
-        ],
-        max_tokens: 100, // Optional: Adjust if the response is too short
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-
-    res.json({ objective: response.data.choices[0].message.content.trim() });
-  } catch (error) {
-    console.error('Error generating objective statement:', error.response ? error.response.data : error.message);
-    res.status(500).json({ error: 'Failed to generate objective statement' });
-  }
-});
-
-
-
-
-
-
-
-
-// Route to serve the index.html file
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-
-// Route to handle user registration
-app.post('/register', async (req, res) => {
-  try {
-    const { username, password, email } = req.body;
-
-
-    // Check if the username already exists
-    const existingEmail = await User.findOne({ email });
-    if (existingEmail) {
-      return res.status(400).send('Email already exists');
-    }
-
-
-    // Hash the password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, password: hashedPassword, email });
-
-
-    // Save the user to the database
-    await newUser.save();
-
-
-    res.send('User registered successfully');
-  } catch (err) {
-    console.error('Error registering user:', err);
-    res.status(500).send('Error registering user');
-  }
-});
-
-
-// Route to handle resume data submission (without authentication)
-// Route to handle resume data submission
+// Route to handle resume form submission
 app.post('/submit-resume', async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      phone,
-      university,
-      universityLocation,
-      degree,
-      gpa,
-      relevantCourse,
-      graduationDate,
-      programmingLanguages,
-      operatingSystems,
-      relevantExperiences,
-      projects,
-      leadershipExperiences,
-    } = req.body;
+    try {
+        const {
+            name,
+            email,
+            phone,
+            university,
+            universityLocation,
+            degree,
+            gpa,
+            relevantCourse,
+            graduationDate,
+            programmingLanguages,
+            operatingSystems,
+            companyName = [],
+            position = [],
+            location = [],
+            responsibilities = [],
+            startDate = [],
+            endDate = [],
+            projectName = [],
+            projectDescription = [],
+            projectStartDate = [],
+            leadershipPosition = [],
+            groupName = [],
+            leadershipLocation = [],
+            leadershipStartDate = [],
+            leadershipEndDate = [],
+        } = req.body;
 
-    const newResume = new Resume({
-      name,
-      email,
-      phone,
-      education: {
-        university,
-        location: universityLocation,
-        degree,
-        gpa,
-        relevantCourses: relevantCourse.split(',').map(course => course.trim()), // Convert to array
-        graduationDate,
-      },
-      technicalSkills: {
-        programmingLanguages: programmingLanguages.split(',').map(lang => lang.trim()), // Convert to array
-        operatingSystems: operatingSystems.split(',').map(os => os.trim()), // Convert to array
-      },
-      relevantExperiences: relevantExperiences.map(exp => ({
-        companyName: exp.companyName,
-        position: exp.position,
-        location: exp.location,
-        responsibilities: exp.responsibilities.split('\n').map(task => task.trim()), // Convert to array
-        startDate: exp.startDate,
-        endDate: exp.endDate,
-      })),
-      projects: projects.map(proj => ({
-        projectName: proj.projectName,
-        projectDescription: proj.projectDescription.split('\n').map(desc => desc.trim()), // Convert to array
-        startDate: proj.startDate,
-      })),
-      leadershipExperiences: leadershipExperiences.map(lead => ({
-        positionName: lead.positionName,
-        groupName: lead.groupName,
-        location: lead.location,
-        startDate: lead.startDate,
-        endDate: lead.endDate,
-      })),
-    });
+        // Map experiences
+        const experiences = companyName.map((_, i) => ({
+            companyName: companyName[i],
+            position: position[i],
+            location: location[i],
+            responsibilities: responsibilities[i],
+            startDate: startDate[i],
+            endDate: endDate[i],
+        }));
 
-    await newResume.save();
+        // Map projects
+        const projects = projectName.map((_, i) => ({
+            projectName: projectName[i],
+            projectDescription: projectDescription[i],
+            projectStartDate: projectStartDate[i],
+        }));
 
-    // Redirect with a success response and the saved resume ID
-    res.status(200).json({ redirect: `/template-engineering?id=${newResume._id}` });
-  } catch (error) {
-    console.error('Error submitting resume:', error);
-    res.status(500).json({ error: 'Failed to save resume data' });
-  }
-});
+        // Map leadership
+        const leadership = leadershipPosition.map((_, i) => ({
+            leadershipPosition: leadershipPosition[i],
+            groupName: groupName[i],
+            location: leadershipLocation[i],
+            leadershipStartDate: leadershipStartDate[i],
+            leadershipEndDate: leadershipEndDate[i],
+        }));
 
+        // Save the resume to the database
+        const newResume = new Resume({
+            name,
+            email,
+            phone,
+            education: {
+                university,
+                location: universityLocation,
+                degree,
+                gpa,
+                relevantCourses: relevantCourse,
+                graduationDate,
+            },
+            technicalSkills: {
+                programmingLanguages,
+                operatingSystems,
+            },
+            experiences,
+            projects,
+            leadership,
+        });
 
-// Route to fetch and display resume in `template_engineering.html`
-app.get('/template-engineering', async (req, res) => {
-  try {
-      const { id } = req.query; // Get resume ID from query params
-      const resume = await Resume.findById(id);
+        const savedResume = await newResume.save();
 
-      if (!resume) {
-          return res.status(404).send('Resume not found');
-      }
-
-      // Read the HTML template file
-      const templatePath = path.join(__dirname, 'public', 'template_engineering.html');
-      let html = fs.readFileSync(templatePath, 'utf8');
-
-      // Replace placeholders with dynamic data
-      html = html
-          .replace('{{name}}', resume.name)
-          .replace('{{contact}}', `${resume.email} • ${resume.phone}`)
-          .replace('{{education}}', `
-              <div class="list-item">
-                  <div class="flex-header">
-                      <div>${resume.education.university} | ${resume.education.location}</div>
-                      <div>${resume.education.graduationDate}</div>
-                  </div>
-                  <div>${resume.education.degree} | GPA: ${resume.education.gpa}</div>
-                  <ul class="bulleted">
-                      <li>Relevant Courses: ${resume.education.relevantCourses.join(', ')}</li>
-                  </ul>
-              </div>
-          `)
-          .replace('{{technicalSkills}}', `
-              <ul class="list">
-                  <li class="list-item">Programming Languages: ${resume.technicalSkills.programmingLanguages.join(', ')}</li>
-                  <li class="list-item">Operating Systems: ${resume.technicalSkills.operatingSystems.join(', ')}</li>
-              </ul>
-          `)
-          .replace('{{relevantExperience}}', resume.relevantExperiences.map(exp => `
-              <div class="experience-item">
-                  <div class="flex-header">
-                      <div>${exp.position} | ${exp.companyName} | ${exp.location}</div>
-                      <div>${exp.startDate} - ${exp.endDate || 'Present'}</div>
-                  </div>
-                  <ul class="bulleted">
-                      ${exp.responsibilities.map(task => `<li>${task}</li>`).join('')}
-                  </ul>
-              </div>
-          `).join(''))
-          .replace('{{projects}}', resume.projects.map(proj => `
-              <div class="project-item">
-                  <div class="flex-header">
-                      <div>${proj.projectName}</div>
-                      <div>${proj.startDate}</div>
-                  </div>
-                  <ul class="bulleted">
-                      ${proj.projectDescription.map(desc => `<li>${desc}</li>`).join('')}
-                  </ul>
-              </div>
-          `).join(''))
-          .replace('{{leadership}}', resume.leadershipExperiences.map(lead => `
-              <div class="leadership-item">
-                  <div class="flex-header">
-                      <div>${lead.positionName} | ${lead.groupName} | ${lead.location}</div>
-                      <div>${lead.startDate} - ${lead.endDate || 'Present'}</div>
-                  </div>
-                  <ul class="bulleted">
-                      <li>${lead.description}</li>
-                  </ul>
-              </div>
-          `).join(''));
-
-      // Send the populated HTML to the client
-      res.send(html);
-  } catch (error) {
-      console.error('Error rendering resume template:', error);
-      res.status(500).send('Error rendering resume template');
-  }
-});
-
-
-// Route to get the resume data
-app.get('/get-resume', async (req, res) => {
-  try {
-    const { id } = req.query;
-    const resume = await Resume.findById(id);
-
-    if (!resume) {
-      return res.status(404).send('Resume not found');
+        // Redirect to the dynamic template page with the resume ID
+        res.redirect(`/resume/${savedResume._id}`);
+    } catch (error) {
+        console.error('Error submitting resume:', error);
+        res.status(500).json({ error: 'Failed to save resume data' });
     }
+});
 
-    res.json(resume);
-  } catch (err) {
-    console.error('Error fetching resume:', err);
-    res.status(500).send('Error fetching resume');
-  }
+// Route to dynamically render the resume template
+app.get('/resume/:id', async (req, res) => {
+    try {
+        const resume = await Resume.findById(req.params.id);
+        if (!resume) {
+            return res.status(404).send('Resume not found');
+        }
+
+        // Render the template with user data
+        res.render('template_engineering', { resume });
+    } catch (error) {
+        console.error('Error fetching resume:', error);
+        res.status(500).send('Error fetching resume');
+    }
 });
 
 
-// Route to update the resume data
-// app.post('/update-resume', async (req, res) => {
-//   try {
-//     const { content } = req.body;
 
-//     // Update resume content in MongoDB (modify for user-specific logic)
-//     await Resume.findOneAndUpdate({}, { content });
+// Test Route to Insert Sample Data
+app.get('/test-insert', async (req, res) => {
+    try {
+        const testData = {
+            name: "Test User",
+            email: "test@example.com",
+            phone: "1234567890",
+            education: {
+                university: "Test University",
+                location: "Test City, Test State",
+                degree: "Bachelor of Science",
+                gpa: "4.0",
+                relevantCourses: "Algorithms, Databases",
+                graduationDate: "2024-05",
+            },
+            technicalSkills: {
+                programmingLanguages: "JavaScript, Python",
+                operatingSystems: "Windows, Linux",
+            },
+            experiences: [
+                {
+                    companyName: "Example Company",
+                    position: "Software Developer",
+                    location: "City, State",
+                    responsibilities: "Developed software applications",
+                    startDate: "2022-01",
+                    endDate: "2023-12",
+                },
+                {
+                    companyName: "Another Company",
+                    position: "Intern",
+                    location: "Another City, State",
+                    responsibilities: "Assisted with development tasks",
+                    startDate: "2021-06",
+                    endDate: "2021-08",
+                },
+            ],
+            projects: [
+                {
+                    projectName: "Project Alpha",
+                    projectDescription: "Built a web app",
+                    projectStartDate: "2022-06",
+                },
+                {
+                    projectName: "Project Beta",
+                    projectDescription: "Developed a machine learning model",
+                    projectStartDate: "2023-01",
+                },
+            ],
+            leadership: [
+                {
+                    leadershipPosition: "President",
+                    groupName: "Coding Club",
+                    location: "University Campus",
+                    leadershipStartDate: "2021-08",
+                    leadershipEndDate: "2023-05",
+                },
+                {
+                    leadershipPosition: "Vice President",
+                    groupName: "AI Society",
+                    location: "University Campus",
+                    leadershipStartDate: "2020-08",
+                    leadershipEndDate: "2021-05",
+                },
+            ],
+        };
 
-//     res.status(200).send('Resume updated successfully');
-//   } catch (err) {
-//     console.error('Error updating resume:', err);
-//     res.status(500).send('Error updating resume');
-//   }
-// });
+        const newResume = new Resume(testData);
+        await newResume.save();
+        res.status(200).send("Test data with experiences, projects, and leadership roles inserted into resumes collection!");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error inserting test data.");
+    }
+});
+
+// Serve the home page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/index.html`);
+    console.log(`Server running at http://localhost:${port}/`);
 });
