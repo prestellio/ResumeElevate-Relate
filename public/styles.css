@@ -248,7 +248,8 @@ a:link {
     color: #326BD6;
 }
 a:visited {
-    color: #109C2C;
+    color: #326BD6;
+    /* old color #109C2C*/
 }
 
 a:hover {
