@@ -1,3 +1,4 @@
+/* Nav bar style */
 nav {
     background-color: #326BD6;
     background-image: url('../Wichita_McKinley.jpg');
@@ -14,6 +15,11 @@ nav {
     padding: 1rem;
 }
 
+.navbar-brand img {
+    height: 50px;
+}
+/*----- Nav bar style ----- */
+
 body {
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     background-color: #55b39e80;
@@ -21,6 +27,12 @@ body {
     padding: 0;
     height: 100%;
 }
+
+div .mb-3{
+    padding-left:2%;
+}
+
+/* Text Style */
 
 h1 {
     font-weight: 1000;
@@ -42,6 +54,23 @@ textarea {
     resize: none;
 }
 
+.text-section {
+    width: 45%;
+}
+
+.text-section h2 {
+    font-weight: 700;
+    color: #007bff;
+}
+
+.text-section p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* ------ Text Style ------ */
+
+/* Button Style */
 button, select {
     padding: 5px 10px;
     border: 1px solid #ddd;
@@ -54,9 +83,37 @@ button:hover, select:hover {
     background-color: #e0e0e0;
 }
 
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* ----- Button Style ----- */
+
+
+
+/* Form Styles */
 label {
     font-weight: 500;
 }
+
+.form-control {
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+}
+
+
+/* ---- Form Styles ----- */
+
+/* Container Styles */
 
 .editor-container {
     max-width: 800px;
@@ -75,6 +132,19 @@ label {
     border-radius: 0.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+.hero {
+    background-color: #343a40;
+    color: white;
+    padding: 50px 0;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+}
+
+/* --------- Container Styles -------- */
 
 #editor {
     min-height: 400px;
@@ -112,7 +182,68 @@ footer {
     font-size: smaller;
 }
 
+#result {
+    margin-top: 1.5rem;
+    font-weight: 600;
+    color: #28a745;
+}
 
+/* Image styles */
+.image-section {
+    width: 45%;
+}
+
+.image-section img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+}
+
+.icon {
+    font-size: 3rem;
+    color: #007bff;
+}
+
+/* -------- Image styles ------ */
+
+
+
+/* Content styles*/
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem 0;
+}
+
+.content-section {
+    padding: 40px 0;
+}
+.content-section h2 {
+    margin-bottom: 20px;
+}
+.content-section p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+/* ------ content style ------ */
+
+.feature {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.about{
+    background-image: url('../About_Us_Gradient_New.jpg');
+    background-size: 100vh;
+    background-position: center;
+    background-repeat: repeat;
+}
+
+
+/* Hyperlink style */
 a:link {
     color: #326BD6;
 }
@@ -128,3 +259,4 @@ a:active {
     color: #309c46;
 }
 
+/* ------ Hyperlink style ------ */
