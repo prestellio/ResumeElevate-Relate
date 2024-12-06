@@ -15,15 +15,15 @@ nav {
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #ececec;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color: #55b39e80;
     margin: 0;
     padding: 0;
     height: 100%;
 }
 
 h1 {
-    font-weight: 700;
+    font-weight: 1000;
     margin-bottom: 1.5rem;
     color: #326BD6;
 }
