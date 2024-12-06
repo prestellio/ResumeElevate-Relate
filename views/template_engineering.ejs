@@ -92,10 +92,8 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="name"><%= resume.name %></div>
-            <div class="contact">
-                Email: <%= resume.email %> | Phone: <%= resume.phone %>
-            </div>
+            <div class="name">Grace Hopper</div>
+            <div class="contact">gracehopper123@gmail.com • (919) 123-1234 • linkedin.com/in/grace-hopper-123 • github.com/gracehopper123</div>
         </div>
 
         <!-- Education Section -->
@@ -103,12 +101,12 @@
             <div class="section-title">Education</div>
             <div class="list-item">
                 <div class="flex-header">
-                    <div><strong><%= resume.education.university %></strong> | <%= resume.education.location %></div>
-                    <div><%= resume.education.graduationDate %></div>
+                    <div>The University of North Carolina at Chapel Hill | Chapel Hill, NC</div>
+                    <div>May 2025</div>
                 </div>
-                <div>Degree: <%= resume.education.degree %> | GPA: <%= resume.education.gpa %></div>
+                <div>B.S. in Computer Science | GPA: 3.7/4.0</div>
                 <ul class="bulleted">
-                    <li>Relevant Courses: <%= resume.education.relevantCourses %></li>
+                    <li>Relevant Courses: Computer Organization, Data Structures, Algorithms & Analysis</li>
                 </ul>
             </div>
         </div>
@@ -117,57 +115,64 @@
         <div class="section" id="technical-skills">
             <div class="section-title">Technical Skills</div>
             <ul class="list">
-                <li class="list-item">Programming Languages: <%= resume.technicalSkills.programmingLanguages %></li>
-                <li class="list-item">Operating Systems: <%= resume.technicalSkills.operatingSystems %></li>
+                <li class="list-item">Programming Languages: Java (Advanced), Python (Advanced), C (Intermediate), C# (Intermediate), C++ (Beginner)</li>
+                <li class="list-item">Operating Systems: Windows XP/Vista/7/8/10, Linux</li>
             </ul>
         </div>
 
         <!-- Relevant Experience Section -->
         <div class="section" id="relevant-experience">
             <div class="section-title">Relevant Experience</div>
-            <% resume.experiences.forEach(exp => { %>
-                <div class="experience-item">
-                    <div class="flex-header">
-                        <div><%= exp.position %> | <%= exp.companyName %> | <%= exp.location %></div>
-                        <div><%= exp.startDate %> - <%= exp.endDate || 'Present' %></div>
-                    </div>
-                    <ul class="bulleted">
-                        <li>Responsibilities: <%= exp.responsibilities %></li>
-                    </ul>
+            <div class="experience-item">
+                <div class="flex-header">
+                    <div>Teaching Assistant | UNC Department of Computer Science | Chapel Hill, NC</div>
+                    <div>Aug 2022 - Present</div>
                 </div>
-            <% }) %>
+                <ul class="bulleted">
+                    <li>Mentor over 275 students, explaining challenging concepts.</li>
+                    <li>Coordinate office hours with other teaching assistants.</li>
+                </ul>
+            </div>
+            <div class="experience-item">
+                <div class="flex-header">
+                    <div>Software Test Engineer Intern | Qualtrics | Seattle, WA</div>
+                    <div>May 2023 - August 2023</div>
+                </div>
+                <ul class="bulleted">
+                    <li>Implemented Python scripts to automate tests.</li>
+                    <li>Improved testing stability and speed by 400% across teams.</li>
+                </ul>
+            </div>
         </div>
 
         <!-- Projects Section -->
         <div class="section" id="projects">
             <div class="section-title">Projects</div>
-            <% resume.projects.forEach(proj => { %>
-                <div class="project-item">
-                    <div class="flex-header">
-                        <div><%= proj.projectName %></div>
-                        <div><%= proj.projectStartDate %></div>
-                    </div>
-                    <ul class="bulleted">
-                        <li>Description: <%= proj.projectDescription %></li>
-                    </ul>
+            <div class="project-item">
+                <div class="flex-header">
+                    <div>RESTroom Yelp | Pearl Hacks Project</div>
+                    <div>Apr 2023</div>
                 </div>
-            <% }) %>
+                <ul class="bulleted">
+                    <li>Collaborated with a team to develop a dynamic web application.</li>
+                    <li>Won multiple awards for innovation.</li>
+                </ul>
+            </div>
         </div>
 
         <!-- Leadership Section -->
         <div class="section" id="leadership">
             <div class="section-title">Leadership Experience</div>
-            <% resume.leadership.forEach(lead => { %>
-                <div class="leadership-item">
-                    <div class="flex-header">
-                        <div><%= lead.leadershipPosition %> | <%= lead.groupName %></div>
-                        <div><%= lead.leadershipStartDate %> - <%= lead.leadershipEndDate || 'Present' %></div>
-                    </div>
-                    <ul class="bulleted">
-                        <li>Location: <%= lead.location %></li>
-                    </ul>
+            <div class="leadership-item">
+                <div class="flex-header">
+                    <div>Director of Promotion | Pearl Hacks | UNC-Chapel Hill</div>
+                    <div>Apr 2023 - Present</div>
                 </div>
-            <% }) %>
+                <ul class="bulleted">
+                    <li>Managed a marketing branch to increase event turnout.</li>
+                    <li>Boosted registrations globally.</li>
+                </ul>
+            </div>
         </div>
     </div>
 </body>

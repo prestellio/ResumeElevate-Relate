@@ -84,7 +84,7 @@
             </div>
             <div class="mb-3">
                 <label for="graduation-date" class="form-label">Date of Graduation or Expected Date</label>
-                <input type="month" class="form-control" id="graduation-date" name="graduationDate" required>
+                <input type="text" class="form-control" id="graduation-date" name="graduationDate" placeholder="e.g., Aug 2022" required>
             </div>
         
             <!-- Technical Skills -->
@@ -111,9 +111,9 @@
                     <label for="responsibilities" class="form-label">Brief Description of Responsibilities</label>
                     <textarea class="form-control" name="responsibilities[]" rows="3" required></textarea>
                     <label for="start-date" class="form-label">Start Date</label>
-                    <input type="month" class="form-control" name="startDate[]" required>
+                    <input type="text" class="form-control" name="startDate[]" placeholder="e.g., Aug 2022" required>
                     <label for="end-date" class="form-label">End Date</label>
-                    <input type="month" class="form-control" name="endDate[]">
+                    <input type="text" class="form-control" name="endDate[]" placeholder="e.g., Dec 2023">                    
                 </div>
             </div>
             <button type="button" class="btn btn-secondary mb-3" id="add-experience">Add Experience</button>
@@ -127,7 +127,7 @@
                     <label for="project-description" class="form-label">Project Description</label>
                     <textarea class="form-control" name="projectDescription[]" rows="2" required></textarea>
                     <label for="project-start-date" class="form-label">Start Date</label>
-                    <input type="month" class="form-control" name="projectStartDate[]" required>
+                    <input type="text" class="form-control" name="projectStartDate[]" placeholder="e.g., Aug 2022" required>                    
                 </div>
             </div>
             <button type="button" class="btn btn-secondary mb-3" id="add-project">Add Project</button>
@@ -143,9 +143,10 @@
                     <label for="leadership-location" class="form-label">Location (City, State)</label>
                     <input type="text" class="form-control" name="leadershipLocation[]" required>
                     <label for="leadership-start-date" class="form-label">Start Date</label>
-                    <input type="month" class="form-control" name="leadershipStartDate[]" required>
+                    <input type="text" class="form-control" name="leadershipStartDate[]" placeholder="e.g., Aug 2022" required>
                     <label for="leadership-end-date" class="form-label">End Date</label>
-                    <input type="month" class="form-control" name="leadershipEndDate[]">
+                    <input type="text" class="form-control" name="leadershipEndDate[]" placeholder="e.g., Present">
+                    
                 </div>
             </div>
             <button type="button" class="btn btn-secondary mb-3" id="add-leadership">Add Leadership Role</button>
@@ -227,6 +228,22 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleRemoveButtons(document.getElementById('leadership-container'), 'leadership');
 });
 </script>
+<script>
+    document.getElementById('resumeForm').addEventListener('submit', function (e) {
+        const dateInputs = document.querySelectorAll('input[placeholder*="e.g.,"]');
+        const datePattern = /^[A-Za-z]{3} \d{4}$/; // Pattern for "Aug 2022"
+
+        for (const input of dateInputs) {
+            if (input.value && !datePattern.test(input.value)) {
+                e.preventDefault();
+                alert(`Please enter a valid date in the format "MMM YYYY" (e.g., Aug 2022) for "${input.name}".`);
+                input.focus();
+                return;
+            }
+        }
+    });
+</script>
+
 </body>
 
     

@@ -205,6 +205,55 @@ app.get('/test-insert', async (req, res) => {
     }
 });
 
+
+function formatDate(dateString) {
+    if (!dateString) return 'Present'; // Handle null or empty values
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const [year, month] = dateString.split('-');
+    return `${months[parseInt(month, 10) - 1]} ${year}`;
+}
+
+// Middleware or Controller to format dates in resume
+app.get('/resume/:id', async (req, res) => {
+    try {
+        const resume = await Resume.findById(req.params.id);
+
+        if (!resume) {
+            return res.status(404).send('Resume not found');
+        }
+
+        // Format dates
+        resume.education.graduationDate = formatDate(resume.education.graduationDate);
+
+        resume.experiences = resume.experiences.map(exp => ({
+            ...exp,
+            startDate: formatDate(exp.startDate),
+            endDate: formatDate(exp.endDate),
+        }));
+
+        resume.projects = resume.projects.map(proj => ({
+            ...proj,
+            projectStartDate: formatDate(proj.projectStartDate),
+        }));
+
+        resume.leadership = resume.leadership.map(lead => ({
+            ...lead,
+            leadershipStartDate: formatDate(lead.leadershipStartDate),
+            leadershipEndDate: formatDate(lead.leadershipEndDate),
+        }));
+
+        // Render the template
+        res.render('template_engineering', { resume });
+    } catch (error) {
+        console.error('Error fetching resume:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 // Serve the home page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
