@@ -68,7 +68,8 @@ label {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 90%;
+    min-width: 80%;
     background-color: #fff;
     padding: 2rem;
     border-radius: 0.5rem;
