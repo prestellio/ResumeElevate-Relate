@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User's Resume</title>
+    <title>Edit Your Resume</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Quill CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
     <style>
-        nav {
-            background-color: #326BD6;
-        }
         body {
             font-family: 'Arial', sans-serif;
             background-color: #728fb4;
@@ -20,14 +20,14 @@
             max-width: 800px;
             margin: 0 auto;
             background-color: #fff;
-            padding: 30px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .header h1 {
@@ -40,78 +40,73 @@
             color: #555;
         }
 
-        .section-title {
-            font-weight: 700;
-            margin-top: 20px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
+        #toolbar-container {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
         }
 
-        .info {
-            margin-bottom: 10px;
+        #editor-container {
+            height: 500px;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
         }
 
-        .info h6 {
-            margin: 0;
-            font-weight: 500;
-        }
-
-        .info p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #555;
-        }
         .toolbar {
             width: 100%;
-            height: 10%;
-            background-color: #f8f8f8;
+            text-align: center;
+            margin-top: 10px;
         }
 
+        #saveResume, #downloadPDF {
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Quill Toolbar -->
+    <div id="toolbar-container"></div>
+
     <div class="resume-container">
         <!-- Header Section -->
         <div class="header">
-            <h1 id="name">Full Name</h1>
-            <p id="email">Email: user@example.com | Phone: <span id="phone"></span></p>
+            <h1 contenteditable="true" id="name">Full Name</h1>
+            <p contenteditable="true" id="email">Email: user@example.com | Phone: <span id="phone">123-456-7890</span></p>
         </div>
 
-        <!-- Profession Section -->
-        <div class="section-title">Professional Summary</div>
-        <p id="profession">A brief summary of the user's professional experience and aspirations.</p>
-
-        <!-- Work Experience Section -->
-        <div class="section-title">Work Experience</div>
-        <div class="info">
-            <h6 id="firstJobTitle">First Job Title</h6>
-            <p id="firstJobDescription">Description of the user's first job and achievements.</p>
-        </div>
-
-        <!-- Education Section -->
-        <div class="section-title">Education</div>
-        <div class="info">
-            <h6 id="school">School Name</h6>
-            <p id="gpa">GPA: </p>
-        </div>
+        <!-- Quill Editor for the entire resume -->
+        <div id="editor-container"></div>
     </div>
+
+    <!-- Buttons -->
     <div class="toolbar">
-        <p></p>
-    
+        <button id="saveResume" class="btn btn-primary">Save Resume</button>
+        <button id="downloadPDF" class="btn btn-success">Download PDF</button>
     </div>
-    <table>
-        <row>
-            <col></col>
-            <col style="width:160px;"><textarea></textarea></col>
-            <col></col>
-        </row>
-    </table>
 
-    
+    <!-- Quill JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
     <script>
-        // Fetch resume data and populate the resume template
+        // Initialize Quill editor with a shared toolbar
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Write your resume content here...',
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Fetch resume data from the server (assuming it's stored as JSON)
         async function loadResumeData() {
             try {
                 const response = await fetch('/get-resume');
@@ -119,13 +114,11 @@
 
                 if (data) {
                     document.getElementById('name').innerText = data.name || 'Full Name';
-                    document.getElementById('email').innerText = 'Email: ' + data.email || 'Email: user@example.com';
+                    document.getElementById('email').innerText = 'Email: ' + (data.email || 'user@example.com');
                     document.getElementById('phone').innerText = data.phone || 'N/A';
-                    document.getElementById('profession').innerText = data.profession || 'Professional summary not available.';
-                    document.getElementById('firstJobTitle').innerText = data.firstJobTitle || 'First Job Title';
-                    document.getElementById('firstJobDescription').innerText = data.firstJob || 'Job description not available.';
-                    document.getElementById('school').innerText = data.school || 'School name not available.';
-                    document.getElementById('gpa').innerText = 'GPA: ' + (data.gpa || 'N/A');
+
+                    // Load Quill content
+                    quill.root.innerHTML = data.resumeContent || 'Start writing your resume here...';
                 }
             } catch (error) {
                 console.error('Error fetching resume data:', error);
@@ -133,6 +126,52 @@
         }
 
         document.addEventListener('DOMContentLoaded', loadResumeData);
+
+        // Save Updated Resume Data
+        document.getElementById('saveResume').addEventListener('click', async () => {
+            const updatedData = {
+                name: document.getElementById('name').innerText,
+                email: document.getElementById('email').innerText.replace('Email: ', ''),
+                phone: document.getElementById('phone').innerText,
+                resumeContent: quill.root.innerHTML
+            };
+
+            try {
+                const response = await fetch('/save-resume', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (response.ok) {
+                    alert('Resume saved successfully!');
+                } else {
+                    alert('Failed to save resume.');
+                }
+            } catch (error) {
+                console.error('Error saving resume:', error);
+            }
+        });
+
+        // Download PDF Functionality
+        document.getElementById('downloadPDF').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/generate-pdf', { method: 'POST' });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'resume.pdf';
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                } else {
+                    alert('Failed to generate PDF.');
+                }
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+            }
+        });
     </script>
 
 </body>
