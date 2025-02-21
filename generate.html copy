@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Resume</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <img src="../Resume_Elevate_Logo.png" style="width:30%; min-width: 150px;" alt="Resume Elevate">      
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="background-color:white;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="generate.html">Generate Resume</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Login.html">Login page</a> <!-- Add active or not, decide later-->
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="editor.html">Edit Resume</a>
+                    </li>                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+  
+    <div class="container mt-5">
+        <h1 class="text-center">Generate Your Resume</h1>
+        <form id="resumeForm" action="http://localhost:3000/submit-resume" method="POST">
+            <!-- Full Name -->
+            <div class="mb-3" >
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+        
+            <!-- Email -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+        
+            <!-- Phone Number -->
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone" name="phone" required>
+            </div>
+        
+            <!-- Education -->
+            <h4>Education</h4>
+            <div class="mb-3">
+                <label for="university" class="form-label">University Name</label>
+                <input type="text" class="form-control" id="university" name="university" required>
+            </div>
+            <div class="mb-3">
+                <label for="university-location" class="form-label">University Location (City, State)</label>
+                <input type="text" class="form-control" id="university-location" name="universityLocation" required>
+            </div>
+            <div class="mb-3">
+                <label for="degree" class="form-label">Degree Type and Major</label>
+                <input type="text" class="form-control" id="degree" name="degree" required>
+            </div>
+            <div class="mb-3">
+                <label for="gpa" class="form-label">GPA</label>
+                <input type="text" class="form-control" id="gpa" name="gpa" required>
+            </div>
+            <div class="mb-3">
+                <label for="relevant-course" class="form-label">Relevant Courses</label>
+                <textarea class="form-control" id="relevant-course" name="relevantCourse" rows="3" placeholder="List relevant courses separated by commas" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="graduation-date" class="form-label">Date of Graduation or Expected Date</label>
+                <input type="text" class="form-control" id="graduation-date" name="graduationDate" placeholder="e.g., Aug 2022" required>
+            </div>
+        
+            <!-- Technical Skills -->
+            <h4>Technical Skills</h4>
+            <div class="mb-3">
+                <label for="programming-languages" class="form-label">Programming Languages</label>
+                <input type="text" class="form-control" id="programming-languages" name="programmingLanguages" placeholder="List programming languages separated by commas" required>
+            </div>
+            <div class="mb-3">
+                <label for="operating-systems" class="form-label">Operating Systems</label>
+                <input type="text" class="form-control" id="operating-systems" name="operatingSystems" placeholder="List operating systems separated by commas" required>
+            </div>
+        
+            <!-- Relevant Experiences -->
+            <h4>Relevant Experiences</h4>
+            <div id="experience-container">
+                <div class="experience mb-3">
+                    <label for="company-name" class="form-label">Company Name</label>
+                    <input type="text" class="form-control" name="companyName[]" required>
+                    <label for="position" class="form-label">Position</label>
+                    <input type="text" class="form-control" name="position[]" required>
+                    <label for="location" class="form-label">Location (City, State)</label>
+                    <input type="text" class="form-control" name="location[]" required>
+                    <label for="responsibilities" class="form-label">Brief Description of Responsibilities</label>
+                    <textarea class="form-control" name="responsibilities[]" rows="3" required></textarea>
+                    <label for="start-date" class="form-label">Start Date</label>
+                    <input type="text" class="form-control" name="startDate[]" placeholder="e.g., Aug 2022" required>
+                    <label for="end-date" class="form-label">End Date</label>
+                    <input type="text" class="form-control" name="endDate[]" placeholder="e.g., Dec 2023">                    
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mb-3" id="add-experience">Add Experience</button>
+        
+            <!-- Projects -->
+            <h4>Projects</h4>
+            <div id="projects-container">
+                <div class="project mb-3">
+                    <label for="project-name" class="form-label">Project Name</label>
+                    <input type="text" class="form-control" name="projectName[]" required>
+                    <label for="project-description" class="form-label">Project Description</label>
+                    <textarea class="form-control" name="projectDescription[]" rows="2" required></textarea>
+                    <label for="project-start-date" class="form-label">Start Date</label>
+                    <input type="text" class="form-control" name="projectStartDate[]" placeholder="e.g., Aug 2022" required>                    
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mb-3" id="add-project">Add Project</button>
+        
+            <!-- Leadership Experience -->
+            <h4>Leadership Experience</h4>
+            <div id="leadership-container">
+                <div class="leadership mb-3">
+                    <label for="leadership-position" class="form-label">Position Name</label>
+                    <input type="text" class="form-control" name="leadershipPosition[]" required>
+                    <label for="group-name" class="form-label">Group Name</label>
+                    <input type="text" class="form-control" name="groupName[]" required>
+                    <label for="leadership-location" class="form-label">Location (City, State)</label>
+                    <input type="text" class="form-control" name="leadershipLocation[]" required>
+                    <label for="leadership-start-date" class="form-label">Start Date</label>
+                    <input type="text" class="form-control" name="leadershipStartDate[]" placeholder="e.g., Aug 2022" required>
+                    <label for="leadership-end-date" class="form-label">End Date</label>
+                    <input type="text" class="form-control" name="leadershipEndDate[]" placeholder="e.g., Present">
+                    
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mb-3" id="add-leadership">Add Leadership Role</button>
+        
+            <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <div class = "padding"><div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer Section -->
+<footer>
+    <p class="copyright">&copy; 2024 Resume Elevate. All Rights Reserved.</p>
+    <ul>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+        <li><a href="generate.html">Generator</a></li>
+    </ul>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Function to toggle the Remove button visibility
+    function toggleRemoveButtons(container, buttonClass) {
+        const entries = container.querySelectorAll(`.${buttonClass}`);
+        entries.forEach(entry => {
+            const removeButton = entry.querySelector('.remove-button');
+            if (entries.length > 1) {
+                if (!removeButton) {
+                    const newRemoveButton = document.createElement('button');
+                    newRemoveButton.type = 'button';
+                    newRemoveButton.classList.add('btn', 'btn-danger', 'remove-button', 'mt-2');
+                    newRemoveButton.textContent = 'Remove';
+                    newRemoveButton.addEventListener('click', () => {
+                        entry.remove();
+                        toggleRemoveButtons(container, buttonClass);
+                    });
+                    entry.appendChild(newRemoveButton);
+                }
+            } else if (removeButton) {
+                removeButton.remove();
+            }
+        });
+    }
+
+    // Add experience
+    document.getElementById('add-experience').addEventListener('click', () => {
+        const container = document.getElementById('experience-container');
+        const newExperience = container.querySelector('.experience').cloneNode(true);
+        newExperience.querySelectorAll('input, textarea').forEach(input => input.value = '');
+        container.appendChild(newExperience);
+        toggleRemoveButtons(container, 'experience');
+    });
+
+    // Add project
+    document.getElementById('add-project').addEventListener('click', () => {
+        const container = document.getElementById('projects-container');
+        const newProject = container.querySelector('.project').cloneNode(true);
+        newProject.querySelectorAll('input, textarea').forEach(input => input.value = '');
+        container.appendChild(newProject);
+        toggleRemoveButtons(container, 'project');
+    });
+
+    // Add leadership
+    document.getElementById('add-leadership').addEventListener('click', () => {
+        const container = document.getElementById('leadership-container');
+        const newLeadership = container.querySelector('.leadership').cloneNode(true);
+        newLeadership.querySelectorAll('input, textarea').forEach(input => input.value = '');
+        container.appendChild(newLeadership);
+        toggleRemoveButtons(container, 'leadership');
+    });
+
+    // Initial check to ensure Remove button is not visible for a single entry
+    toggleRemoveButtons(document.getElementById('experience-container'), 'experience');
+    toggleRemoveButtons(document.getElementById('projects-container'), 'project');
+    toggleRemoveButtons(document.getElementById('leadership-container'), 'leadership');
+});
+</script>
+<script>
+    document.getElementById('resumeForm').addEventListener('submit', function (e) {
+        const dateInputs = document.querySelectorAll('input[placeholder*="e.g.,"]');
+        const datePattern = /^[A-Za-z]{3} \d{4}$/; // Pattern for "Aug 2022"
+
+        for (const input of dateInputs) {
+            if (input.value && !datePattern.test(input.value)) {
+                e.preventDefault();
+                alert(`Please enter a valid date in the format "MMM YYYY" (e.g., Aug 2022) for "${input.name}".`);
+                input.focus();
+                return;
+            }
+        }
+    });
+</script>
+
+</body>
+
+    
+</body>
