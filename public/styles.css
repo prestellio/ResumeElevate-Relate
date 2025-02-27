@@ -11,6 +11,11 @@
     background-image: url("../AboutPageGradient.jpg");
 }
 
+.active {
+    background-color: #555;
+    border-radius: 3px;
+}
+
 body {
     background-color: #3bceac;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -26,17 +31,52 @@ button {
     font-size: 1.5rem;
 }
 
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.left, .center, .right {
+    width: 25%;
+    border: solid 3px #540d6e;
+    border-radius: 10px;
+    background-color: #9ba2ff;
+}
+
+.template-left {
+    width: 40%;
+    background-color: #444;
+    box-shadow: 0px 10px 10px black;
+}
+
+.template-left ul {
+    display: inline-block;
+}
+
+.template-left li {
+    width: 20%;
+}
+
+.template-right {
+    width: 60%;
+    background-color: #9ba2ff;
+    align-items: center;
+    
+    z-index: -1;
+}
+
+
 div {
-    /* background-color: white; */
     color:#225bb2;
     border-radius: 3px;
+    padding: 0 20px;
 }
 
 div h1 {
     color: black;
     font-weight: 900;
     text-shadow: 4px 2px 0px #3bceac;
-    margin: 75px;
+    
 }
 
 div h2 {
@@ -52,11 +92,11 @@ div h2 {
     background-size: 70%;
 }
 
-.div-float-left {
+.float-left {
     float: left;
 }
 
-.div-float-right {
+.float-right {
     float: right;
 }
 
@@ -69,11 +109,10 @@ div .div-clear {
     background-image: url("../HexGrid.png");
     background-repeat: repeat;
     background-size: 10%;
+    border-top: solid 30px #333;
+    border-bottom: solid 30px #333;
     color: white;
-    padding-left: 30%;
-    padding-right: 30%;
-    padding-top: 40px;
-    padding-bottom: 40px;
+    padding: 20px 30%;
 }
 
 .div-alt-1 h2 {
@@ -90,7 +129,7 @@ div .div-clear {
 .div-alt-1 section {
     padding: 20px;
     background-color: #9ba2ff;
-    border: 10px solid white;
+    border: solid 10px white;
     border-radius: 10px;
     box-shadow: inset 0px 0px 10px black;
 }
@@ -98,13 +137,11 @@ div .div-clear {
 .div-alt-2 {
     box-shadow: inset 0px 10px 15px black, inset 0px -10px 15px black;
     padding: 60px 0px;
-    text-align: right;
 }
 
 .div-alt-2 h1 {
     font-size: 3.5rem;
     font-weight: 1000;
-    margin-bottom: 1.5rem;
     color: #225bb2;
     text-shadow: 2px 1px 0px white;
     text-align: center;
@@ -114,46 +151,96 @@ div .div-clear {
     background-color: white;
     box-shadow: 10px 0px 30px darkgray;
     text-align: left;
-    float: left;
-}
-
-.div-alt-3 p {
-    text-align: left;
-    float: left;
+    padding: 20px 40px;
 }
 
 .div-alt-3 img {
     box-shadow: 5px 5px 5px black;
-    float: right;
+    width: 200px;
 }
 
-.div-alt-3 h2 {
-    text-align: right;
-    float: right;
+.div-alt-4 {
+    background-color: #540d6e;
+    color: #9ba2ff;
+    text-shadow: none;
 }
 
-.div-alt-3r {
+.div-alt-4 div {
     background-color: white;
-    box-shadow: 10px 0px 30px darkgray;
-    text-align: left;
-    float: left;
+    border-radius: 10px;
+    padding: 30px;
+    color: #225bb2;
 }
 
-.div-alt-3r p {
-    text-align: left;
-    float: left;
+.div-questions {
+    background-color: white;
+    color: black;
+    padding: 50px 20%;
 }
 
-.div-alt-3r img {
-    box-shadow: 5px 5px 5px black;
-    float: right;
+.div-questions div {
+    padding: 20px;
+    border: solid 10px lightgray;
+    border-radius: 30px;
+    min-height: 500px;
+    box-shadow:  -5px -5px 20px black;
 }
 
-.div-alt-3r h2 {
-    text-align: right;
-    float: right;
+
+
+/* START IDs for div-questions and questions.html */
+
+/* #art-questions {
+    display: none;
 }
 
+#business-questions {
+    display: none;
+}
+
+#education-questions {
+    display: none;
+}
+
+#emergency-questions {
+    display: none;
+}
+
+#engineering-questions {
+    display: none;
+}
+
+#science-quetions {
+    display: none;
+} */
+
+input[id^="art"] {
+    display: none;
+}
+
+input[id^="bus"] {
+    display: none;
+}
+
+input[id^="ed"] {
+    display: none;
+}
+
+input[id^="en"] {
+    display: none;
+}
+
+input[id^="es"] {
+    display: none;
+}
+
+input[id^="sci"] {
+    display: none;
+}
+
+
+
+/* END IDs for questions.hmtl */
 
 footer {
     background-color: #540d6e;
@@ -181,7 +268,6 @@ header {
     background-position-y: center;
     background-repeat: no-repeat;
     box-shadow: 10px 5px 15px black;
-    margin-bottom: 50px;
 }
 
 header img {
@@ -189,30 +275,59 @@ header img {
     border-bottom-left-radius: 10px;
 }
 
+.header-template-selection {
+    background-image: none;
+    height: 5vh;
+    width: 100vw;
+}
+
+.header-template-selection img {
+    max-height: 5vh;
+    border-bottom-left-radius: 10px;
+}
+
 .index-polygon {
-    min-height: 1000px;
+    min-height: 600px;
     clip-path: polygon(0 0, 50% 0, 80% 100%, 0% 100%);
     background-color: white;
-    padding-left: 5%;
+    padding: 20px 50% 20px 5%;
     box-shadow: 5px 5px 10px black;
-    width: 100%;
+    margin: none;
 }
 
 .index-polygon h1{
-    margin: 0px 0px;
     padding: 20px 0px;
 }
 
 .index-polygon p{
     float: left;
-    height: 300px;
-    margin-right: 50%;
-    margin-left: 10px;
+    line-height: 1.5em;
 }
 
 .index-polygon img {
     z-index: 2;
     float: right
+}
+
+.inner-div-1 {
+    background-color: #3bceac;
+    color: white;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+main {
+    margin: 30px 0 0 0;
+}
+
+.main-questions {
+    background-color: white;
+}
+
+.main-template-selection {
+    height: 95vh;
+    width: 100vw;
+    margin: none;
 }
 
 .navbar {
@@ -263,8 +378,14 @@ header img {
     }
 }
 
+::selection {background-color: #540d6e; color:white;}
+
 .span-white {
     background-color: white;
+}
+
+section {
+    padding: 20px;
 }
 
 .text-outline {
@@ -275,3 +396,6 @@ header img {
         0px -1px 0px white;
 }
 
+ul {
+    display: block;
+}

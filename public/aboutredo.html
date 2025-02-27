@@ -23,9 +23,9 @@
         <nav class="navbar">
             <button class="navbar-toggle" id="navbarToggle">&#9776;</button>
             <div class="navbar-menu" id="navbarMenu">
-                <a class="nav-link active" href="index.html">Home</a>
+                <a class="nav-link" href="index.html">Home</a>
                 <a class="nav-link" href="generate.html">Generate Resume</a>
-                <a class="nav-link" href="about.html">About</a>
+                <a class="nav-link active" href="about.html">About</a>
                 <a class="nav-link" href="Login.html">Login page</a> <!-- Add active or not, decide later-->
                 <a class="nav-link" href="editor.html">Edit Resume</a>
             </div>
@@ -36,67 +36,86 @@
         <div class="div-alt-2">
             <h1>About Resume Elevate</h1>
         </div>
-        <div class="div-alt-3">
-            <p>Learn more about how we're building a smarter way to manage and generate resumes.</p>
-            <p>The first step is to check out our Resume Generator. There you will asked a number of questions 
-                that will be improved and used to build your resume. Relate wants to make sure that the resume 
-                is tailored to your profession and that this resume acts as an extention of your interview.</p>
-        </div>
-        <div>
-            <span class="span-white">
-                <h2>Template Selection</h2>
-                <p>The next step is to select the template that looks the best to you. Relate plans to have a 
-                    variety of templates for each profession that will make your resume style a little more 
-                    unique. After you pick your favorite, we'll load you up to our Editor for the chance to 
-                    further develop your resume.</p>
+        <!-- Learn About us -->
+        <section>
+            <div class="div-alt-3">
+                <p>
+                    <img class ="float-right" src="../RelateLogo.png" alt="test">
+                    Learn more about how we're building a smarter way to manage and generate resumes.</p>
+                <p>
+                    The first step is to check out our Resume Generator. There you will asked a number of questions 
+                    that will be improved and used to build your resume. Relate wants to make sure that the resume 
+                    is tailored to your profession and that this resume acts as an extention of your interview.
+                </p>
+            </div>
+        </section>
+        <!-- Template Selection -->
+        <section>
+            <div>
+                <div class="inner-div-1">
+                    <h2>Template Selection</h2>
                     <p>
-                        <img src=""> <!-- Needs and image of our template selection -->
+                        <img class="float-left" src="" alt=""> <!-- Needs an image of our template selection -->
+                        The next step is to select the template that looks the best to you. Relate plans to have a 
+                        variety of templates for each profession that will make your resume style a little more 
+                        unique. After you pick your favorite, we'll load you up to our Editor for the chance to 
+                        further develop your resume.
                     </p>
-                </span>
-            
-        </div>
-        <div class="div-alt-3">
-            <h2>Resume Editor</h2>
-            <p>The final process is to modify your resume to fit your needs. While we are confident that your 
-                resume is looking great, it doesn't hurt to add any final touches or changes. You're free to 
-                add what you want from images and shapes, to colors and text decoration. Our most useful 
-                feature is our AI assitant. Waiting patiently, it will help you with your edits and will 
-                suggest improvements that would make for a great addition to your resume.
-            </p>
-            <p>
-                And thats it! Whether you want gorify your resume or spin one up quickly for that job down the 
-                street, Relate is built for an easy and professional resume building experience. Don't forget to 
-                export your document, and come by anytime you want to spice up your interview!
-            </p>
-        </div>
-
-        <div class="div-alt-1">
-            <h2>Our Vision</h2>
-            <p>ResumeElevate is designed to help users create professional resumes effortlessly. Our goal is to 
-                create a platform that not only allows users to generate resumes but also provides tools for secure 
-                login, seamless updates, and document management, all integrated with powerful backend technology.
-            </p>
-        </div>
+                </div>
+            </div>
+        </section>
+        <!-- Resume Editor -->
+        <section>
+            <div class="div-alt-3">
+                <h2>Resume Editor</h2>
+                <p class="float-left">
+                    <img src="" alt=""> <!-- Needs an image of our Editor! -->
+                </p>
+                <p>The final process is to modify your resume to fit your needs. While we are confident that your 
+                    resume is looking great, it doesn't hurt to add any final touches or changes. You're free to 
+                    add what you want from images and shapes, to colors and text decoration. Our most useful 
+                    feature is our AI assitant. Waiting patiently, it will help you with your edits and will 
+                    suggest improvements that would make for a great addition to your resume.
+                </p>
+                <p>
+                    And thats it! Whether you want gorify your resume or spin one up quickly for that job down the 
+                    street, Relate is built for an easy and professional resume building experience. Don't forget to 
+                    export your document, and come by anytime you want to spice up your interview!
+                </p>
+            </div>
+        </section>
+        <section>
+            <div class="div-alt-1">
+                <h2>Our Vision</h2>
+                <p class="float-right">
+                    <img src="" alt="">
+                </p>
+                <p>ResumeElevate is designed to help users create professional resumes effortlessly. Our goal is to 
+                    create a platform that not only allows users to generate resumes but also provides tools for secure 
+                    login, seamless updates, and document management, all integrated with powerful backend technology.
+                </p>
+            </div>
+        </section>
 
         <section>
             <div>
                 <h2>Technologies We're Using</h2>
-                <div>
-                    <div>
+                <div class="container">
+                    <div class="left">
                         <i class="icon bi bi-code-slash"></i>
                         <h4>Node.js & Express</h4>
                         <p>Our backend is built with Node.js and Express to provide a fast, scalable, and secure 
                             environment for handling user data and dynamic content.
                         </p>
                     </div>
-                    <div>
+                    <div class="center">
                         <i class="icon bi bi-database"></i>
                         <h4>MongoDB & Mongoose</h4>
                         <p>We use MongoDB as our database, and Mongoose for managing schema and data relationships, 
                             ensuring that user data is stored securely and efficiently.
                         </p>
                     </div>
-                    <div>
+                    <div class="right">
                         <i class="icon bi bi-bootstrap-fill"></i>
                         <h4>Bootstrap</h4>
                         <p>The front-end of the website is powered by Bootstrap, offering a responsive, 
@@ -104,6 +123,23 @@
                         </p>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Project Overview -->
+        <section>
+            <div class="div-alt-4">
+                <h2>Project Overview</h2>
+                <div>
+                    <p>This project is built to deliver a seamless user experience. Below are the steps involved in the development of the platform:</p>
+                    <ul>
+                        <li>Designing a responsive, multi-page website using HTML, CSS, and Bootstrap for aesthetics and user interaction.</li>
+                        <li>Implementing secure authentication features with password encryption and user sessions using Node.js and Express.</li>
+                        <li>Building a dynamic connection to MongoDB for managing user data, resume details, and other content with the help of Mongoose.</li>
+                        <li>Creating a resume generation tool that allows users to generate and download resumes in real-time.</li>
+                        <li>Ensuring data security and integrity by implementing best practices for database interactions and backend development.</li>
+                    </ul>
+                </div>  
             </div>
         </section>
         
