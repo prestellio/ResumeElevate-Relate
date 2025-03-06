@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Questionnaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .question-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .question {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            height: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #007BFF;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .answer-button {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .answer-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="question-container" id="questionContainer">
+        <p class="question" id="questionText"></p>
+        <div id="answerOptions"></div>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                question: "What is your favorite programming language?", 
+                answers: ["JavaScript", "Python", "C++", "Java"] 
+            },
+            { 
+                question: "What type of projects do you like?", 
+                answers: ["Web Development", "Machine Learning", "Game Development", "Cybersecurity"] 
+            },
+            { 
+                question: "Do you prefer working solo or in a team?", 
+                answers: ["Solo", "Team", "Both", "Depends on the project"] 
+            },
+            { 
+                question: "What is your experience level?", 
+                answers: ["Beginner", "Intermediate", "Advanced", "Expert"] 
+            },
+            { 
+                question: "What is your preferred coding environment?", 
+                answers: ["Windows", "MacOS", "Linux", "Cloud IDEs"] 
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                document.getElementById("questionContainer").innerHTML = "<h2>Thank you for completing the questionnaire!</h2>";
+                return;
+            }
+
+            const questionObj = questions[currentQuestionIndex];
+
+            document.getElementById("questionText").textContent = questionObj.question;
+            const answerContainer = document.getElementById("answerOptions");
+            answerContainer.innerHTML = "";
+
+            questionObj.answers.forEach(answer => {
+                const button = document.createElement("button");
+                button.classList.add("answer-button");
+                button.textContent = answer;
+                button.onclick = () => nextQuestion();
+                answerContainer.appendChild(button);
+            });
+
+            updateProgressBar();
+        }
+
+        function nextQuestion(answer) {
+    userAnswers.push({ question: questions[currentQuestionIndex].question, answer: answer });
+    document.getElementById("questionContainer").classList.add("hidden");
+
+    setTimeout(() => {
+        currentQuestionIndex++;
+        loadQuestion();
+        document.getElementById("questionContainer").classList.remove("hidden");
+    }, 500);
+}
+
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById("progressBar").style.width = `${progress}%`;
+        }
+
+        async function submitAnswers() {
+    try {
+        const response = await fetch('http://localhost:3000/save-answers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ answers: userAnswers })
+        });
+
+        console.log("Response status:", response.status); // ✅ Log response status
+
+        if (!response.ok) {
+            throw new Error("Failed to save answers");
+        }
+
+        const data = await response.json();
+        console.log("Server response:", data); // ✅ Log server response
+
+        alert("Your answers have been saved successfully!");
+
+        document.getElementById("questionContainer").innerHTML = "<h2>Thank you! Your answers have been saved. 🎉</h2>";
+
+    } catch (error) {
+        console.error("Error submitting answers:", error);
+        alert("Error saving answers. Please check your internet connection and try again.");
+    }
+}
+        loadQuestion();
+    </script>
+
+</body>
+</html>

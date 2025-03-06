@@ -73,7 +73,7 @@
                     const data = await response.json();
                     if (data.resumeId) {
                         // **Redirect to editor.html with resumeId**
-                        window.location.href = `editor.html?resumeId=${data.resumeId}`;
+                        window.location.href = `editor_review.html?resumeId=${data.resumeId}`;
                     } else {
                         alert('Error: Resume ID not received.');
                     }
