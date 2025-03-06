@@ -16,6 +16,14 @@
     border-radius: 3px;
 }
 
+.align-left {
+    text-align: left;
+}
+
+.align-center {
+    text-align: center;
+}
+
 body {
     background-color: #3bceac;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -33,6 +41,7 @@ button {
 
 .container {
     display: flex;
+    flex: 0 1 20%;
     justify-content: space-between;
 }
 
@@ -112,7 +121,6 @@ div .div-clear {
     border-top: solid 30px #333;
     border-bottom: solid 30px #333;
     color: white;
-    padding: 20px 30%;
 }
 
 .div-alt-1 h2 {
@@ -122,16 +130,13 @@ div .div-clear {
     color: black;
 }
 
-.div-alt-1 p {
-    text-align: center;
-}
-
 .div-alt-1 section {
     padding: 20px;
     background-color: #9ba2ff;
     border: solid 10px white;
     border-radius: 10px;
     box-shadow: inset 0px 0px 10px black;
+    margin: 20px 30%;
 }
 
 .div-alt-2 {
@@ -152,11 +157,25 @@ div .div-clear {
     box-shadow: 10px 0px 30px darkgray;
     text-align: left;
     padding: 20px 40px;
+    display: block;
 }
 
 .div-alt-3 img {
     box-shadow: 5px 5px 5px black;
     width: 200px;
+}
+
+.span-alt-1 {
+    background-color: #540d6e;
+    color: #9ba2ff;
+    text-shadow: none;
+}
+
+.span-alt-1 div {
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    color: #225bb2;
 }
 
 .div-alt-4 {
@@ -186,6 +205,46 @@ div .div-clear {
     box-shadow:  -5px -5px 20px black;
 }
 
+.form-control {
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+}
+
+.generate-form {
+    color: black;
+    background-color: white;
+    border-radius: 0.75rem;
+    margin: 30px 15%;
+}
+
+.generate-form button {
+    margin: 0.75rem;
+    width: 100%;
+}
+
+.generate-form div {
+    margin: 0.75rem;
+    padding: 0.5rem;
+}
+
+.generate-form h1 {
+    text-shadow: none;
+    text-align: center;
+    padding-top: 2rem;
+}
+
+.generate-form label, input {
+    font-weight: lighter;
+    display: block;
+    text-align: left;
+    padding: 0.25rem 0px;
+    width: 98%;
+}
+
+.generate-form input {
+    border-width: thin;
+}
+
 
 
 /* START IDs for div-questions and questions.html */
@@ -210,7 +269,7 @@ div .div-clear {
     display: none;
 }
 
-#science-quetions {
+#science-quetions { 
     display: none;
 } */
 
@@ -314,6 +373,28 @@ header img {
     color: white;
     border-radius: 10px;
     padding: 30px;
+}
+
+.inner-div-2 {
+    background-color: white;
+    border: solid 30px #999;
+    border-radius: 25px;
+    box-shadow: 10px 10px 20px black;
+    margin: 20px 10%;
+    padding: 20px;
+}
+
+.inner-div-2 img{
+    max-width: 35%;
+    padding: 5px;
+}
+
+.inner-div-3 {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 10px 10px 20px black;
+    margin: 20px;
+    padding: 40px 20px;
 }
 
 main {
