@@ -2,44 +2,71 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../RelateLogo.png" type="image/x-icon"></link>
-    <title>Template Selection | ResumeElevate</title>
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
-
-    <!-- Personal CSS sheet (style.css)-->
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../RelateLogo.png" type="image/x-icon">
+  <title>Template Selection | ResumeElevate</title>
+  <!-- Personal CSS sheet (style.css) -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 
-
-<!-- Main page starts -->
 <body>
-    <header class="header-template-selection">
-        <a href="/index.html#top">
-            <img src="../RelateLogo.png" alt="Resume Relate Logo: green and blue peacock">
-        </a>
-    </header>
+  <header class="header-template-selection">
+    <a href="/index.html#top">
+      <img src="../RelateLogo.png" alt="Resume Relate Logo: green and blue peacock">
+    </a>
+  </header>
 
-    <main class="container main-template-selection">
-        <div class="template-left">
-            <ul>
-                <!-- If we want to get fancy, we can have the javascript write <li id="field-#"> where each template is assigned a # -->
-                <li id="eng-template"></li>
-            </ul>
-        </div>
-        <div class="template-right">
-            <img src="../RelateLogo.png" alt="Resume preview" style="width:100px">
-        </div>
-    </main>
+  <main class="container main-template-selection">
+    <div class="template-left">
+      <ul class="template-list" id="templateList">
+        <!-- Template previews will be added here dynamically -->
+      </ul>
+    </div>
+    <div class="template-right">
+      <img id="templatePreview" src="../RelateLogo.png" alt="Resume preview" style="width:100px">
+    </div>
+  </main>
 
-    <!-- Bootstrap (not currently needed)-->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
+  <!-- Personalized script -->
+  <script>
+    // Replace this URL with your actual API endpoint that returns the templates from your database.
+    const apiEndpoint = '/api/templates';
 
-    <!-- Personalized script (ResumeElevateScript.js) -->
-    <script src="ResumeElevateScript.js"></script>
+    // Fetch the template images from the database.
+    async function loadTemplates() {
+      try {
+        const response = await fetch(apiEndpoint);
+        if (!response.ok) {
+          throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        // Expecting JSON array of objects e.g. [{ id: 1, imageUrl: "path/to/image.jpg", title: "Template 1" }, ...]
+        const templates = await response.json();
 
+        const templateList = document.getElementById('templateList');
+
+        templates.forEach(template => {
+          const li = document.createElement('li');
+          // Create an image element for the preview
+          const img = document.createElement('img');
+          img.src = template.imageUrl;
+          img.alt = template.title;
+          img.classList.add('template-preview');
+          // When a preview is clicked, update the main preview on the right side.
+          img.addEventListener('click', () => {
+            document.getElementById('templatePreview').src = template.imageUrl;
+          });
+          li.appendChild(img);
+          templateList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+      }
+    }
+
+    // Initialize template loading on DOM content load.
+    document.addEventListener('DOMContentLoaded', loadTemplates);
+  </script>
 </body>
-
 
 </html>

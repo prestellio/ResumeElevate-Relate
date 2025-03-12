@@ -67,7 +67,7 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     }
 });
 
-
+document.getElementById("template_selection").addEventListener(select)
 //-------------------------------------------------------------------------------------------------------
 
 
