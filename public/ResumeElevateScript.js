@@ -66,6 +66,8 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         alert('Error submitting resume.');
     }
 });
+
+
 //-------------------------------------------------------------------------------------------------------
 
 
