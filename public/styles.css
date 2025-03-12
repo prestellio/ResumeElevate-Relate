@@ -25,6 +25,9 @@
 }
 
 body {
+    display: flex;
+    margin: 0;
+    flex-direction: column;
     background-color: #3bceac;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 1.4rem;
@@ -45,35 +48,19 @@ button {
     justify-content: space-between;
 }
 
+.container-row {
+    display: flex;
+    flex-direction: row;
+    flex: 0 1 20%;
+    justify-content: space-between;
+}
+
 .left, .center, .right {
     width: 25%;
     border: solid 3px #540d6e;
     border-radius: 10px;
     background-color: #9ba2ff;
 }
-
-.template-left {
-    width: 40%;
-    background-color: #444;
-    box-shadow: 0px 10px 10px black;
-}
-
-.template-left ul {
-    display: inline-block;
-}
-
-.template-left li {
-    width: 20%;
-}
-
-.template-right {
-    width: 60%;
-    background-color: #9ba2ff;
-    align-items: center;
-    
-    z-index: -1;
-}
-
 
 div {
     color:#225bb2;
@@ -157,7 +144,6 @@ div .div-clear {
     box-shadow: 10px 0px 30px darkgray;
     text-align: left;
     padding: 20px 40px;
-    display: block;
 }
 
 .div-alt-3 img {
@@ -245,6 +231,88 @@ div .div-clear {
     border-width: thin;
 }
 
+.grid-container {
+    display: grid;
+
+}
+
+/* Template page css: needs special css since it is a different kind of page */
+
+.template-page-grid {
+    background-color: #9ba2ff;
+    display: grid;
+    position: fixed;
+    justify-content: stretch;
+    align-content: stretch;
+    grid-template-rows: 5vh;
+    grid-template-columns: 33.33vw;
+    height: 100vh;
+    width: 100vw;
+}
+
+.template-page-grid header {
+    grid-area: 1 / 1 / 2 / 4;
+    background-image: none;
+    background: linear-gradient(#225bb2,#000) ;
+    margin: 0;
+}
+
+.template-page-grid header img{
+    height: 5vh;
+}
+
+.template-page-grid aside {
+    grid-area: 2 / 1 / 21 / 2;
+    background-color: #444;
+    box-shadow: 0px 10px 10px black;
+}
+
+.template-page-grid aside ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 5%;
+}
+
+.template-page-grid aside li {
+    display: inline-block;
+    width: 40%;
+    text-align: center;
+    padding: 2% 0;
+}
+
+.template-page-grid aside li:hover {
+    background-color: #555;
+    border: solid 1px #ccc;
+}
+
+.template-page-grid aside li:active {
+    background-color: #666;
+    border: solid 1px #fff;
+}
+
+.template-page-grid
+
+.template-page-grid-aside img{
+    max-width: 75%;
+    max-height: 90%
+}
+
+.template-page-grid-aside input {
+    appearance: none;
+}
+
+.template-page-grid-aside input:checked {
+    background-color: #555;
+    border: solid 1px #ccc;
+}
+
+.template-page-grid main {
+    grid-area: 2 / 2 / 21 / 4;
+    place-content: center;
+    place-items: center;
+}
+
+/* ------------END TEMPLATE PAGE------------- */
 
 
 /* START IDs for div-questions and questions.html */
@@ -302,6 +370,7 @@ input[id^="sci"] {
 /* END IDs for questions.hmtl */
 
 footer {
+    flex: 0 1 100%;
     background-color: #540d6e;
     padding: 20px;
     font-size: 0.7rem;
@@ -316,6 +385,10 @@ footer div {
 
 h1 {
     color: #9ba2ff;
+}
+
+.container header {
+    flex: 0 1 100%;
 }
 
 header {
@@ -399,6 +472,7 @@ header img {
 
 main {
     margin: 30px 0 0 0;
+    flex: 0 1 100%;
 }
 
 .main-questions {
