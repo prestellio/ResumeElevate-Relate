@@ -178,13 +178,15 @@ div .div-clear {
 }
 
 .div-questions {
-    background-color: white;
+    box-shadow: -10px 0px 20px;
+    background-color: #9ba2ff;
     color: black;
     padding: 50px 20%;
 }
 
 .div-questions div {
     padding: 20px;
+    background-color: white;
     border: solid 10px lightgray;
     border-radius: 30px;
     min-height: 500px;
@@ -219,7 +221,7 @@ div .div-clear {
     padding-top: 2rem;
 }
 
-.generate-form label, input {
+.generate-form label {
     font-weight: lighter;
     display: block;
     text-align: left;
@@ -228,12 +230,53 @@ div .div-clear {
 }
 
 .generate-form input {
+    font-weight: lighter;
+    display: block;
+    text-align: left;
+    padding: 0.25rem 0px;
+    width: 98%;
     border-width: thin;
 }
 
 .grid-container {
     display: grid;
 
+}
+
+.login-page form {
+    width: fit-content;
+    align-self: center;
+    margin: 0 auto;
+}
+
+.login-page label {
+    font-weight: lighter;
+    display: block;
+    text-align: left;
+    padding: 0.25rem 0px;
+}
+
+.login-page input {
+    font-weight: lighter;
+    display: block;
+    align-items: left;
+    padding: 1rem 4rem;
+    border-width: thin;
+    box-shadow: inset 0 0 2px #444;
+}
+
+.login-page-div {
+    background-color: #eee;
+    border-radius: 10px;
+    box-shadow: 0 0 5px black;
+    margin: 30px 20%;
+    padding-top: 20px;
+    text-align: center;
+    align-items: center;
+}
+
+.login-page-div div{
+    padding: 10px 0;
 }
 
 /* Template page css: needs special css since it is a different kind of page */
@@ -404,7 +447,8 @@ header {
 
 header img {
     max-width: 10%;
-    border-bottom-left-radius: 10px;
+    height:fit-content;
+    border-bottom-right-radius: 10px;
 }
 
 .header-template-selection {
