@@ -1,115 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Your Resume</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Quill CSS -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #728fb4;
-            padding: 20px;
-        }
-
-        .resume-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        #toolbar-container {
-            background-color: #f8f8f8;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        #editor-container {
-            height: 500px;
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .toolbar {
-            width: 100%;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        #saveResume, #downloadPDF {
-            margin: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Your Resume</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Quill CSS -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #728fb4;
+      padding: 20px;
+    }
+    .resume-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    #toolbar-container {
+      background-color: #f8f8f8;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    #editor-container {
+      height: 500px;
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .toolbar {
+      width: 100%;
+      text-align: center;
+      margin-top: 10px;
+    }
+    #saveResume, #downloadPDF {
+      margin: 10px;
+    }
+    /* Professional styling for resume preview */
+    #resumeOutput {
+      margin-top: 20px;
+      background: #f7f7f7;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      font-family: 'Georgia', serif;
+      color: #333;
+    }
+    #resumeOutput h1 {
+      font-size: 32px;
+      margin-bottom: 5px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 5px;
+    }
+    #resumeOutput h2 {
+      font-size: 24px;
+      margin-top: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    #resumeOutput p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+  </style>
 </head>
 <body>
+  <div class="resume-container">
+    <!-- Quill Toolbar -->
+    <div id="toolbar-container"></div>
+    <!-- Quill Editor -->
+    <div id="editor-container"></div>
+  </div>
 
-    <div class="resume-container">
-        <!-- Quill Toolbar -->
-        <div id="toolbar-container"></div>
+  <!-- Buttons -->
+  <div class="toolbar">
+    <button id="saveResume" class="btn btn-primary">Save Resume</button>
+    <button id="downloadPDF" class="btn btn-success">Download PDF</button>
+  </div>
 
-        <!-- Quill Editor for the entire resume -->
-        <div id="editor-container"></div>
-    </div>
+  <!-- Container to display the printed resume preview -->
+  <div id="resumeOutput">
+    <h2>Resume Preview</h2>
+    <!-- The formatted resume will appear here after clicking "Save Resume" -->
+  </div>
 
-    <!-- Buttons -->
-    <div class="toolbar">
-        <button id="saveResume" class="btn btn-primary">Save Resume</button>
-        <button id="downloadPDF" class="btn btn-success">Download PDF</button>
-    </div>
+  <!-- Quill JS -->
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <script>
+    // Initialize Quill editor
+    var quill = new Quill('#editor-container', {
+      theme: 'snow',
+      placeholder: 'Your resume will appear here...',
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, false] }],
+          ['bold', 'italic', 'underline'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['link'],
+          ['clean']
+        ]
+      }
+    });
 
-    <!-- Quill JS -->
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    // Fetch resume data and prepopulate the Quill editor if resumeId is present
+    async function loadResumeData() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const resumeId = urlParams.get('resumeId');
 
-    <script>
-        // Initialize Quill editor
-        var quill = new Quill('#editor-container', {
-            theme: 'snow',
-            placeholder: 'Your resume will appear here...',
-            modules: {
-                toolbar: [
-                    [{ header: [1, 2, false] }],
-                    ['bold', 'italic', 'underline'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    ['link'],
-                    ['clean']
-                ]
-            }
-        });
-
-        // Fetch resume data and prepopulate the Quill editor
-        async function loadResumeData() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const resumeId = urlParams.get('resumeId');
-
-    if (!resumeId) {
+      if (!resumeId) {
         console.error("No resume ID found in the URL.");
         alert("Error: No Resume ID found. Try submitting the form again.");
         return;
-    }
+      }
 
-    try {
+      try {
         const response = await fetch(`/get-resume/${resumeId}`);
         if (!response.ok) {
-            throw new Error("Resume not found");
+          throw new Error("Resume not found");
         }
-
         const resume = await response.json();
-        console.log("Fetched Resume Data:", resume); // Debugging Log
+        console.log("Fetched Resume Data:", resume);
 
-        // **Ensure missing fields do not break the code**
+        // Ensure missing fields do not break the code
         const name = resume.name || "Full Name";
         const email = resume.email || "Email Not Provided";
         const phone = resume.phone || "Phone Not Provided";
-        const education = resume.education || {}; // Prevent 'undefined' errors
+        const education = resume.education || {};
         const degree = education.degree || "Degree Not Provided";
         const university = education.university || "University Not Provided";
         const location = education.location || "Location Not Provided";
@@ -117,111 +139,114 @@
         const relevantCourses = education.relevantCourses || "Not Available";
 
         let resumeContent = `<h1>${name}</h1>
-            <p><strong>Email:</strong> ${email} | <strong>Phone:</strong> ${phone}</p>
-            <h2>Education</h2>
-            <p><strong>${degree}</strong>, ${university}, ${location}</p>
-            <p>GPA: ${gpa}</p>
-            <p><strong>Relevant Courses:</strong> ${relevantCourses}</p>
-            <h2>Experience</h2>`;
+          <p><strong>Email:</strong> ${email} | <strong>Phone:</strong> ${phone}</p>
+          <h2>Education</h2>
+          <p><strong>${degree}</strong>, ${university}, ${location}</p>
+          <p>GPA: ${gpa}</p>
+          <p><strong>Relevant Courses:</strong> ${relevantCourses}</p>
+          <h2>Experience</h2>`;
 
         if (resume.experiences && resume.experiences.length > 0) {
-            resume.experiences.forEach(exp => {
-                resumeContent += `<p><strong>${exp.position || "Position Not Provided"}</strong> 
-                                  at ${exp.companyName || "Company Not Provided"}, 
-                                  ${exp.location || "Location Not Provided"} 
-                                  (${exp.startDate || "Start Date Not Provided"} - 
-                                  ${exp.endDate || "End Date Not Provided"})</p>
-                                  <p>${exp.responsibilities || "Responsibilities Not Provided"}</p>`;
-            });
+          resume.experiences.forEach(exp => {
+            resumeContent += `<p><strong>${exp.position || "Position Not Provided"}</strong> 
+                              at ${exp.companyName || "Company Not Provided"}, 
+                              ${exp.location || "Location Not Provided"} 
+                              (${exp.startDate || "Start Date Not Provided"} - 
+                              ${exp.endDate || "End Date Not Provided"})</p>
+                              <p>${exp.responsibilities || "Responsibilities Not Provided"}</p>`;
+          });
         } else {
-            resumeContent += `<p>No experience added.</p>`;
+          resumeContent += `<p>No experience added.</p>`;
         }
 
         resumeContent += `<h2>Projects</h2>`;
         if (resume.projects && resume.projects.length > 0) {
-            resume.projects.forEach(proj => {
-                resumeContent += `<p><strong>${proj.projectName || "Project Name Not Provided"}</strong> 
-                                  - ${proj.projectDescription || "Description Not Provided"} 
-                                  (Started: ${proj.projectStartDate || "Start Date Not Provided"})</p>`;
-            });
+          resume.projects.forEach(proj => {
+            resumeContent += `<p><strong>${proj.projectName || "Project Name Not Provided"}</strong> 
+                              - ${proj.projectDescription || "Description Not Provided"} 
+                              (Started: ${proj.projectStartDate || "Start Date Not Provided"})</p>`;
+          });
         } else {
-            resumeContent += `<p>No projects added.</p>`;
+          resumeContent += `<p>No projects added.</p>`;
         }
 
         resumeContent += `<h2>Leadership Experience</h2>`;
         if (resume.leadership && resume.leadership.length > 0) {
-            resume.leadership.forEach(lead => {
-                resumeContent += `<p><strong>${lead.leadershipPosition || "Position Not Provided"}</strong> 
-                                  at ${lead.groupName || "Group Name Not Provided"} 
-                                  (${lead.leadershipStartDate || "Start Date Not Provided"} - 
-                                  ${lead.leadershipEndDate || "End Date Not Provided"})</p>`;
-            });
+          resume.leadership.forEach(lead => {
+            resumeContent += `<p><strong>${lead.leadershipPosition || "Position Not Provided"}</strong> 
+                              at ${lead.groupName || "Group Name Not Provided"} 
+                              (${lead.leadershipStartDate || "Start Date Not Provided"} - 
+                              ${lead.leadershipEndDate || "End Date Not Provided"})</p>`;
+          });
         } else {
-            resumeContent += `<p>No leadership experience added.</p>`;
+          resumeContent += `<p>No leadership experience added.</p>`;
         }
 
-        // **Insert prepopulated text into Quill editor**
+        // Insert prepopulated text into Quill editor
         quill.root.innerHTML = resumeContent;
-    } catch (error) {
+      } catch (error) {
         console.error('Error fetching resume data:', error);
         alert("Error fetching resume. Try again.");
+      }
     }
-}
+    document.addEventListener('DOMContentLoaded', loadResumeData);
 
-        document.addEventListener('DOMContentLoaded', loadResumeData);
+    // Save Updated Resume Data and display a formatted resume preview
+    document.getElementById('saveResume').addEventListener('click', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const resumeId = urlParams.get('resumeId');
 
-        // Save Updated Resume Data
-        document.getElementById('saveResume').addEventListener('click', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const resumeId = urlParams.get('resumeId');
+      if (!resumeId) {
+        alert("Error: Resume ID is missing.");
+        return;
+      }
 
-            if (!resumeId) {
-                alert("Error: Resume ID is missing.");
-                return;
-            }
+      const updatedData = {
+        resumeId,
+        resumeContent: quill.root.innerHTML
+      };
 
-            const updatedData = {
-                resumeId,
-                resumeContent: quill.root.innerHTML
-            };
-
-            try {
-                const response = await fetch('/save-resume', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedData)
-                });
-
-                if (response.ok) {
-                    alert('Resume saved successfully!');
-                } else {
-                    alert('Failed to save resume.');
-                }
-            } catch (error) {
-                console.error('Error saving resume:', error);
-                alert('Error saving resume.');
-            }
+      try {
+        const response = await fetch('/save-resume', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedData)
         });
 
-        // Download PDF Functionality
-        document.getElementById('downloadPDF').addEventListener('click', async () => {
-            try {
-                const response = await fetch('/generate-pdf', { method: 'POST' });
+        if (response.ok) {
+          alert('Resume saved successfully!');
+          // Display the formatted resume preview
+          document.getElementById('resumeOutput').innerHTML = `
+            <h2>Resume Preview</h2>
+            ${quill.root.innerHTML}
+          `;
+        } else {
+          alert('Failed to save resume.');
+        }
+      } catch (error) {
+        console.error('Error saving resume:', error);
+        alert('Error saving resume.');
+      }
+    });
 
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = 'resume.pdf';
-                    link.click();
-                    URL.revokeObjectURL(link.href);
-                } else {
-                    alert('Failed to generate PDF.');
-                }
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-            }
-        });
-    </script>
+    // Download PDF Functionality remains unchanged
+    document.getElementById('downloadPDF').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/generate-pdf', { method: 'POST' });
+        if (response.ok) {
+          const blob = await response.blob();
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'resume.pdf';
+          link.click();
+          URL.revokeObjectURL(link.href);
+        } else {
+          alert('Failed to generate PDF.');
+        }
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      }
+    });
+  </script>
 </body>
 </html>
