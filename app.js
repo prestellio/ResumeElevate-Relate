@@ -84,6 +84,26 @@ app.post('/submit-resume', async (req, res) => {
     }
 });
 
+app.post('/save-answers', async (req, res) => {
+    try {
+        console.log("Received request:", req.body); // ✅ Log request data
+
+        if (!req.body.answers || req.body.answers.length === 0) {
+            return res.status(400).json({ error: "No answers received" });
+        }
+
+        const newAnswers = new Answer({ answers: req.body.answers });
+        await newAnswers.save();
+
+        console.log("Answers saved successfully!"); // ✅ Log successful save
+        res.status(201).json({ message: "Answers saved successfully!" });
+
+    } catch (error) {
+        console.error("Error saving answers:", error);
+        res.status(500).json({ error: "Failed to save answers" });
+    }
+});
+
 
 // Route to fetch a resume by ID
 app.get('/get-resume/:id', async (req, res) => {
