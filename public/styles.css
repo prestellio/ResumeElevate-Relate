@@ -1,108 +1,196 @@
-/* Nav bar style */
-nav {
-    background-color: #326BD6;
-    background-image: url('../Wichita_McKinley.jpg');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    color: aliceblue;
-    font-size: large;
-    font-weight: 1000;
+
+/* Colors
+#6d696a - Brown
+#3bceac - Green
+#9ba2ff - Light blue
+#225bb2 - Darkblue
+#540d6e - Purple
+
+*/
+.about-background {
+    background-image: url("../AboutPageGradient.jpg");
 }
 
-.navbar {
-    background-color: #326bd6;
-    padding: 1rem;
+.active {
+    background-color: #555;
+    border-radius: 3px;
 }
 
-.navbar-brand img {
-    height: 50px;
+.align-left {
+    text-align: left;
 }
-/*----- Nav bar style ----- */
+
+.align-center {
+    text-align: center;
+}
 
 body {
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    background-color: #55b39e80;
+    display: flex;
     margin: 0;
-    padding: 0;
-    height: 100%;
-}
-
-div .mb-3{
-    padding-left:2%;
-}
-
-/* Text Style */
-
-h1 {
-    font-weight: 1000;
-    margin-bottom: 1.5rem;
-    color: #326BD6;
-}
-
-h4 {
-    font-weight: 700;
-}
-
-textarea {
-    width: 100%;
-    height: 150px;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    resize: none;
-}
-
-.text-section {
-    width: 45%;
-}
-
-.text-section h2 {
-    font-weight: 700;
-    color: #007bff;
-}
-
-.text-section p {
+    flex-direction: column;
+    background-color: #3bceac;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 1.4rem;
-    line-height: 1.6;
 }
 
-/* ------ Text Style ------ */
-
-/* Button Style */
-button, select {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f0f0f0;
-    cursor: pointer;
-}
-
-button:hover, select:hover {
-    background-color: #e0e0e0;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-/* ----- Button Style ----- */
-
-
-
-/* Form Styles */
-label {
+button {
     font-weight: 500;
+    color: white;
+    background-color: #225bb2;
+    border-radius: 15px;
+    padding: 10px;
+    font-size: 1.5rem;
+}
+
+.container {
+    display: flex;
+    flex: 0 1 20%;
+    justify-content: space-between;
+}
+
+.container-row {
+    display: flex;
+    flex-direction: row;
+    flex: 0 1 20%;
+    justify-content: space-between;
+}
+
+.left, .center, .right {
+    width: 25%;
+    border: solid 3px #540d6e;
+    border-radius: 10px;
+    background-color: #9ba2ff;
+}
+
+div {
+    color:#225bb2;
+    border-radius: 3px;
+    padding: 0 20px;
+}
+
+div h1 {
+    color: black;
+    font-weight: 900;
+    text-shadow: 4px 2px 0px #3bceac;
+    
+}
+
+div h2 {
+    color: black;
+    font-weight: 600;
+    margin-bottom: 40px;
+}
+
+.div-resume-image {
+    background-image: url("../ResumeWorking.jpg");
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: 70%;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+div .div-clear {
+    background-color: none;
+}
+
+.div-alt-1 {
+    background-color: #3bceac;
+    background-image: url("../HexGrid.png");
+    background-repeat: repeat;
+    background-size: 10%;
+    border-top: solid 30px #333;
+    border-bottom: solid 30px #333;
+    color: white;
+}
+
+.div-alt-1 h2 {
+    text-align: center;
+    font-size: 4rem;
+    font-weight: 800;
+    color: black;
+}
+
+.div-alt-1 section {
+    padding: 20px;
+    background-color: #9ba2ff;
+    border: solid 10px white;
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 10px black;
+    margin: 20px 30%;
+}
+
+.div-alt-2 {
+    box-shadow: inset 0px 10px 15px black, inset 0px -10px 15px black;
+    padding: 60px 0px;
+}
+
+.div-alt-2 h1 {
+    font-size: 3.5rem;
+    font-weight: 1000;
+    color: #225bb2;
+    text-shadow: 2px 1px 0px white;
+    text-align: center;
+}
+
+.div-alt-3 {
+    background-color: white;
+    box-shadow: 10px 0px 30px darkgray;
+    text-align: left;
+    padding: 20px 40px;
+}
+
+.div-alt-3 img {
+    box-shadow: 5px 5px 5px black;
+    width: 200px;
+}
+
+.span-alt-1 {
+    background-color: #540d6e;
+    color: #9ba2ff;
+    text-shadow: none;
+}
+
+.span-alt-1 div {
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    color: #225bb2;
+}
+
+.div-alt-4 {
+    background-color: #540d6e;
+    color: #9ba2ff;
+    text-shadow: none;
+}
+
+.div-alt-4 div {
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    color: #225bb2;
+}
+
+.div-questions {
+    box-shadow: -10px 0px 20px;
+    background-color: #9ba2ff;
+    color: black;
+    padding: 50px 20%;
+}
+
+.div-questions div {
+    padding: 20px;
+    background-color: white;
+    border: solid 10px lightgray;
+    border-radius: 30px;
+    min-height: 500px;
+    box-shadow:  -5px -5px 20px black;
 }
 
 .form-control {
@@ -110,154 +198,403 @@ label {
     padding: 0.75rem;
 }
 
-
-/* ---- Form Styles ----- */
-
-/* Container Styles */
-
-.editor-container {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 20px;
+.generate-form {
+    color: black;
     background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 0.75rem;
+    margin: 30px 15%;
 }
 
-.container {
-    max-width: 90%;
-    min-width: 80%;
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.generate-form button {
+    margin: 0.75rem;
+    width: 100%;
 }
 
-.hero {
-    background-color: #343a40;
-    color: white;
-    padding: 50px 0;
+.generate-form div {
+    margin: 0.75rem;
+    padding: 0.5rem;
+}
+
+.generate-form h1 {
+    text-shadow: none;
     text-align: center;
+    padding-top: 2rem;
 }
 
-.hero h1 {
-    font-size: 3.5rem;
+.generate-form label {
+    font-weight: lighter;
+    display: block;
+    text-align: left;
+    padding: 0.25rem 0px;
+    width: 98%;
 }
 
-/* --------- Container Styles -------- */
-
-#editor {
-    min-height: 400px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: white;
+.generate-form input {
+    font-weight: lighter;
+    display: block;
+    text-align: left;
+    padding: 0.25rem 0px;
+    width: 98%;
+    border-width: thin;
 }
 
-.toolbar {
-    margin-bottom: 10px;
-    display: flex;
-    gap: 10px;
+.grid-container {
+    display: grid;
+
 }
 
-.padding {
-    padding-block: 40px;
+.login-page form {
+    width: fit-content;
+    align-self: center;
+    margin: 0 auto;
 }
+
+.login-page label {
+    font-weight: lighter;
+    display: block;
+    text-align: left;
+    padding: 0.25rem 0px;
+}
+
+.login-page input {
+    font-weight: lighter;
+    display: block;
+    align-items: left;
+    padding: 1rem 4rem;
+    border-width: thin;
+    box-shadow: inset 0 0 2px #444;
+}
+
+.login-page-div {
+    background-color: #eee;
+    border-radius: 10px;
+    box-shadow: 0 0 5px black;
+    margin: 30px 20%;
+    padding-top: 20px;
+    text-align: center;
+    align-items: center;
+}
+
+.login-page-div div{
+    padding: 10px 0;
+}
+
+/* Template page css: needs special css since it is a different kind of page */
+
+.template-page-grid {
+    background-color: #9ba2ff;
+    display: grid;
+    position: fixed;
+    justify-content: stretch;
+    align-content: stretch;
+    grid-template-rows: 5vh;
+    grid-template-columns: 33.33vw;
+    height: 100vh;
+    width: 100vw;
+}
+
+.template-page-grid header {
+    grid-area: 1 / 1 / 2 / 4;
+    background-image: none;
+    background: linear-gradient(#225bb2,#000) ;
+    margin: 0;
+}
+
+.template-page-grid header img{
+    height: 5vh;
+}
+
+.template-page-grid aside {
+    grid-area: 2 / 1 / 21 / 2;
+    background-color: #444;
+    box-shadow: 0px 10px 10px black;
+}
+
+.template-page-grid aside ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 5%;
+}
+
+.template-page-grid aside li {
+    display: inline-block;
+    width: 40%;
+    text-align: center;
+    padding: 2% 0;
+}
+
+.template-page-grid aside li:hover {
+    background-color: #555;
+    border: solid 1px #ccc;
+}
+
+.template-page-grid aside li:active {
+    background-color: #666;
+    border: solid 1px #fff;
+}
+
+.template-page-grid
+
+.template-page-grid-aside img{
+    max-width: 75%;
+    max-height: 90%
+}
+
+.template-page-grid-aside input {
+    appearance: none;
+}
+
+.template-page-grid-aside input:checked {
+    background-color: #555;
+    border: solid 1px #ccc;
+}
+
+.template-page-grid main {
+    grid-area: 2 / 2 / 21 / 4;
+    place-content: center;
+    place-items: center;
+}
+
+/* ------------END TEMPLATE PAGE------------- */
+
+
+/* START IDs for div-questions and questions.html */
+
+/* #art-questions {
+    display: none;
+}
+
+#business-questions {
+    display: none;
+}
+
+#education-questions {
+    display: none;
+}
+
+#emergency-questions {
+    display: none;
+}
+
+#engineering-questions {
+    display: none;
+}
+
+#science-quetions { 
+    display: none;
+} */
+
+input[id^="art"] {
+    display: none;
+}
+
+input[id^="bus"] {
+    display: none;
+}
+
+input[id^="ed"] {
+    display: none;
+}
+
+input[id^="en"] {
+    display: none;
+}
+
+input[id^="es"] {
+    display: none;
+}
+
+input[id^="sci"] {
+    display: none;
+}
+
+
+
+/* END IDs for questions.hmtl */
 
 footer {
-    background-color: #06203C;
-    color: white;
-    padding-top: 10px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 10px;
-    font-size: small;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-    
-}
-
-.copyright {
-    font-size: smaller;
-}
-
-#result {
-    margin-top: 1.5rem;
-    font-weight: 600;
-    color: #28a745;
-}
-
-/* Image styles */
-.image-section {
-    width: 45%;
-}
-
-.image-section img {
-    max-width: 100%;
-    border-radius: 0.5rem;
-}
-
-.icon {
-    font-size: 3rem;
-    color: #007bff;
-}
-
-/* -------- Image styles ------ */
-
-
-
-/* Content styles*/
-
-.content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 3rem 0;
-}
-
-.content-section {
-    padding: 40px 0;
-}
-.content-section h2 {
-    margin-bottom: 20px;
-}
-.content-section p {
-    font-size: 1.1rem;
-    line-height: 1.7;
-}
-
-/* ------ content style ------ */
-
-.feature {
-    text-align: center;
+    flex: 0 1 100%;
+    background-color: #540d6e;
     padding: 20px;
-    margin-bottom: 20px;
+    font-size: 0.7rem;
+    color: white;
 }
 
-.about{
-    background-image: url('../About_Us_Gradient_New.jpg');
-    background-size: 100vh;
-    background-position: center;
-    background-repeat: repeat;
+footer div {
+    background-color: #540d6e;
+    color: white;
+    border-radius: none;
 }
 
-
-/* Hyperlink style */
-a:link {
-    color: #326BD6;
-}
-a:visited {
-    color: #326BD6;
-    /* old color #109C2C*/
+h1 {
+    color: #9ba2ff;
 }
 
-a:hover {
-    color: #4e7ed8;
+.container header {
+    flex: 0 1 100%;
 }
 
-a:active {
-    color: #309c46;
+header {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: #225bb2;
+    background-image: url("../WichitaHeaderImage.png");
+    background-size: 100%;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    box-shadow: 10px 5px 15px black;
 }
 
-/* ------ Hyperlink style ------ */
+header img {
+    max-width: 10%;
+    height:fit-content;
+    border-bottom-right-radius: 10px;
+}
+
+.header-template-selection {
+    background-image: none;
+    height: 5vh;
+    width: 100vw;
+}
+
+.header-template-selection img {
+    max-height: 5vh;
+    border-bottom-left-radius: 10px;
+}
+
+.index-polygon {
+    min-height: 600px;
+    clip-path: polygon(0 0, 50% 0, 80% 100%, 0% 100%);
+    background-color: white;
+    padding: 20px 50% 20px 5%;
+    box-shadow: 5px 5px 10px black;
+    margin: none;
+}
+
+.index-polygon h1{
+    padding: 20px 0px;
+}
+
+.index-polygon p{
+    float: left;
+    line-height: 1.5em;
+}
+
+.index-polygon img {
+    z-index: 2;
+    float: right
+}
+
+.inner-div-1 {
+    background-color: #3bceac;
+    color: white;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+.inner-div-2 {
+    background-color: white;
+    border: solid 30px #999;
+    border-radius: 25px;
+    box-shadow: 10px 10px 20px black;
+    margin: 20px 10%;
+    padding: 20px;
+}
+
+.inner-div-2 img{
+    max-width: 35%;
+    padding: 5px;
+}
+
+.inner-div-3 {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 10px 10px 20px black;
+    margin: 20px;
+    padding: 40px 20px;
+}
+
+main {
+    margin: 30px 0 0 0;
+    flex: 0 1 100%;
+}
+
+.main-questions {
+    background-color: white;
+}
+
+.main-template-selection {
+    height: 95vh;
+    width: 100vw;
+    margin: none;
+}
+
+.navbar {
+    background-color: #333;
+    overflow: hidden;
+}
+
+.navbar-menu a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    text-shadow: 3px 3px 5px black;
+}
+
+.navbar-menu a:hover{
+    font-size: 23px;
+    background-color: #444;
+    border-radius: 3px;
+    padding: 13px 15px;
+}
+
+.navbar-menu a:active{
+    font-size: 20px;
+    background-color: #222;
+    border-radius: 3px;
+    padding: 14px 25px;
+}
+
+.navbar-toggle {
+    display: none;
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 14px 16px;
+    font-size: 18px;
+}
+
+@media screen and (max-width: 600px) {
+    .navbar-menu {
+        display: none;
+        width: 100%;
+    }
+    .navbar-toggle {
+        display: block;
+    }
+}
+
+::selection {background-color: #540d6e; color:white;}
+
+.span-white {
+    background-color: white;
+}
+
+section {
+    padding: 20px;
+}
+
+.text-outline {
+    text-shadow: 
+        1px 0px 0px white,
+        -1px 0px 0px white,
+        0px 1px 0px white,
+        0px -1px 0px white;
+}
+
+ul {
+    display: block;
+}
