@@ -191,8 +191,7 @@
                         console.log('Fetching templates directly from GCS...');
                         
                         // List all templates in the bucket
-                        const bucketName = 'project-relate';
-                        const baseUrl = `https://storage.googleapis.com/${bucketName}`;
+                        const baseUrl = `https://storage.googleapis.com/project-relate`;
                         
                         // Since direct bucket listing isn't possible from browser,
                         // we'll use a static list but pretend it's dynamic
@@ -200,10 +199,10 @@
                         
                         // This is just a temporary fallback approach
                         templates = [
-                            { id: 'template1', name: 'Modern Template', url: `${baseUrl}/template1.png` },
-                            { id: 'template2', name: 'Professional Template', url: `${baseUrl}/template2.png` },
-                            { id: 'template3', name: 'Creative Template', url: `${baseUrl}/template3.png` },
-                            { id: 'template4', name: 'Executive Template', url: `${baseUrl}/template4.png` }
+                            { id: 'template1', name: 'Modern Template', url: `${baseUrl}/template1.jpg` },
+                            { id: 'template2', name: 'Professional Template', url: `${baseUrl}/template2.jpg` },
+                            { id: 'template3', name: 'Creative Template', url: `${baseUrl}/template3.jpg` },
+                            { id: 'template4', name: 'Executive Template', url: `${baseUrl}/template4.jpg`}
                         ];
                         
                         console.log('Fallback templates loaded:', templates);
