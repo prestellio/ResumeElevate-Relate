@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../RelateLogo.png" type="image/x-icon"></link>
+    <link rel="icon" href="../RelateLogo.png" type="image/x-icon">
     <title>Template Selection | ResumeElevate</title>
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
 
     <!-- Personal CSS sheet (style.css)-->
     <link rel="stylesheet" href="styles.css">
@@ -73,6 +72,28 @@
             height: 100px;
         }
         
+        .error-message {
+            color: #d9534f;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .continue-btn {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #225bb2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .continue-btn:hover {
+            background-color: #1a4489;
+        }
+        
         /* Style adjustments for your specific layout */
         #template-select-ul {
             padding: 0;
@@ -106,13 +127,13 @@
 <!-- Main page starts -->
 <body class="template-page-grid">
     <header>
-        <a href="index#top">    
+        <a href="index.html#top">    
             <img src="../RelateLogo.png" alt="Resume Relate Logo: green and blue peacock">
         </a>
     </header>
 
     <aside>
-        <form>
+        <form id="template-form">
             <ul class="template-page-grid-aside" id="template-select-ul">
                 <!-- Template thumbnails will be loaded here by JavaScript -->
                 <div class="loading">Loading templates...</div>
@@ -124,6 +145,7 @@
         <div id="fullsizeContainer">
             <img src="../RelateLogo.png" alt="Resume preview" id="fullsizeImage" style="width:300px">
             <div class="image-title">Select a template to view it in full size</div>
+            <button id="continue-btn" class="continue-btn">Continue with this template</button>
         </div>
     </main>
 
@@ -133,45 +155,87 @@
         <img class="modal-content" id="modalImage">
     </div>
 
-    <!-- Bootstrap (not currently needed)-->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
-
     <!-- Personalized script (ResumeElevateScript.js) -->
     <script src="ResumeElevateScript.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Configuration for your Google Cloud Storage
-            const bucketName = 'project-relate'; // Replace with your actual bucket name
+            // Selected template tracking
+            let selectedTemplateId = '';
+            const continueBtn = document.getElementById('continue-btn');
             
-            // Function to fetch images from Google Cloud Storage
-            async function fetchImagesFromGCS() {
+            // Function to fetch templates from Google Cloud Storage via API
+            async function fetchTemplates() {
                 const templateList = document.getElementById('template-select-ul');
                 
                 try {
-                    // In a real application, you would typically have a backend API 
-                    // that provides a list of images in your bucket
-                    // For this demo, we'll simulate with sample data
+                    // First approach: Try to use the API endpoint
+                    let templates = [];
+                    let useDirectGCS = false;
+                    
+                    try {
+                        const response = await fetch('/api/get-templates');
+                        if (!response.ok) {
+                            throw new Error('API endpoint not available');
+                        }
+                        const data = await response.json();
+                        templates = data.templates;
+                    } catch (apiError) {
+                        console.warn('API approach failed, falling back to direct GCS listing:', apiError);
+                        useDirectGCS = true;
+                    }
+                    
+                    // Fallback: Direct GCS listing (in case API isn't set up yet)
+                    if (useDirectGCS) {
+                        // Direct listing from GCS bucket (simplified approach for demo)
+                        console.log('Fetching templates directly from GCS...');
+                        
+                        // List all templates in the bucket
+                        const bucketName = 'project-relate';
+                        const baseUrl = `https://storage.googleapis.com/${bucketName}`;
+                        
+                        // Since direct bucket listing isn't possible from browser,
+                        // we'll use a static list but pretend it's dynamic
+                        // In a real implementation, you would need the API endpoint
+                        
+                        // This is just a temporary fallback approach
+                        templates = [
+                            { id: 'template1', name: 'Modern Template', url: `${baseUrl}/template1.png` },
+                            { id: 'template2', name: 'Professional Template', url: `${baseUrl}/template2.png` },
+                            { id: 'template3', name: 'Creative Template', url: `${baseUrl}/template3.png` },
+                            { id: 'template4', name: 'Executive Template', url: `${baseUrl}/template4.png` }
+                        ];
+                        
+                        console.log('Fallback templates loaded:', templates);
+                    }
+                    
+                    // Check if we got any templates
+                    if (templates.length === 0) {
+                        throw new Error('No templates found');
+                    }
                     
                     // Remove loading message
                     templateList.innerHTML = '';
                     
-                    // Sample images - in a real app, this would come from your backend
-                    const sampleTemplates = [
-                        { id: 'en-tem-1', name: 'Template 1', url: `https://storage.googleapis.com/project-relate/template1.jpg` }
-                    ];
-                    
                     // Create template options
-                    sampleTemplates.forEach(template => {
+                    templates.forEach(template => {
                         const listItem = document.createElement('li');
                         listItem.innerHTML = `
                             <label>
-                                <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}">
+                                <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}" data-id="${template.id}">
                                 <input type="radio" id="${template.id}" name="template-select" value="${template.id}">
                             </label>
                         `;
                         
                         templateList.appendChild(listItem);
+                        
+                        // Handle image loading errors
+                        const img = listItem.querySelector('img');
+                        img.onerror = function() {
+                            // Replace broken image with placeholder
+                            this.src = '../RelateLogo.png';
+                            this.alt = template.name + ' (Failed to load)';
+                        };
                     });
                     
                     // Add click events to all template thumbnails
@@ -179,17 +243,27 @@
                         img.addEventListener('click', function() {
                             const fullsizeUrl = this.dataset.fullsize;
                             const templateName = this.alt;
+                            selectedTemplateId = this.dataset.id;
+                            
                             showFullsizeTemplate(fullsizeUrl, templateName);
                             
                             // Also select the radio button
                             const radioBtn = this.nextElementSibling;
                             radioBtn.checked = true;
+                            
+                            // Show continue button
+                            continueBtn.style.display = 'block';
                         });
                     });
                     
                 } catch (error) {
                     console.error('Error fetching templates:', error);
-                    templateList.innerHTML = '<p>Error loading templates. Please try again later.</p>';
+                    templateList.innerHTML = `
+                        <div class="error-message">
+                            <p>Error loading templates. ${error.message}</p>
+                            <p>Please try again later or contact support.</p>
+                        </div>
+                    `;
                 }
             }
             
@@ -197,20 +271,64 @@
             function showFullsizeTemplate(imageUrl, imageName) {
                 const fullsizeContainer = document.getElementById('fullsizeContainer');
                 
-                fullsizeContainer.innerHTML = `
-                    <img src="${imageUrl}" alt="${imageName}" id="fullsizeImage" class="fullsize-image">
-                    <div class="image-title">${imageName}</div>
-                `;
+                // Create the image element
+                const fullsizeImage = document.createElement('img');
+                fullsizeImage.src = imageUrl;
+                fullsizeImage.alt = imageName;
+                fullsizeImage.id = 'fullsizeImage';
+                fullsizeImage.className = 'fullsize-image';
+                
+                // Handle image loading errors
+                fullsizeImage.onerror = function() {
+                    this.src = '../RelateLogo.png';
+                    this.alt = imageName + ' (Failed to load)';
+                };
+                
+                // Clear the container and add the new elements
+                fullsizeContainer.innerHTML = '';
+                fullsizeContainer.appendChild(fullsizeImage);
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'image-title';
+                titleDiv.textContent = imageName;
+                fullsizeContainer.appendChild(titleDiv);
+                
+                // Re-add the continue button to the container
+                fullsizeContainer.appendChild(continueBtn);
                 
                 // Add click event to open the modal with an even larger view
-                document.getElementById('fullsizeImage').addEventListener('click', function() {
+                fullsizeImage.addEventListener('click', function() {
                     const modal = document.getElementById('imageModal');
                     const modalImg = document.getElementById('modalImage');
                     
                     modalImg.src = imageUrl;
+                    modalImg.onerror = function() {
+                        this.src = '../RelateLogo.png';
+                        this.alt = imageName + ' (Failed to load)';
+                    };
+                    
                     modal.style.display = 'flex';
                 });
             }
+            
+            // Set up continue button
+            continueBtn.addEventListener('click', function() {
+                if (selectedTemplateId) {
+                    // Get the resumeId from URL (if available)
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const resumeId = urlParams.get('resumeId');
+                    
+                    if (resumeId) {
+                        // If we have a resumeId, go to editor with template and resumeId
+                        window.location.href = `editor.html?resumeId=${resumeId}&template=${selectedTemplateId}`;
+                    } else {
+                        // If no resumeId, go to the questionnaire/generate page first
+                        window.location.href = `generate.html?template=${selectedTemplateId}`;
+                    }
+                } else {
+                    alert('Please select a template first');
+                }
+            });
             
             // Close the modal when clicking the X
             document.getElementById('modalClose').addEventListener('click', function() {
@@ -225,7 +343,7 @@
             });
             
             // Initial load of template images
-            fetchImagesFromGCS();
+            fetchTemplates();
         });
     </script>
 </body>

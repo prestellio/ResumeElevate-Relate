@@ -7,6 +7,10 @@ const Resume = require('./models/Resume');
 const app = express();
 const port = 3000;
 
+const templateRoutes = require('./routes/templateRoutes');
+
+// Use the routes
+app.use('/api', templateRoutes);
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
