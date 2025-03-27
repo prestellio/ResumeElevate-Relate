@@ -1,3 +1,5 @@
+<!-- Description: This page is the template selection page for the user to choose a template for their resume. (templateselection.html) -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,13 +12,103 @@
 
     <!-- Personal CSS sheet (style.css)-->
     <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* Additional styles for the image preview functionality */
+        .preview-image {
+            width: 100%;
+            margin-bottom: 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .preview-image:hover {
+            transform: scale(1.03);
+        }
+        
+        .fullsize-image {
+            max-width: 100%;
+            max-height: 80vh;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        
+        .image-title {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        
+        /* Style adjustments for your specific layout */
+        #template-select-ul {
+            padding: 0;
+        }
+        
+        #template-select-ul li {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+        
+        #template-select-ul li label {
+            display: block;
+            position: relative;
+        }
+        
+        #template-select-ul li input[type="radio"] {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        
+        main div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    </style>
 </head>
-
 
 <!-- Main page starts -->
 <body class="template-page-grid">
     <header>
-        <a href="index#top">
+        <a href="index#top">    
             <img src="../RelateLogo.png" alt="Resume Relate Logo: green and blue peacock">
         </a>
     </header>
@@ -24,48 +116,116 @@
     <aside>
         <form>
             <ul class="template-page-grid-aside" id="template-select-ul">
-                <!-- If we want to get fancy, we can have the javascript write <li id="field-#"> where each template is assigned a # -->
-                <li>
-                    <label>
-                        <img src="../RelateLogo.png" alt="template option" id="">
-                        <input type="radio" id="en-tem-1" name="template-select" value="en-template-1">
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <img src="../RelateLogo.png" alt="template option">
-                        <input type="radio" id="template-select" name="Sum">
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <img src="../RelateLogo.png" alt="template option">
-                        <input type="radio" id="template-select" name="Sum">
-                    </label>
-                </li>
-                <li>
-                    <label>
-                        <img src="../RelateLogo.png" alt="template option">
-                        <input type="radio" id="template-select" name="Sum">
-                    </label>
-                </li>
+                <!-- Template thumbnails will be loaded here by JavaScript -->
+                <div class="loading">Loading templates...</div>
             </ul>
         </form>
     </aside>
-    <!-- <main class="container main-template-selection"> -->
+
     <main>
-        <div>
-            <img src="../RelateLogo.png" alt="Resume preview" style="width:100px">
+        <div id="fullsizeContainer">
+            <img src="../RelateLogo.png" alt="Resume preview" id="fullsizeImage" style="width:300px">
+            <div class="image-title">Select a template to view it in full size</div>
         </div>
     </main>
+
+    <!-- Modal for extra large view -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
 
     <!-- Bootstrap (not currently needed)-->
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
 
     <!-- Personalized script (ResumeElevateScript.js) -->
     <script src="ResumeElevateScript.js"></script>
-
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration for your Google Cloud Storage
+            const bucketName = 'project-relate'; // Replace with your actual bucket name
+            
+            // Function to fetch images from Google Cloud Storage
+            async function fetchImagesFromGCS() {
+                const templateList = document.getElementById('template-select-ul');
+                
+                try {
+                    // In a real application, you would typically have a backend API 
+                    // that provides a list of images in your bucket
+                    // For this demo, we'll simulate with sample data
+                    
+                    // Remove loading message
+                    templateList.innerHTML = '';  
+                    
+                    // Sample images - in a real app, this would come from your backend
+                    // Create template options
+                    sampleTemplates.forEach(template => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <label>
+                                <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}">
+                                <input type="radio" id="${template.id}" name="template-select" value="${template.id}">
+                            </label>
+                        `;
+                        
+                        templateList.appendChild(listItem);
+                    });
+                    
+                    // Add click events to all template thumbnails
+                    document.querySelectorAll('.preview-image').forEach(img => {
+                        img.addEventListener('click', function() {
+                            const fullsizeUrl = this.dataset.fullsize;
+                            const templateName = this.alt;
+                            showFullsizeTemplate(fullsizeUrl, templateName);
+                            
+                            // Also select the radio button
+                            const radioBtn = this.nextElementSibling;
+                            radioBtn.checked = true;
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error fetching templates:', error);
+                    templateList.innerHTML = '<p>Error loading templates. Please try again later.</p>';
+                }
+            }
+            
+            // Function to display fullsize template
+            function showFullsizeTemplate(imageUrl, imageName) {
+                const fullsizeContainer = document.getElementById('fullsizeContainer');
+                
+                fullsizeContainer.innerHTML = `
+                    <img src="${imageUrl}" alt="${imageName}" id="fullsizeImage" class="fullsize-image">
+                    <div class="image-title">${imageName}</div>
+                `;
+                
+                // Add click event to open the modal with an even larger view
+                document.getElementById('fullsizeImage').addEventListener('click', function() {
+                    const modal = document.getElementById('imageModal');
+                    const modalImg = document.getElementById('modalImage');
+                    
+                    modalImg.src = imageUrl;
+                    modal.style.display = 'flex';
+                });
+            }
+            
+            // Close the modal when clicking the X
+            document.getElementById('modalClose').addEventListener('click', function() {
+                document.getElementById('imageModal').style.display = 'none';
+            });
+            
+            // Close the modal when clicking outside the image
+            document.getElementById('imageModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+            
+            // Initial load of template images
+            fetchImagesFromGCS();
+        });
+    </script>
 </body>
-
 
 </html>
