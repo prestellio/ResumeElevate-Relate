@@ -3,176 +3,633 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Questionnaire</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link rel="icon" href="../RelateLogo.png" type="image/x-icon">
+    <title>Resume Questionnaire | ResumeElevate</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
+        .questionnaire-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background-color: white;
             padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .question-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        .question-section {
+            opacity: 1;
             transition: opacity 0.5s ease-in-out;
         }
 
-        .hidden {
+        .question-section.hidden {
             opacity: 0;
-            pointer-events: none;
+            display: none;
         }
 
-        .question {
-            font-size: 20px;
-            margin-bottom: 15px;
+        .question-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #225bb2;
+        }
+
+        .question-prompt {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            background-color: #9ba2ff;
+            color: black;
+            border: 2px solid #225bb2;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background-color: #225bb2;
+            color: white;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #9ba2ff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .textarea-field {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #9ba2ff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 120px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .back-btn, .next-btn, .submit-btn {
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            background-color: #6d696a;
+            color: white;
+            border: none;
+        }
+
+        .next-btn, .submit-btn {
+            background-color: #225bb2;
+            color: white;
+            border: none;
         }
 
         .progress-container {
             width: 100%;
-            background-color: #ddd;
             height: 10px;
-            margin-top: 20px;
+            background-color: #ddd;
             border-radius: 5px;
+            margin-bottom: 30px;
         }
 
         .progress-bar {
-            height: 10px;
-            background-color: #007BFF;
+            height: 100%;
+            background-color: #225bb2;
             width: 0%;
             border-radius: 5px;
             transition: width 0.5s ease-in-out;
         }
 
-        .answer-button {
-            display: block;
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
+        .section-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
         }
 
-        .answer-button:hover {
-            background-color: #0056b3;
+        .add-btn {
+            background-color: #3bceac;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .remove-btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+    <header id="top">
+        <a href="index.html">
+            <img src="../RelateLogo.png" alt="Resume Relate Logo">
+        </a>
+        
+        <nav class="navbar">
+            <button class="navbar-toggle" id="navbarToggle">&#9776;</button>
+            <div class="navbar-menu" id="navbarMenu">
+                <a class="nav-link" href="index.html">Home</a>
+                <a class="nav-link" href="generate.html">Generate Resume</a>
+                <a class="nav-link" href="about.html">About</a>
+                <a class="nav-link" href="login.html">Login</a>
+                <a class="nav-link" href="editor.html">Edit Resume</a>
+            </div>
+        </nav>
+    </header>
 
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
+    <main>
+        <div class="questionnaire-container">
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
 
-    <div class="question-container" id="questionContainer">
-        <p class="question" id="questionText"></p>
-        <div id="answerOptions"></div>
-    </div>
+            <!-- Career Selection Question -->
+            <div class="question-section" id="career-selection">
+                <h2 class="question-title">Let's Start Building Your Resume</h2>
+                <p class="question-prompt">What career field are you interested in?</p>
+                <button class="option-btn" data-career="engineering">Engineering</button>
+                <button class="option-btn" data-career="business">Business & Finance</button>
+                <button class="option-btn" data-career="technology">Technology & IT</button>
+                <button class="option-btn" data-career="healthcare">Healthcare</button>
+                <button class="option-btn" data-career="education">Education</button>
+                <button class="option-btn" data-career="arts">Arts & Creative Fields</button>
+                <button class="option-btn" data-career="science">Science & Research</button>
+            </div>
 
+            <!-- Personal Information -->
+            <div class="question-section hidden" id="personal-info">
+                <h2 class="question-title">Personal Information</h2>
+                <p class="question-prompt">Tell us a bit about yourself.</p>
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" class="input-field" placeholder="e.g., John Smith">
+                
+                <label for="email">Email Address</label>
+                <input type="email" id="email" class="input-field" placeholder="e.g., johnsmith@example.com">
+                
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" class="input-field" placeholder="e.g., (555) 123-4567">
+                
+                <label for="location">Location</label>
+                <input type="text" id="location" class="input-field" placeholder="e.g., New York, NY">
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="personal-back">Back</button>
+                    <button class="next-btn" id="personal-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Education Information -->
+            <div class="question-section hidden" id="education-info">
+                <h2 class="question-title">Education</h2>
+                <p class="question-prompt">Tell us about your educational background.</p>
+                <div id="education-sections">
+                    <div class="section-container">
+                        <label for="university">University/Institution</label>
+                        <input type="text" id="university" class="input-field" placeholder="e.g., Wichita State University">
+                        
+                        <label for="degree">Degree</label>
+                        <input type="text" id="degree" class="input-field" placeholder="e.g., Bachelor of Science in Computer Science">
+                        
+                        <label for="graduation-date">Graduation Date</label>
+                        <input type="text" id="graduation-date" class="input-field" placeholder="e.g., May 2025">
+                        
+                        <label for="gpa">GPA (Optional)</label>
+                        <input type="text" id="gpa" class="input-field" placeholder="e.g., 3.8/4.0">
+                        
+                        <label for="relevant-courses">Relevant Courses</label>
+                        <input type="text" id="relevant-courses" class="input-field" placeholder="e.g., Data Structures, Algorithms, Database Systems">
+                    </div>
+                </div>
+                <button class="add-btn" id="add-education">+ Add Another Education</button>
+                <div class="nav-buttons">
+                    <button class="back-btn" id="education-back">Back</button>
+                    <button class="next-btn" id="education-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Experience Information -->
+            <div class="question-section hidden" id="experience-info">
+                <h2 class="question-title">Work Experience</h2>
+                <p class="question-prompt">Tell us about your work experience.</p>
+                <div id="experience-sections">
+                    <div class="section-container">
+                        <label for="company-name">Company Name</label>
+                        <input type="text" id="company-name" class="input-field" placeholder="e.g., ABC Corporation">
+                        
+                        <label for="job-title">Job Title</label>
+                        <input type="text" id="job-title" class="input-field" placeholder="e.g., Software Engineer Intern">
+                        
+                        <label for="job-location">Location</label>
+                        <input type="text" id="job-location" class="input-field" placeholder="e.g., Wichita, KS">
+                        
+                        <label for="employment-dates">Employment Dates</label>
+                        <input type="text" id="employment-dates" class="input-field" placeholder="e.g., May 2023 - August 2023">
+                        
+                        <label for="job-responsibilities">Key Responsibilities and Achievements</label>
+                        <textarea id="job-responsibilities" class="textarea-field" placeholder="e.g., Developed and maintained web applications using React and Node.js. Improved application performance by 30%."></textarea>
+                    </div>
+                </div>
+                <button class="add-btn" id="add-experience">+ Add Another Experience</button>
+                <div class="nav-buttons">
+                    <button class="back-btn" id="experience-back">Back</button>
+                    <button class="next-btn" id="experience-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Projects Information -->
+            <div class="question-section hidden" id="projects-info">
+                <h2 class="question-title">Projects</h2>
+                <p class="question-prompt">Tell us about your significant projects.</p>
+                <div id="project-sections">
+                    <div class="section-container">
+                        <label for="project-name">Project Name</label>
+                        <input type="text" id="project-name" class="input-field" placeholder="e.g., E-commerce Website">
+                        
+                        <label for="project-dates">Project Dates</label>
+                        <input type="text" id="project-dates" class="input-field" placeholder="e.g., January 2023 - March 2023">
+                        
+                        <label for="project-description">Project Description</label>
+                        <textarea id="project-description" class="textarea-field" placeholder="e.g., Developed a full-stack e-commerce website using MERN stack. Implemented user authentication, product search, and payment processing."></textarea>
+                    </div>
+                </div>
+                <button class="add-btn" id="add-project">+ Add Another Project</button>
+                <div class="nav-buttons">
+                    <button class="back-btn" id="projects-back">Back</button>
+                    <button class="next-btn" id="projects-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Skills Information -->
+            <div class="question-section hidden" id="skills-info">
+                <h2 class="question-title">Skills</h2>
+                <p class="question-prompt">What technical and soft skills do you possess?</p>
+                <label for="technical-skills">Technical Skills</label>
+                <input type="text" id="technical-skills" class="input-field" placeholder="e.g., JavaScript, React, Node.js, SQL, Git">
+                
+                <label for="soft-skills">Soft Skills</label>
+                <input type="text" id="soft-skills" class="input-field" placeholder="e.g., Team Collaboration, Problem Solving, Communication, Leadership">
+                
+                <label for="languages">Languages (Optional)</label>
+                <input type="text" id="languages" class="input-field" placeholder="e.g., English (Native), Spanish (Intermediate)">
+                
+                <label for="certifications">Certifications (Optional)</label>
+                <input type="text" id="certifications" class="input-field" placeholder="e.g., AWS Certified Developer, Google Analytics Certification">
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="skills-back">Back</button>
+                    <button class="next-btn" id="skills-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Field-Specific Questions (Engineering) -->
+            <div class="question-section hidden" id="engineering-questions">
+                <h2 class="question-title">Engineering-Specific Information</h2>
+                <p class="question-prompt">Let's get some information specific to your engineering field.</p>
+                <label for="engineering-type">Engineering Discipline</label>
+                <select id="engineering-type" class="input-field">
+                    <option value="">Select your engineering discipline</option>
+                    <option value="software">Software Engineering</option>
+                    <option value="mechanical">Mechanical Engineering</option>
+                    <option value="electrical">Electrical Engineering</option>
+                    <option value="civil">Civil Engineering</option>
+                    <option value="aerospace">Aerospace Engineering</option>
+                    <option value="chemical">Chemical Engineering</option>
+                    <option value="biomedical">Biomedical Engineering</option>
+                    <option value="industrial">Industrial Engineering</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="engineering-software">Technical Software Proficiency</label>
+                <input type="text" id="engineering-software" class="input-field" placeholder="e.g., AutoCAD, MATLAB, SolidWorks, ANSYS">
+                
+                <label for="engineering-projects">Significant Engineering Projects</label>
+                <textarea id="engineering-projects" class="textarea-field" placeholder="Briefly describe 1-2 significant engineering projects you've worked on"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="engineering-back">Back</button>
+                    <button class="next-btn" id="engineering-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="question-section hidden" id="summary-section">
+                <h2 class="question-title">Professional Summary</h2>
+                <p class="question-prompt">Let's create a brief professional summary for your resume.</p>
+                <label for="professional-summary">Professional Summary</label>
+                <textarea id="professional-summary" class="textarea-field" placeholder="e.g., Dedicated Software Engineer with 2 years of experience in web development. Proficient in JavaScript, React, and Node.js. Passionate about creating efficient, scalable applications that solve real-world problems."></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="summary-back">Back</button>
+                    <button class="submit-btn" id="submit-resume">Generate Resume</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="container">
+        <div>
+            <p>&copy; 2024 Resume Elevate</p>
+            <ul>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="careers.html">Careers</a></li>
+            </ul>
+        </div>
+        <div>
+            <p>A Wichita State Project</p>
+            <p>Relate Resume Generator</p>
+        </div>
+    </footer>
+
+    <script src="ResumeElevateScript.js"></script>
     <script>
-        const questions = [
-            { 
-                question: "What is your favorite programming language?", 
-                answers: ["JavaScript", "Python", "C++", "Java"] 
-            },
-            { 
-                question: "What type of projects do you like?", 
-                answers: ["Web Development", "Machine Learning", "Game Development", "Cybersecurity"] 
-            },
-            { 
-                question: "Do you prefer working solo or in a team?", 
-                answers: ["Solo", "Team", "Both", "Depends on the project"] 
-            },
-            { 
-                question: "What is your experience level?", 
-                answers: ["Beginner", "Intermediate", "Advanced", "Expert"] 
-            },
-            { 
-                question: "What is your preferred coding environment?", 
-                answers: ["Windows", "MacOS", "Linux", "Cloud IDEs"] 
+        document.addEventListener('DOMContentLoaded', function() {
+            // Section IDs in order of appearance
+            const sectionIds = [
+                'career-selection',
+                'personal-info',
+                'education-info',
+                'experience-info', 
+                'projects-info',
+                'skills-info',
+                'summary-section'
+            ];
+
+            // Field-specific sections mapped by career choice
+            const fieldSpecificSections = {
+                'engineering': 'engineering-questions'
+                // Add others as needed
+            };
+
+            // Current workflow of sections
+            let currentWorkflow = [...sectionIds];
+            
+            // Track current section index
+            let currentSectionIndex = 0;
+            
+            // Career choice
+            let selectedCareer = '';
+
+            // Resume data object to store all responses
+            const resumeData = {
+                personalInfo: {},
+                education: [],
+                experience: [],
+                projects: [],
+                skills: {},
+                fieldSpecific: {},
+                summary: ''
+            };
+
+            // Initialize the questionnaire
+            initQuestionnaire();
+
+            function initQuestionnaire() {
+                // Career selection buttons
+                const careerButtons = document.querySelectorAll('.option-btn[data-career]');
+                careerButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        selectedCareer = this.getAttribute('data-career');
+                        
+                        // Update workflow to include field-specific questions
+                        if (fieldSpecificSections[selectedCareer]) {
+                            // Insert field-specific section before summary
+                            const summaryIndex = currentWorkflow.indexOf('summary-section');
+                            currentWorkflow.splice(summaryIndex, 0, fieldSpecificSections[selectedCareer]);
+                        }
+                        
+                        // Move to next section
+                        moveToNextSection();
+                    });
+                });
+
+                // Setup navigation buttons
+                document.getElementById('personal-back').addEventListener('click', moveToPreviousSection);
+                document.getElementById('personal-next').addEventListener('click', function() {
+                    collectPersonalInfo();
+                    moveToNextSection();
+                });
+
+                document.getElementById('education-back').addEventListener('click', moveToPreviousSection);
+                document.getElementById('education-next').addEventListener('click', function() {
+                    collectEducationInfo();
+                    moveToNextSection();
+                });
+
+                document.getElementById('experience-back').addEventListener('click', moveToPreviousSection);
+                document.getElementById('experience-next').addEventListener('click', function() {
+                    collectExperienceInfo();
+                    moveToNextSection();
+                });
+
+                document.getElementById('projects-back').addEventListener('click', moveToPreviousSection);
+                document.getElementById('projects-next').addEventListener('click', function() {
+                    collectProjectsInfo();
+                    moveToNextSection();
+                });
+
+                document.getElementById('skills-back').addEventListener('click', moveToPreviousSection);
+                document.getElementById('skills-next').addEventListener('click', function() {
+                    collectSkillsInfo();
+                    moveToNextSection();
+                });
+
+                // Engineering specific section
+                if (document.getElementById('engineering-back')) {
+                    document.getElementById('engineering-back').addEventListener('click', moveToPreviousSection);
+                    document.getElementById('engineering-next').addEventListener('click', function() {
+                        collectEngineeringInfo();
+                        moveToNextSection();
+                    });
+                }
+
+                document.getElementById('summary-back').addEventListener('click', moveToPreviousSection);
+                document.getElementById('submit-resume').addEventListener('click', function() {
+                    collectSummary();
+                    submitResume();
+                });
+                
+                // Setup "Add More" buttons
+                document.getElementById('add-education').addEventListener('click', addEducationSection);
+                document.getElementById('add-experience').addEventListener('click', addExperienceSection);
+                document.getElementById('add-project').addEventListener('click', addProjectSection);
+                
+                // Update progress bar
+                updateProgressBar();
             }
-        ];
 
-        let currentQuestionIndex = 0;
-        let userAnswers = [];
-        function loadQuestion() {
-            if (currentQuestionIndex >= questions.length) {
-                document.getElementById("questionContainer").innerHTML = "<h2>Thank you for completing the questionnaire!</h2>";
-                return;
+            function moveToNextSection() {
+                // Hide current section
+                document.getElementById(currentWorkflow[currentSectionIndex]).classList.add('hidden');
+                
+                // Move to next section index
+                currentSectionIndex++;
+                
+                // Show next section
+                document.getElementById(currentWorkflow[currentSectionIndex]).classList.remove('hidden');
+                
+                // Update progress bar
+                updateProgressBar();
             }
 
-            const questionObj = questions[currentQuestionIndex];
+            function moveToPreviousSection() {
+                // Hide current section
+                document.getElementById(currentWorkflow[currentSectionIndex]).classList.add('hidden');
+                
+                // Move to previous section index
+                currentSectionIndex--;
+                
+                // Show previous section
+                document.getElementById(currentWorkflow[currentSectionIndex]).classList.remove('hidden');
+                
+                // Update progress bar
+                updateProgressBar();
+            }
 
-            document.getElementById("questionText").textContent = questionObj.question;
-            const answerContainer = document.getElementById("answerOptions");
-            answerContainer.innerHTML = "";
+            function updateProgressBar() {
+                const progressPercentage = ((currentSectionIndex) / (currentWorkflow.length - 1)) * 100;
+                document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+            }
 
-            questionObj.answers.forEach(answer => {
-                const button = document.createElement("button");
-                button.classList.add("answer-button");
-                button.textContent = answer;
-                button.onclick = () => nextQuestion();
-                answerContainer.appendChild(button);
-            });
+            // Data collection functions
+            function collectPersonalInfo() {
+                resumeData.personalInfo = {
+                    name: document.getElementById('full-name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    location: document.getElementById('location').value
+                };
+            }
 
-            updateProgressBar();
-        }
+            function collectEducationInfo() {
+                // Simple version - just collect the first education entry
+                resumeData.education = [{
+                    university: document.getElementById('university').value,
+                    degree: document.getElementById('degree').value,
+                    graduationDate: document.getElementById('graduation-date').value,
+                    gpa: document.getElementById('gpa').value,
+                    relevantCourses: document.getElementById('relevant-courses').value
+                }];
+            }
 
-        function nextQuestion(answer) {
-    userAnswers.push({ question: questions[currentQuestionIndex].question, answer: answer });
-    document.getElementById("questionContainer").classList.add("hidden");
+            function collectExperienceInfo() {
+                // Simple version - just collect the first experience entry
+                resumeData.experience = [{
+                    companyName: document.getElementById('company-name').value,
+                    jobTitle: document.getElementById('job-title').value,
+                    location: document.getElementById('job-location').value,
+                    dates: document.getElementById('employment-dates').value,
+                    responsibilities: document.getElementById('job-responsibilities').value
+                }];
+            }
 
-    setTimeout(() => {
-        currentQuestionIndex++;
-        loadQuestion();
-        document.getElementById("questionContainer").classList.remove("hidden");
-    }, 500);
-}
+            function collectProjectsInfo() {
+                // Simple version - just collect the first project entry
+                resumeData.projects = [{
+                    projectName: document.getElementById('project-name').value,
+                    dates: document.getElementById('project-dates').value,
+                    description: document.getElementById('project-description').value
+                }];
+            }
 
+            function collectSkillsInfo() {
+                resumeData.skills = {
+                    technical: document.getElementById('technical-skills').value,
+                    soft: document.getElementById('soft-skills').value,
+                    languages: document.getElementById('languages').value,
+                    certifications: document.getElementById('certifications').value
+                };
+            }
 
-        function updateProgressBar() {
-            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-            document.getElementById("progressBar").style.width = `${progress}%`;
-        }
+            function collectEngineeringInfo() {
+                resumeData.fieldSpecific.engineering = {
+                    discipline: document.getElementById('engineering-type').value,
+                    software: document.getElementById('engineering-software').value,
+                    projects: document.getElementById('engineering-projects').value
+                };
+            }
 
-        async function submitAnswers() {
-    try {
-        const response = await fetch('http://localhost:3000/save-answers', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers: userAnswers })
+            function collectSummary() {
+                resumeData.summary = document.getElementById('professional-summary').value;
+            }
+
+            // Submit resume to backend
+            function submitResume() {
+                // Show loading state
+                document.getElementById('submit-resume').textContent = 'Processing...';
+                document.getElementById('submit-resume').disabled = true;
+                
+                // Send data to server
+                fetch('/submit-resume', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(resumeData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.resumeId) {
+                        // Redirect to editor with the resume ID
+                        window.location.href = `editor.html?resumeId=${data.resumeId}`;
+                    } else {
+                        alert('Error: Failed to generate resume. Please try again.');
+                        document.getElementById('submit-resume').textContent = 'Generate Resume';
+                        document.getElementById('submit-resume').disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting resume:', error);
+                    alert('Error: Failed to submit resume. Please try again.');
+                    document.getElementById('submit-resume').textContent = 'Generate Resume';
+                    document.getElementById('submit-resume').disabled = false;
+                });
+            }
+
+            // Section addition functions
+            function addEducationSection() {
+                alert("This function will add another education section. For simplicity, this feature is disabled in the demo.");
+            }
+
+            function addExperienceSection() {
+                alert("This function will add another experience section. For simplicity, this feature is disabled in the demo.");
+            }
+
+            function addProjectSection() {
+                alert("This function will add another project section. For simplicity, this feature is disabled in the demo.");
+            }
         });
-
-        console.log("Response status:", response.status); // ✅ Log response status
-
-        if (!response.ok) {
-            throw new Error("Failed to save answers");
-        }
-
-        const data = await response.json();
-        console.log("Server response:", data); // ✅ Log server response
-
-        alert("Your answers have been saved successfully!");
-
-        document.getElementById("questionContainer").innerHTML = "<h2>Thank you! Your answers have been saved. 🎉</h2>";
-
-    } catch (error) {
-        console.error("Error submitting answers:", error);
-        alert("Error saving answers. Please check your internet connection and try again.");
-    }
-}
-        loadQuestion();
     </script>
-
 </body>
 </html>
