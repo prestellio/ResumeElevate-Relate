@@ -383,23 +383,38 @@ async function saveResumeReview(resumeId, quillEducation, quillExperience, quill
 
 // Template selection page initialization
 function initTemplateSelection() {
-    // Sample template data (in a real app, this would come from your backend)
-    const sampleTemplates = [
-        { id: 'template1', name: 'Professional Template', url: '../RelateLogo.png' },
-        { id: 'template2', name: 'Creative Template', url: '../RelateLogo.png' },
-        { id: 'template3', name: 'Modern Template', url: '../RelateLogo.png' }
-    ];
-
-    // Function to fetch images from Google Cloud Storage
+    // Configuration
+    const apiEndpoint = '/api/get-templates'; // The endpoint we've defined in templateRoutes.js
+    
+    // Function to fetch images from Google Cloud Storage via our API
     async function fetchImagesFromGCS() {
         const templateList = document.getElementById('template-select-ul');
+        templateList.innerHTML = '<div class="loading">Loading templates...</div>';
         
         try {
-            // Remove loading message
-            templateList.innerHTML = '';  
+            // Fetch templates from our backend API
+            const response = await fetch(apiEndpoint);
             
-            // Create template options
-            sampleTemplates.forEach(template => {
+            if (!response.ok) {
+                throw new Error(`API responded with status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.success || !data.templates || !Array.isArray(data.templates)) {
+                throw new Error('Invalid response format from API');
+            }
+            
+            // Remove loading message
+            templateList.innerHTML = '';
+            
+            // Create template options from the API response
+            if (data.templates.length === 0) {
+                templateList.innerHTML = '<p>No templates found. Please check back later.</p>';
+                return;
+            }
+            
+            data.templates.forEach(template => {
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
                     <label>
@@ -423,6 +438,12 @@ function initTemplateSelection() {
                     radioBtn.checked = true;
                 });
             });
+            
+            // Show the first template by default
+            if (data.templates.length > 0) {
+                const firstTemplate = data.templates[0];
+                showFullsizeTemplate(firstTemplate.url, firstTemplate.name);
+            }
             
         } catch (error) {
             console.error('Error fetching templates:', error);
@@ -486,13 +507,8 @@ function initQuestionnaire() {
 
     // Field-specific sections mapped by career choice
     const fieldSpecificSections = {
-        'engineering': 'engineering-questions',
-        'business': 'business-questions',
-        'technology': 'technology-questions',
-        'healthcare': 'healthcare-questions',
-        'education': 'education-questions',
-        'arts': 'arts-questions',
-        'science': 'science-questions'
+        'engineering': 'engineering-questions'
+        // Add others as needed
     };
 
     // Current workflow of sections
@@ -528,89 +544,10 @@ function initQuestionnaire() {
                 currentWorkflow.splice(summaryIndex, 0, fieldSpecificSections[selectedCareer]);
             }
             
-            // Move to next section with animation
+            // Move to next section
             moveToNextSection();
         });
     });
-
-    // Fancy transition function to move to the next section
-    function moveToNextSection() {
-        // Get current and next section elements
-        const currentSection = document.getElementById(currentWorkflow[currentSectionIndex]);
-        currentSectionIndex++;
-        const nextSection = document.getElementById(currentWorkflow[currentSectionIndex]);
-        
-        // Apply fade out to current section
-        currentSection.classList.add('fade-out');
-        
-        // After fade out completes, hide current and prepare next
-        setTimeout(() => {
-            currentSection.classList.add('hidden');
-            currentSection.classList.remove('fade-out');
-            
-            // Show next section but initially invisible
-            nextSection.classList.remove('hidden');
-            nextSection.classList.add('fade-in');
-            
-            // Trigger reflow to ensure transition works
-            void nextSection.offsetWidth;
-            
-            // Start fade in for next section
-            setTimeout(() => {
-                nextSection.classList.remove('fade-in');
-            }, 50);
-            
-            // Update progress bar
-            updateProgressBar();
-        }, 500); // Match this to your CSS transition duration
-    }
-
-    // Fancy transition function to move to the previous section
-    function moveToPreviousSection() {
-        // Get current and previous section elements
-        const currentSection = document.getElementById(currentWorkflow[currentSectionIndex]);
-        currentSectionIndex--;
-        const prevSection = document.getElementById(currentWorkflow[currentSectionIndex]);
-        
-        // Apply fade out to current section
-        currentSection.classList.add('fade-out');
-        
-        // After fade out completes, hide current and prepare previous
-        setTimeout(() => {
-            currentSection.classList.add('hidden');
-            currentSection.classList.remove('fade-out');
-            
-            // Show previous section but initially invisible
-            prevSection.classList.remove('hidden');
-            prevSection.classList.add('fade-in');
-            
-            // Trigger reflow to ensure transition works
-            void prevSection.offsetWidth;
-            
-            // Start fade in for previous section
-            setTimeout(() => {
-                prevSection.classList.remove('fade-in');
-            }, 50);
-            
-            // Update progress bar
-            updateProgressBar();
-        }, 500); // Match this to your CSS transition duration
-    }
-
-    function updateProgressBar() {
-        const progressPercentage = ((currentSectionIndex) / (currentWorkflow.length - 1)) * 100;
-        const progressBar = document.getElementById('progressBar');
-        progressBar.style.width = `${progressPercentage}%`;
-        
-        // Add color transition based on progress
-        if (progressPercentage < 30) {
-            progressBar.style.backgroundColor = '#225bb2'; // Default blue
-        } else if (progressPercentage < 70) {
-            progressBar.style.backgroundColor = '#3bceac'; // Green
-        } else {
-            progressBar.style.backgroundColor = '#9ba2ff'; // Light blue
-        }
-    }
 
     // Setup navigation buttons
     document.getElementById('personal-back').addEventListener('click', moveToPreviousSection);
@@ -643,73 +580,63 @@ function initQuestionnaire() {
         moveToNextSection();
     });
 
-    // Setup field-specific back/next buttons
-    const fieldIds = Object.values(fieldSpecificSections);
-    fieldIds.forEach(fieldId => {
-        const backBtn = document.getElementById(`${fieldId.split('-')[0]}-back`);
-        const nextBtn = document.getElementById(`${fieldId.split('-')[0]}-next`);
-        
-        if (backBtn) backBtn.addEventListener('click', moveToPreviousSection);
-        if (nextBtn) nextBtn.addEventListener('click', function() {
-            // Call appropriate collector function if needed
-            const fieldType = fieldId.split('-')[0];
-            if (typeof window[`collect${fieldType.charAt(0).toUpperCase() + fieldType.slice(1)}Info`] === 'function') {
-                window[`collect${fieldType.charAt(0).toUpperCase() + fieldType.slice(1)}Info`]();
-            }
+    // Engineering specific section
+    if (document.getElementById('engineering-back')) {
+        document.getElementById('engineering-back').addEventListener('click', moveToPreviousSection);
+        document.getElementById('engineering-next').addEventListener('click', function() {
+            collectEngineeringInfo();
             moveToNextSection();
         });
-    });
+    }
 
     document.getElementById('summary-back').addEventListener('click', moveToPreviousSection);
     document.getElementById('submit-resume').addEventListener('click', function() {
         collectSummary();
-        
-        // Add loading animation to submit button
-        this.innerHTML = '<span class="spinner"></span> Processing...';
-        this.disabled = true;
-        
-        // Submit with a slight delay for better user experience
-        setTimeout(() => {
-            submitResume();
-        }, 800);
+        submitResume();
     });
     
-    // Setup "Add More" buttons with animation
-    document.getElementById('add-education').addEventListener('click', function() {
-        addEducationSection();
-        this.classList.add('button-clicked');
-        setTimeout(() => {
-            this.classList.remove('button-clicked');
-        }, 300);
-    });
+    // Setup "Add More" buttons
+    document.getElementById('add-education').addEventListener('click', addEducationSection);
+    document.getElementById('add-experience').addEventListener('click', addExperienceSection);
+    document.getElementById('add-project').addEventListener('click', addProjectSection);
     
-    document.getElementById('add-experience').addEventListener('click', function() {
-        addExperienceSection();
-        this.classList.add('button-clicked');
-        setTimeout(() => {
-            this.classList.remove('button-clicked');
-        }, 300);
-    });
-    
-    document.getElementById('add-project').addEventListener('click', function() {
-        addProjectSection();
-        this.classList.add('button-clicked');
-        setTimeout(() => {
-            this.classList.remove('button-clicked');
-        }, 300);
-    });
-    
-    // Initialize first section with fade-in effect
-    const firstSection = document.getElementById(currentWorkflow[0]);
-    firstSection.classList.add('fade-in');
-    setTimeout(() => {
-        firstSection.classList.remove('fade-in');
-    }, 50);
-    
-    // Update progress bar initially
+    // Update progress bar
     updateProgressBar();
 
-    // Data collection functions - Keep your existing implementations
+    function moveToNextSection() {
+        // Hide current section
+        document.getElementById(currentWorkflow[currentSectionIndex]).classList.add('hidden');
+        
+        // Move to next section index
+        currentSectionIndex++;
+        
+        // Show next section
+        document.getElementById(currentWorkflow[currentSectionIndex]).classList.remove('hidden');
+        
+        // Update progress bar
+        updateProgressBar();
+    }
+
+    function moveToPreviousSection() {
+        // Hide current section
+        document.getElementById(currentWorkflow[currentSectionIndex]).classList.add('hidden');
+        
+        // Move to previous section index
+        currentSectionIndex--;
+        
+        // Show previous section
+        document.getElementById(currentWorkflow[currentSectionIndex]).classList.remove('hidden');
+        
+        // Update progress bar
+        updateProgressBar();
+    }
+
+    function updateProgressBar() {
+        const progressPercentage = ((currentSectionIndex) / (currentWorkflow.length - 1)) * 100;
+        document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+    }
+
+    // Data collection functions
     function collectPersonalInfo() {
         resumeData.personalInfo = {
             name: document.getElementById('full-name').value,
@@ -720,102 +647,105 @@ function initQuestionnaire() {
     }
 
     function collectEducationInfo() {
-        // Your existing implementation
+        // Simple version - just collect the first education entry
+        resumeData.education = [{
+            university: document.getElementById('university').value,
+            degree: document.getElementById('degree').value,
+            graduationDate: document.getElementById('graduation-date').value,
+            gpa: document.getElementById('gpa').value,
+            relevantCourses: document.getElementById('relevant-courses').value
+        }];
     }
 
     function collectExperienceInfo() {
-        // Your existing implementation
+        // Simple version - just collect the first experience entry
+        resumeData.experience = [{
+            companyName: document.getElementById('company-name').value,
+            jobTitle: document.getElementById('job-title').value,
+            location: document.getElementById('job-location').value,
+            dates: document.getElementById('employment-dates').value,
+            responsibilities: document.getElementById('job-responsibilities').value
+        }];
     }
 
     function collectProjectsInfo() {
-        // Your existing implementation
+        // Simple version - just collect the first project entry
+        resumeData.projects = [{
+            projectName: document.getElementById('project-name').value,
+            dates: document.getElementById('project-dates').value,
+            description: document.getElementById('project-description').value
+        }];
     }
 
     function collectSkillsInfo() {
-        // Your existing implementation
+        resumeData.skills = {
+            technical: document.getElementById('technical-skills').value,
+            soft: document.getElementById('soft-skills').value,
+            languages: document.getElementById('languages').value,
+            certifications: document.getElementById('certifications').value
+        };
     }
 
     function collectEngineeringInfo() {
-        // Your existing implementation
+        resumeData.fieldSpecific.engineering = {
+            discipline: document.getElementById('engineering-type').value,
+            software: document.getElementById('engineering-software').value,
+            projects: document.getElementById('engineering-projects').value
+        };
     }
 
     function collectSummary() {
-        // Your existing implementation
+        resumeData.summary = document.getElementById('professional-summary').value;
     }
 
+    // Submit resume to backend
     function submitResume() {
-        // Your existing implementation
+        // Show loading state
+        document.getElementById('submit-resume').textContent = 'Processing...';
+        document.getElementById('submit-resume').disabled = true;
+        
+        // Send data to server
+        fetch('/submit-resume', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(resumeData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.resumeId) {
+                // Redirect to editor with the resume ID
+                window.location.href = `editor.html?resumeId=${data.resumeId}`;
+            } else {
+                alert('Error: Failed to generate resume. Please try again.');
+                document.getElementById('submit-resume').textContent = 'Generate Resume';
+                document.getElementById('submit-resume').disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting resume:', error);
+            alert('Error: Failed to submit resume. Please try again.');
+            document.getElementById('submit-resume').textContent = 'Generate Resume';
+            document.getElementById('submit-resume').disabled = false;
+        });
     }
 
-    // Section addition functions with visual feedback
+    // Section addition functions
     function addEducationSection() {
-        // Create a new education section with animation
-        const educationSections = document.getElementById('education-sections');
-        const newSection = document.createElement('div');
-        newSection.className = 'section-container';
-        newSection.style.opacity = '0';
-        newSection.style.transform = 'translateY(20px)';
-        newSection.style.transition = 'all 0.5s ease';
-        
-        // Add content to the new section (adjust based on your HTML structure)
-        newSection.innerHTML = `
-            <div class="section-header">
-                <h4>Additional Education</h4>
-                <button type="button" class="remove-btn">Remove</button>
-            </div>
-            <label for="university-new">University/Institution</label>
-            <input type="text" id="university-new" class="input-field" placeholder="e.g., Wichita State University">
-            
-            <label for="degree-new">Degree</label>
-            <input type="text" id="degree-new" class="input-field" placeholder="e.g., Bachelor of Science in Computer Science">
-            
-            <label for="graduation-date-new">Graduation Date</label>
-            <input type="text" id="graduation-date-new" class="input-field" placeholder="e.g., May 2025">
-            
-            <label for="gpa-new">GPA (Optional)</label>
-            <input type="text" id="gpa-new" class="input-field" placeholder="e.g., 3.8/4.0">
-            
-            <label for="relevant-courses-new">Relevant Courses</label>
-            <input type="text" id="relevant-courses-new" class="input-field" placeholder="e.g., Data Structures, Algorithms, Database Systems">
-        `;
-        
-        educationSections.appendChild(newSection);
-        
-        // Add event listener to remove button
-        newSection.querySelector('.remove-btn').addEventListener('click', function() {
-            removeSection(newSection);
-        });
-        
-        // Trigger animation
-        setTimeout(() => {
-            newSection.style.opacity = '1';
-            newSection.style.transform = 'translateY(0)';
-        }, 50);
+        alert("This function will add another education section. For simplicity, this feature is disabled in the demo.");
     }
 
     function addExperienceSection() {
-        // Implementation similar to addEducationSection
-        // Alert for demo purposes in original code
         alert("This function will add another experience section. For simplicity, this feature is disabled in the demo.");
     }
 
     function addProjectSection() {
-        // Implementation similar to addEducationSection
-        // Alert for demo purposes in original code
         alert("This function will add another project section. For simplicity, this feature is disabled in the demo.");
-    }
-
-    function removeSection(section) {
-        // Animate section removal
-        section.style.opacity = '0';
-        section.style.transform = 'translateY(-20px)';
-        section.style.maxHeight = '0';
-        section.style.padding = '0';
-        section.style.margin = '0';
-        
-        // Remove after animation completes
-        setTimeout(() => {
-            section.remove();
-        }, 500);
     }
 }
