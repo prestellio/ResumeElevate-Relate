@@ -491,7 +491,7 @@ function initTemplateSelection() {
     // Initial load of template images
     fetchImagesFromGCS();
 }
-
+//QUESTIONNAIRE.HTML STARTS HERE
 // Questionnaire page initialization
 function initQuestionnaire() {
     // Section IDs in order of appearance
