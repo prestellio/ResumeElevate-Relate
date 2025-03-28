@@ -1,4 +1,4 @@
-//app.js
+// Original app.js with added debugging
 
 const express = require('express');
 const cors = require('cors');
@@ -11,11 +11,7 @@ const port = 3000;
 
 const templateRoutes = require('./routes/templateRoutes');
 
-// Use the routes
-app.use('/api', templateRoutes);
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
+// Middleware
 // Parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,6 +22,23 @@ app.use(cors({
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
 }));
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Debug middleware - log all requests
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
+// Use the template routes - make sure this is after all middleware
+app.use('/api', templateRoutes);
+
+// Add a test route to verify the server is working
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API is working!' });
+});
 
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://rojerojer24:Limosine1@relate.qorzo.mongodb.net', { useNewUrlParser: true, useUnifiedTopology: true })
@@ -152,7 +165,10 @@ app.post('/save-resume', async (req, res) => {
     }
 });
 
+// Add a catch-all route handler for debugging purposes
+app.use((req, res) => {
+    console.log(`404 - Route not found: ${req.method} ${req.url}`);
+    res.status(404).json({ error: 'Route not found' });
+});
 
 app.listen(port, () => console.log(`Server running at http://localhost:${port}/`));
-
-
