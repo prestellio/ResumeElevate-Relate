@@ -143,6 +143,63 @@
             cursor: pointer;
             margin-top: 10px;
         }
+        /* Spinner for the submit button */
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Button click animation */
+    .button-clicked {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+    
+    /* Section container animation */
+    .section-container {
+        transition: all 0.5s ease;
+        overflow: hidden;
+    }
+    
+    /* Section header styling */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .section-header h4 {
+        margin: 0;
+    }
+    
+    /* Enhanced remove button styling */
+    .remove-btn {
+        background-color: #ff6b6b;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .remove-btn:hover {
+        background-color: #ff4757;
+        transform: translateY(-2px);
+    }
     </style>
 </head>
 <body>

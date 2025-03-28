@@ -598,3 +598,85 @@ section {
 ul {
     display: block;
 }
+.question-section {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    position: relative;
+}
+
+.question-section.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    display: none;
+}
+
+.question-section.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}
+
+.question-section.fade-in {
+    display: block;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Enhance the overall questionnaire styling */
+.questionnaire-container {
+    transition: background-color 0.5s ease;
+}
+
+.nav-buttons button {
+    transition: all 0.3s ease;
+}
+
+.nav-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.progress-bar {
+    transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Add animation for option buttons */
+.option-btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.option-btn:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: width 0.3s ease;
+    z-index: -1;
+}
+
+.option-btn:hover:after {
+    width: 100%;
+}
+
+/* Add pulsing effect for submit button */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 91, 178, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(34, 91, 178, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 91, 178, 0);
+    }
+}
+
+.submit-btn {
+    animation: pulse 2s infinite;
+}
