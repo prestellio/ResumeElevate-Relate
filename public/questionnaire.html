@@ -85,6 +85,8 @@
             font-size: 1.2rem;
             border-radius: 10px;
             cursor: pointer;
+            transition: opacity 1s;
+            transition-delay: 100ms;
         }
 
         .back-btn {
@@ -148,7 +150,7 @@
 <body>
     <header id="top">
         <a href="index.html">
-            <img src="../RelateLogo.png" alt="Resume Relate Logo">
+            <img src="../RelateLogo_proto_square.png" alt="Resume Relate Logo">
         </a>
         
         <nav class="navbar">
@@ -371,6 +373,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Section IDs in order of appearance
+            //May want to store this on the database in the future - Preston
             const sectionIds = [
                 'career-selection',
                 'personal-info',
@@ -486,12 +489,14 @@
 
             function moveToNextSection() {
                 // Hide current section
+                buttonFadeOut(currentWorkflow[currentSectionIndex]); //Makes div fade out
                 document.getElementById(currentWorkflow[currentSectionIndex]).classList.add('hidden');
                 
                 // Move to next section index
                 currentSectionIndex++;
                 
                 // Show next section
+                buttonFadeIn(currentWorkflow[currentSectionIndex]); //Makes div fade in
                 document.getElementById(currentWorkflow[currentSectionIndex]).classList.remove('hidden');
                 
                 // Update progress bar
@@ -500,14 +505,16 @@
 
             function moveToPreviousSection() {
                 // Hide current section
+                buttonFadeOut(currentWorkflow[currentSectionIndex]); //Makes div fade out
                 document.getElementById(currentWorkflow[currentSectionIndex]).classList.add('hidden');
                 
                 // Move to previous section index
                 currentSectionIndex--;
                 
                 // Show previous section
+                buttonFadeIn(currentWorkflow[currentSectionIndex]); //Makes div fade in
                 document.getElementById(currentWorkflow[currentSectionIndex]).classList.remove('hidden');
-                
+
                 // Update progress bar
                 updateProgressBar();
             }

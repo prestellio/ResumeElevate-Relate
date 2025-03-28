@@ -70,4 +70,44 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
 
 //-------------------------------------------------------------------------------------------------------
 
+//Sleep function for timeouts
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve,ms));
+}
+
+//fade in and fade out for option-btn, next-btn, back-btn classes
+//-------------------------------------------------------------------------------------------------------
+
+function buttonFadeOut(questionDiv){
+    //Sets div to fade out
+    questionDiv.classList.remove('fadeIn');
+    questionDiv.classList.add('fadeOut');
+
+    //Change duration based on transition speed
+    sleep(1100);      
+}
+
+//Fades the next div in
+function buttonFadeIn(nextQuestion){
+
+
+    let tempStr = nextQuestion.split("-");
+
+    //Gets the div
+    let nextDiv = document.getElementById(nextQuestion);
+    
+    nextDiv.style= "opacity:0;";
+
+    nextDiv.classList.remove('fadeOut');
+    nextDiv.classList.add('fadeIn');
+}
+
+
+
+
+
+//-------------------------------------------------------------------------------------------------------
+
+
+
 
