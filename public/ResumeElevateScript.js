@@ -1,3 +1,6 @@
+//ResumeElevateScript.js - Consolidated JavaScript for Resume Elevate
+
+// Common navigation functions
 function toggleNav() {
     var navList = document.getElementById("nav-btn");
     if (navList.style.display === "none" || navList.style.display === "") {
@@ -380,23 +383,38 @@ async function saveResumeReview(resumeId, quillEducation, quillExperience, quill
 
 // Template selection page initialization
 function initTemplateSelection() {
-    // Sample template data (in a real app, this would come from your backend)
-    const sampleTemplates = [
-        { id: 'template1', name: 'Professional Template', url: '../RelateLogo.png' },
-        { id: 'template2', name: 'Creative Template', url: '../RelateLogo.png' },
-        { id: 'template3', name: 'Modern Template', url: '../RelateLogo.png' }
-    ];
-
-    // Function to fetch images from Google Cloud Storage
+    // Configuration
+    const apiEndpoint = '/api/get-templates'; // The endpoint we've defined in templateRoutes.js
+    
+    // Function to fetch images from Google Cloud Storage via our API
     async function fetchImagesFromGCS() {
         const templateList = document.getElementById('template-select-ul');
+        templateList.innerHTML = '<div class="loading">Loading templates...</div>';
         
         try {
-            // Remove loading message
-            templateList.innerHTML = '';  
+            // Fetch templates from our backend API
+            const response = await fetch(apiEndpoint);
             
-            // Create template options
-            sampleTemplates.forEach(template => {
+            if (!response.ok) {
+                throw new Error(`API responded with status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.success || !data.templates || !Array.isArray(data.templates)) {
+                throw new Error('Invalid response format from API');
+            }
+            
+            // Remove loading message
+            templateList.innerHTML = '';
+            
+            // Create template options from the API response
+            if (data.templates.length === 0) {
+                templateList.innerHTML = '<p>No templates found. Please check back later.</p>';
+                return;
+            }
+            
+            data.templates.forEach(template => {
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
                     <label>
@@ -420,6 +438,12 @@ function initTemplateSelection() {
                     radioBtn.checked = true;
                 });
             });
+            
+            // Show the first template by default
+            if (data.templates.length > 0) {
+                const firstTemplate = data.templates[0];
+                showFullsizeTemplate(firstTemplate.url, firstTemplate.name);
+            }
             
         } catch (error) {
             console.error('Error fetching templates:', error);
