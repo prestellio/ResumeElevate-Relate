@@ -64,9 +64,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Navigation function to the generator page
+// Navigation function to the questionnaire page
 function toGenerator() {
-    window.location.href = "generate.html";
+    window.location.href = "questionnaire.html";
 }
 
 // Login/Registration form handling
