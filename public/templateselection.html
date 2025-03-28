@@ -1,540 +1,314 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../RelateLogo.png" type="image/x-icon">
-    <title>Resume Questionnaire | ResumeElevate</title>
+    <link rel="icon" href="../RelateLogo.png" type="image/x-icon"></link>
+    <title>Template Selection | ResumeElevate</title>
+
+    <!-- Personal CSS sheet -->
     <link rel="stylesheet" href="styles.css">
+    
     <style>
-        .questionnaire-container {
-            max-width: 800px;
-            margin: 30px auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .question-section {
-            opacity: 1;
-            transition: opacity 0.5s ease-in-out;
-        }
-
-        .question-section.hidden {
-            opacity: 0;
-            display: none;
-        }
-
-        .question-title {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #225bb2;
-        }
-
-        .question-prompt {
-            font-size: 1.4rem;
-            margin-bottom: 25px;
-        }
-
-        .option-btn {
-            background-color: #9ba2ff;
-            color: black;
-            border: 2px solid #225bb2;
-            border-radius: 10px;
-            padding: 15px 20px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-bottom: 10px;
+        /* Additional styles for the image preview functionality */
+        .preview-image {
             width: 100%;
-            text-align: left;
-        }
-
-        .option-btn:hover {
-            background-color: #225bb2;
-            color: white;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.2rem;
-            border: 2px solid #9ba2ff;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .textarea-field {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.2rem;
-            border: 2px solid #9ba2ff;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            min-height: 120px;
-        }
-
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-        }
-
-        .back-btn, .next-btn, .submit-btn {
-            padding: 12px 25px;
-            font-size: 1.2rem;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        .back-btn {
-            background-color: #6d696a;
-            color: white;
-            border: none;
-        }
-
-        .next-btn, .submit-btn {
-            background-color: #225bb2;
-            color: white;
-            border: none;
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 10px;
-            background-color: #ddd;
-            border-radius: 5px;
-            margin-bottom: 30px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: #225bb2;
-            width: 0%;
-            border-radius: 5px;
-            transition: width 0.5s ease-in-out;
-        }
-
-        .section-container {
-            border: 1px solid #ddd;
-            padding: 15px;
             margin-bottom: 15px;
-            border-radius: 10px;
-        }
-
-        .add-btn {
-            background-color: #3bceac;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 15px;
-            font-size: 1rem;
             cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .remove-btn {
-            background-color: #ff6b6b;
-            color: white;
-            border: none;
             border-radius: 5px;
-            padding: 5px 10px;
-            font-size: 0.9rem;
-            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .preview-image:hover {
+            transform: scale(1.03);
+        }
+        
+        .fullsize-image {
+            max-width: 100%;
+            max-height: 80vh;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        
+        .image-title {
             margin-top: 10px;
+            font-size: 18px;
+            color: #333;
         }
         
-        .question-container {
-            margin-bottom: 20px;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
         }
         
-        .question-container label {
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        
+        /* Style adjustments for layout */
+        #template-select-ul {
+            padding: 0;
+        }
+        
+        #template-select-ul li {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+        
+        #template-select-ul li label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
+            position: relative;
+        }
+        
+        #template-select-ul li input[type="radio"] {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        
+        main div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
     </style>
 </head>
-<body>
-    <header id="top">
-        <a href="index.html">
-            <img src="../RelateLogo.png" alt="Resume Relate Logo">
+
+<body class="template-page-grid">
+    <header>
+        <a href="index.html">    
+            <img src="../RelateLogo.png" alt="Resume Relate Logo: green and blue peacock">
         </a>
-        
-        <nav class="navbar">
-            <button class="navbar-toggle" id="navbarToggle">&#9776;</button>
-            <div class="navbar-menu" id="navbarMenu">
-                <a class="nav-link" href="index.html">Home</a>
-                <a class="nav-link" href="generate.html">Generate Resume</a>
-                <a class="nav-link" href="about.html">About</a>
-                <a class="nav-link" href="login.html">Login</a>
-                <a class="nav-link" href="editor.html">Edit Resume</a>
-            </div>
-        </nav>
     </header>
 
+    <aside>
+        <form>
+            <ul class="template-page-grid-aside" id="template-select-ul">
+                <!-- Template thumbnails will be loaded here by JavaScript -->
+                <div class="loading">Loading templates...</div>
+            </ul>
+        </form>
+    </aside>
+
     <main>
-        <div class="questionnaire-container">
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-
-            <!-- Career Selection Question -->
-            <div class="question-section" id="career-selection">
-                <h2 class="question-title">Let's Start Building Your Resume</h2>
-                <p class="question-prompt">What career field are you interested in?</p>
-                <button class="option-btn" data-career="engineering">Engineering</button>
-                <button class="option-btn" data-career="business">Business & Finance</button>
-                <button class="option-btn" data-career="technology">Technology & IT</button>
-                <button class="option-btn" data-career="healthcare">Healthcare</button>
-                <button class="option-btn" data-career="education">Education</button>
-                <button class="option-btn" data-career="arts">Arts & Creative Fields</button>
-                <button class="option-btn" data-career="science">Science & Research</button>
-            </div>
-
-            <!-- Personal Information -->
-            <div class="question-section hidden" id="personal-info">
-                <h2 class="question-title">Personal Information</h2>
-                <p class="question-prompt">Tell us a bit about yourself.</p>
-                <label for="full-name">Full Name</label>
-                <input type="text" id="full-name" class="input-field" placeholder="e.g., John Smith">
-                
-                <label for="email">Email Address</label>
-                <input type="email" id="email" class="input-field" placeholder="e.g., johnsmith@example.com">
-                
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" class="input-field" placeholder="e.g., (555) 123-4567">
-                
-                <label for="location">Location</label>
-                <input type="text" id="location" class="input-field" placeholder="e.g., New York, NY">
-                
-                <div class="nav-buttons">
-                    <button class="back-btn" id="personal-back">Back</button>
-                    <button class="next-btn" id="personal-next">Next</button>
-                </div>
-            </div>
-
-            <!-- Education Information -->
-            <div class="question-section hidden" id="education-info">
-                <h2 class="question-title">Education</h2>
-                <p class="question-prompt">Tell us about your educational background.</p>
-                <div id="education-sections">
-                    <div class="section-container">
-                        <label for="university">University/Institution</label>
-                        <input type="text" id="university" class="input-field" placeholder="e.g., Wichita State University">
-                        
-                        <label for="degree">Degree</label>
-                        <input type="text" id="degree" class="input-field" placeholder="e.g., Bachelor of Science in Computer Science">
-                        
-                        <label for="graduation-date">Graduation Date</label>
-                        <input type="text" id="graduation-date" class="input-field" placeholder="e.g., May 2025">
-                        
-                        <label for="gpa">GPA (Optional)</label>
-                        <input type="text" id="gpa" class="input-field" placeholder="e.g., 3.8/4.0">
-                        
-                        <label for="relevant-courses">Relevant Courses</label>
-                        <input type="text" id="relevant-courses" class="input-field" placeholder="e.g., Data Structures, Algorithms, Database Systems">
-                    </div>
-                </div>
-                <button class="add-btn" id="add-education">+ Add Another Education</button>
-                <div class="nav-buttons">
-                    <button class="back-btn" id="education-back">Back</button>
-                    <button class="next-btn" id="education-next">Next</button>
-                </div>
-            </div>
-
-            <!-- Experience Information -->
-            <div class="question-section hidden" id="experience-info">
-                <h2 class="question-title">Work Experience</h2>
-                <p class="question-prompt">Tell us about your work experience.</p>
-                <div id="experience-sections">
-                    <div class="section-container">
-                        <label for="company-name">Company Name</label>
-                        <input type="text" id="company-name" class="input-field" placeholder="e.g., ABC Corporation">
-                        
-                        <label for="job-title">Job Title</label>
-                        <input type="text" id="job-title" class="input-field" placeholder="e.g., Software Engineer Intern">
-                        
-                        <label for="job-location">Location</label>
-                        <input type="text" id="job-location" class="input-field" placeholder="e.g., Wichita, KS">
-                        
-                        <label for="employment-dates">Employment Dates</label>
-                        <input type="text" id="employment-dates" class="input-field" placeholder="e.g., May 2023 - August 2023">
-                        
-                        <label for="job-responsibilities">Key Responsibilities and Achievements</label>
-                        <textarea id="job-responsibilities" class="textarea-field" placeholder="e.g., Developed and maintained web applications using React and Node.js. Improved application performance by 30%."></textarea>
-                    </div>
-                </div>
-                <button class="add-btn" id="add-experience">+ Add Another Experience</button>
-                <div class="nav-buttons">
-                    <button class="back-btn" id="experience-back">Back</button>
-                    <button class="next-btn" id="experience-next">Next</button>
-                </div>
-            </div>
-
-            <!-- Projects Information -->
-            <div class="question-section hidden" id="projects-info">
-                <h2 class="question-title">Projects</h2>
-                <p class="question-prompt">Tell us about your significant projects.</p>
-                <div id="project-sections">
-                    <div class="section-container">
-                        <label for="project-name">Project Name</label>
-                        <input type="text" id="project-name" class="input-field" placeholder="e.g., E-commerce Website">
-                        
-                        <label for="project-dates">Project Dates</label>
-                        <input type="text" id="project-dates" class="input-field" placeholder="e.g., January 2023 - March 2023">
-                        
-                        <label for="project-description">Project Description</label>
-                        <textarea id="project-description" class="textarea-field" placeholder="e.g., Developed a full-stack e-commerce website using MERN stack. Implemented user authentication, product search, and payment processing."></textarea>
-                    </div>
-                </div>
-                <button class="add-btn" id="add-project">+ Add Another Project</button>
-                <div class="nav-buttons">
-                    <button class="back-btn" id="projects-back">Back</button>
-                    <button class="next-btn" id="projects-next">Next</button>
-                </div>
-            </div>
-
-            <!-- Skills Information -->
-            <div class="question-section hidden" id="skills-info">
-                <h2 class="question-title">Skills</h2>
-                <p class="question-prompt">What technical and soft skills do you possess?</p>
-                <label for="technical-skills">Technical Skills</label>
-                <input type="text" id="technical-skills" class="input-field" placeholder="e.g., JavaScript, React, Node.js, SQL, Git">
-                
-                <label for="soft-skills">Soft Skills</label>
-                <input type="text" id="soft-skills" class="input-field" placeholder="e.g., Team Collaboration, Problem Solving, Communication, Leadership">
-                
-                <label for="languages">Languages (Optional)</label>
-                <input type="text" id="languages" class="input-field" placeholder="e.g., English (Native), Spanish (Intermediate)">
-                
-                <label for="certifications">Certifications (Optional)</label>
-                <input type="text" id="certifications" class="input-field" placeholder="e.g., AWS Certified Developer, Google Analytics Certification">
-                
-                <div class="nav-buttons">
-                    <button class="back-btn" id="skills-back">Back</button>
-                    <button class="next-btn" id="skills-next">Next</button>
-                </div>
-            </div>
-
-            <!-- Summary Section -->
-            <div class="question-section hidden" id="summary-section">
-                <h2 class="question-title">Professional Summary</h2>
-                <p class="question-prompt">Let's create a brief professional summary for your resume.</p>
-                <label for="professional-summary">Professional Summary</label>
-                <textarea id="professional-summary" class="textarea-field" placeholder="e.g., Dedicated Software Engineer with 2 years of experience in web development. Proficient in JavaScript, React, and Node.js. Passionate about creating efficient, scalable applications that solve real-world problems."></textarea>
-                
-                <div class="nav-buttons">
-                    <button class="back-btn" id="summary-back">Back</button>
-                    <button class="submit-btn" id="submit-resume">Generate Resume</button>
-                </div>
-            </div>
+        <div id="fullsizeContainer">
+            <img src="../RelateLogo.png" alt="Resume preview" id="fullsizeImage" style="width:300px">
+            <div class="image-title">Select a template to view it in full size</div>
         </div>
     </main>
 
-    <footer class="container">
-        <div>
-            <p>&copy; 2024 Resume Elevate</p>
-            <ul>
-                <li><a href="about.html">About Us</a></li>
-                <li><a href="privacy.html">Privacy Policy</a></li>
-                <li><a href="careers.html">Careers</a></li>
-            </ul>
-        </div>
-        <div>
-            <p>A Wichita State Project</p>
-            <p>Relate Resume Generator</p>
-        </div>
-    </footer>
+    <!-- Modal for extra large view -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
 
-    <script src="ResumeElevateScript.js"></script>
+    <!-- For testing/debugging only - remove in production -->
+    <div id="debugInfo" style="position: fixed; bottom: 0; left: 0; background: #f8f8f8; padding: 5px; font-size: 12px; max-width: 100%; overflow: auto;"></div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Section IDs in order of appearance
-            const sectionIds = [
-                'career-selection',
-                'personal-info',
-                'education-info',
-                'experience-info', 
-                'projects-info',
-                'skills-info',
-                'summary-section'
-            ];
-
-            // Current workflow of sections
-            let currentWorkflow = [...sectionIds];
+            // Add debug log function
+            function debugLog(message) {
+                console.log(message);
+                const debugElement = document.getElementById('debugInfo');
+                if (debugElement) {
+                    debugElement.innerHTML += message + '<br>';
+                }
+            }
             
-            // Track current section index
-            let currentSectionIndex = 0;
+            // Configuration for API
+            const apiEndpoint = '/api/get-templates';
+            debugLog(`Using API endpoint: ${apiEndpoint}`);
             
-            // Career choice
-            let selectedCareer = '';
-
-            // Resume data object to store all responses
-            const resumeData = {
-                personalInfo: {},
-                education: [],
-                experience: [],
-                projects: [],
-                skills: {},
-                fieldSpecific: {},
-                summary: ''
-            };
-
-            // Define career-specific questions for each field
-            const careerQuestions = {
-                'engineering': [
-                    {
-                        question: "What type of engineering are you specialized in?",
-                        type: "select",
-                        options: ["Software Engineering", "Mechanical Engineering", "Electrical Engineering", "Civil Engineering", "Chemical Engineering", "Aerospace Engineering", "Biomedical Engineering", "Other"]
-                    },
-                    {
-                        question: "What engineering software or tools are you proficient with?",
-                        type: "text",
-                        placeholder: "e.g., AutoCAD, MATLAB, SolidWorks, Python, Java, Git"
-                    },
-                    {
-                        question: "Do you have any engineering certifications or licenses?",
-                        type: "text",
-                        placeholder: "e.g., PE License, AWS Certified Developer, PMP"
-                    },
-                    {
-                        question: "Describe a complex engineering problem you've solved.",
-                        type: "textarea",
-                        placeholder: "Please provide details about the problem, your approach, and the outcome."
+            // Function to fetch images
+            async function fetchImagesFromGCS() {
+                const templateList = document.getElementById('template-select-ul');
+                templateList.innerHTML = '<div class="loading">Loading templates...</div>';
+                
+                try {
+                    debugLog(`Fetching templates from: ${apiEndpoint}`);
+                    
+                    // Fetch templates from our backend API
+                    const response = await fetch(apiEndpoint);
+                    
+                    debugLog(`Response status: ${response.status}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API responded with status: ${response.status}`);
                     }
-                ],
-                'business': [
-                    {
-                        question: "What business field are you specialized in?",
-                        type: "select",
-                        options: ["Finance", "Marketing", "Management", "Entrepreneurship", "Human Resources", "Supply Chain", "Accounting", "Other"]
-                    },
-                    {
-                        question: "What business software or tools are you proficient with?",
-                        type: "text",
-                        placeholder: "e.g., Excel, Tableau, SAP, Salesforce, QuickBooks"
-                    },
-                    {
-                        question: "Have you led any business initiatives or projects?",
-                        type: "textarea",
-                        placeholder: "Please describe your role and the impact of these initiatives."
-                    },
-                    {
-                        question: "Do you have any business certifications?",
-                        type: "text",
-                        placeholder: "e.g., CPA, CFA, PMP, Six Sigma"
+                    
+                    const data = await response.json();
+                    debugLog(`Received data: ${JSON.stringify(data).substring(0, 200)}...`);
+                    
+                    if (!data.success || !data.templates || !Array.isArray(data.templates)) {
+                        throw new Error('Invalid response format from API');
                     }
-                ],
-                'technology': [
-                    {
-                        question: "What area of technology do you specialize in?",
-                        type: "select",
-                        options: ["Software Development", "Data Science", "Cybersecurity", "Cloud Computing", "AI/Machine Learning", "DevOps", "UI/UX Design", "Other"]
-                    },
-                    {
-                        question: "What programming languages and frameworks are you proficient with?",
-                        type: "text",
-                        placeholder: "e.g., Python, JavaScript, React, Node.js, TensorFlow"
-                    },
-                    {
-                        question: "Describe a significant tech project you've worked on.",
-                        type: "textarea",
-                        placeholder: "Include technologies used, your role, and the outcome."
-                    },
-                    {
-                        question: "What tech certifications do you hold?",
-                        type: "text",
-                        placeholder: "e.g., AWS Solutions Architect, CompTIA Security+, Google Cloud Professional"
+                    
+                    // Remove loading message
+                    templateList.innerHTML = '';
+                    
+                    // Create template options from the API response
+                    if (data.templates.length === 0) {
+                        templateList.innerHTML = '<p>No templates found. Please check back later.</p>';
+                        return;
                     }
-                ],
-                'healthcare': [
-                    {
-                        question: "What healthcare field are you specialized in?",
-                        type: "select",
-                        options: ["Nursing", "Medicine", "Physical Therapy", "Healthcare Administration", "Public Health", "Pharmacy", "Laboratory Sciences", "Other"]
-                    },
-                    {
-                        question: "What healthcare certifications or licenses do you hold?",
-                        type: "text",
-                        placeholder: "e.g., RN, MD, CNA, CPT, RHIA"
-                    },
-                    {
-                        question: "What healthcare technologies or systems are you experienced with?",
-                        type: "text",
-                        placeholder: "e.g., Epic, Cerner, Meditech, eClinicalWorks"
-                    },
-                    {
-                        question: "Describe your experience with patient care or healthcare processes.",
-                        type: "textarea",
-                        placeholder: "Include your responsibilities and any improvements you've implemented."
+                    
+                    debugLog(`Found ${data.templates.length} templates`);
+                    
+                    data.templates.forEach(template => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <label>
+                                <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}">
+                                <input type="radio" id="${template.id}" name="template-select" value="${template.id}">
+                            </label>
+                        `;
+                        
+                        templateList.appendChild(listItem);
+                    });
+                    
+                    // Add click events to all template thumbnails
+                    document.querySelectorAll('.preview-image').forEach(img => {
+                        img.addEventListener('click', function() {
+                            const fullsizeUrl = this.dataset.fullsize;
+                            const templateName = this.alt;
+                            showFullsizeTemplate(fullsizeUrl, templateName);
+                            
+                            // Also select the radio button
+                            const radioBtn = this.nextElementSibling;
+                            radioBtn.checked = true;
+                        });
+                    });
+                    
+                    // Show the first template by default
+                    if (data.templates.length > 0) {
+                        const firstTemplate = data.templates[0];
+                        showFullsizeTemplate(firstTemplate.url, firstTemplate.name);
                     }
-                ],
-                'education': [
-                    {
-                        question: "What educational level do you specialize in teaching?",
-                        type: "select",
-                        options: ["Early Childhood", "Elementary", "Middle School", "High School", "Higher Education", "Special Education", "Adult Education", "Other"]
-                    },
-                    {
-                        question: "What subjects are you qualified to teach?",
-                        type: "text",
-                        placeholder: "e.g., Mathematics, English, Science, History"
-                    },
-                    {
-                        question: "What teaching certifications or credentials do you hold?",
-                        type: "text",
-                        placeholder: "e.g., State Teaching License, TESOL, National Board Certification"
-                    },
-                    {
-                        question: "Describe your teaching philosophy or approach.",
-                        type: "textarea",
-                        placeholder: "Share how you engage students and facilitate learning."
+                    
+                } catch (error) {
+                    console.error('Error fetching templates:', error);
+                    debugLog(`Error: ${error.message}`);
+                    templateList.innerHTML = `<p>Error loading templates: ${error.message}. Please try again later.</p>`;
+                    
+                    // For testing - add sample templates if API fails
+                    // This is for demonstration/development only and should be removed in production
+                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                        debugLog('Using sample templates for local development');
+                        const sampleTemplates = [
+                            { id: 'template1', name: 'Simple Template', url: '../RelateLogo.png' },
+                            { id: 'template2', name: 'Professional Template', url: '../RelateLogo.png' }
+                        ];
+                        
+                        templateList.innerHTML = '<p>Using sample templates (API unavailable)</p>';
+                        
+                        sampleTemplates.forEach(template => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `
+                                <label>
+                                    <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}">
+                                    <input type="radio" id="${template.id}" name="template-select" value="${template.id}">
+                                </label>
+                            `;
+                            
+                            templateList.appendChild(listItem);
+                        });
+                        
+                        document.querySelectorAll('.preview-image').forEach(img => {
+                            img.addEventListener('click', function() {
+                                const fullsizeUrl = this.dataset.fullsize;
+                                const templateName = this.alt;
+                                showFullsizeTemplate(fullsizeUrl, templateName);
+                                
+                                const radioBtn = this.nextElementSibling;
+                                radioBtn.checked = true;
+                            });
+                        });
+                        
+                        if (sampleTemplates.length > 0) {
+                            showFullsizeTemplate(sampleTemplates[0].url, sampleTemplates[0].name);
+                        }
                     }
-                ],
-                'arts': [
-                    {
-                        question: "What creative field do you specialize in?",
-                        type: "select",
-                        options: ["Graphic Design", "Fine Arts", "Photography", "Music", "Film/Video", "Animation", "Writing", "Other"]
-                    },
-                    {
-                        question: "What creative software or tools are you proficient with?",
-                        type: "text",
-                        placeholder: "e.g., Adobe Creative Suite, Pro Tools, Final Cut Pro"
-                    },
-                    {
-                        question: "Describe a significant creative project you've completed.",
-                        type: "textarea",
-                        placeholder: "Include your role, techniques used, and the outcome."
-                    },
-                    {
-                        question: "Do you have a portfolio or published work?",
-                        type: "text",
-                        placeholder: "e.g., Website URL, exhibition experience, published works"
-                    }
-                ],
-                'science': [
-                    {
-                        question: "What scientific field do you specialize in?",
-                        type: "select",
-                        options: ["Biology", "Chemistry", "Physics", "Environmental Science", "Astronomy", "Geology", "Psychology", "Other"]
-                    },
-                    {
-                        question: "What laboratory or research techniques are you proficient with?",
-                        type: "text",
-                        placeholder: "e.g., PCR, Spectroscopy, Statistical Analysis, GIS"
-                    },
-                    {
-                        question: "Describe a significant research project you've contributed to.",
-                        type: "textarea",
-                        placeholder: "Include your role, methodologies used, and findings."
-                    },
-                    {
-                        question: "Have you published any scientific papers or presented at conferences?",
-                        type: "text",
-                        placeholder: "Please list publications or presentations with dates."
-                    }
-                ]
-            };
+                }
+            }
+            
+            // Function to display fullsize template
+            function showFullsizeTemplate(imageUrl, imageName) {
+                const fullsizeContainer = document.getElementById('fullsizeContainer');
+                
+                fullsizeContainer.innerHTML = `
+                    <img src="${imageUrl}" alt="${imageName}" id="fullsizeImage" class="fullsize-image">
+                    <div class="image-title">${imageName}</div>
+                `;
+                
+                // Add click event to open the modal with an even larger view
+                document.getElementById('fullsizeImage').addEventListener('click', function() {
+                    const modal = document.getElementById('imageModal');
+                    const modalImg = document.getElementById('modalImage');
+                    
+                    modalImg.src = imageUrl;
+                    modal.style.display = 'flex';
+                });
+            }
+            
+            // Close the modal when clicking the X
+            document.getElementById('modalClose').addEventListener('click', function() {
+                document.getElementById('imageModal').style.display = 'none';
+            });
+            
+            // Close the modal when clicking outside the image
+            document.getElementById('imageModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+            
+            // Add a direct test of the API
+            debugLog('Running API test...');
+            fetch('/api/test')
+                .then(response => {
+                    debugLog(`Test API response status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    debugLog(`Test API data: ${JSON.stringify(data)}`);
+                })
+                .catch(error => {
+                    debugLog(`Test API error: ${error.message}`);
+                });
+            
+            // Initial load of template images
+            fetchImagesFromGCS();
+        });
+    </script>
+</body>
+</html>

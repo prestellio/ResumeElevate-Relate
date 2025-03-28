@@ -337,6 +337,213 @@
                 </div>
             </div>
 
+            <!-- Business & Finance Field-Specific Questions -->
+            <div class="question-section hidden" id="business-questions">
+                <h2 class="question-title">Business & Finance Information</h2>
+                <p class="question-prompt">Let's get some information specific to your business or finance career.</p>
+                
+                <label for="business-specialty">Business Specialty</label>
+                <select id="business-specialty" class="input-field">
+                    <option value="">Select your business specialty</option>
+                    <option value="accounting">Accounting</option>
+                    <option value="finance">Finance</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="management">Management</option>
+                    <option value="economics">Economics</option>
+                    <option value="hr">Human Resources</option>
+                    <option value="consulting">Consulting</option>
+                    <option value="entrepreneurship">Entrepreneurship</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="business-software">Software Proficiency</label>
+                <input type="text" id="business-software" class="input-field" placeholder="e.g., Excel, QuickBooks, SAP, Tableau, PowerBI">
+                
+                <label for="business-certifications">Professional Certifications</label>
+                <input type="text" id="business-certifications" class="input-field" placeholder="e.g., CPA, CFA, MBA, PMP, Six Sigma">
+                
+                <label for="business-achievements">Key Business Achievements</label>
+                <textarea id="business-achievements" class="textarea-field" placeholder="Briefly describe 1-2 significant business achievements, such as increasing revenue, reducing costs, improving processes, etc."></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="business-back">Back</button>
+                    <button class="next-btn" id="business-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Technology & IT Field-Specific Questions -->
+            <div class="question-section hidden" id="technology-questions">
+                <h2 class="question-title">Technology & IT Information</h2>
+                <p class="question-prompt">Let's get some information specific to your technology career.</p>
+                
+                <label for="tech-specialty">Tech Specialty</label>
+                <select id="tech-specialty" class="input-field">
+                    <option value="">Select your tech specialty</option>
+                    <option value="frontend">Front-end Development</option>
+                    <option value="backend">Back-end Development</option>
+                    <option value="fullstack">Full-stack Development</option>
+                    <option value="mobile">Mobile Development</option>
+                    <option value="data">Data Science/Analytics</option>
+                    <option value="cloud">Cloud Computing</option>
+                    <option value="devops">DevOps</option>
+                    <option value="security">Cybersecurity</option>
+                    <option value="ai">AI/Machine Learning</option>
+                    <option value="network">Network Administration</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="programming-languages">Programming Languages</label>
+                <input type="text" id="programming-languages" class="input-field" placeholder="e.g., JavaScript, Python, Java, C#, Ruby">
+                
+                <label for="tech-frameworks">Frameworks & Technologies</label>
+                <input type="text" id="tech-frameworks" class="input-field" placeholder="e.g., React, Node.js, Django, AWS, Docker, Kubernetes">
+                
+                <label for="tech-projects">Technical Projects</label>
+                <textarea id="tech-projects" class="textarea-field" placeholder="Briefly describe 1-2 significant technical projects you've worked on, including technologies used and your role"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="technology-back">Back</button>
+                    <button class="next-btn" id="technology-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Healthcare Field-Specific Questions -->
+            <div class="question-section hidden" id="healthcare-questions">
+                <h2 class="question-title">Healthcare Information</h2>
+                <p class="question-prompt">Let's get some information specific to your healthcare career.</p>
+                
+                <label for="healthcare-specialty">Healthcare Specialty</label>
+                <select id="healthcare-specialty" class="input-field">
+                    <option value="">Select your healthcare specialty</option>
+                    <option value="nursing">Nursing</option>
+                    <option value="medicine">Medicine</option>
+                    <option value="pharmacy">Pharmacy</option>
+                    <option value="therapy">Physical/Occupational Therapy</option>
+                    <option value="mental-health">Mental Health</option>
+                    <option value="public-health">Public Health</option>
+                    <option value="administration">Healthcare Administration</option>
+                    <option value="research">Medical Research</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="healthcare-certifications">Professional Certifications & Licenses</label>
+                <input type="text" id="healthcare-certifications" class="input-field" placeholder="e.g., RN, MD, PharmD, PT, LCSW">
+                
+                <label for="healthcare-skills">Clinical Skills</label>
+                <input type="text" id="healthcare-skills" class="input-field" placeholder="e.g., Patient Assessment, Medication Administration, Phlebotomy, Wound Care">
+                
+                <label for="healthcare-experience">Specialized Experience</label>
+                <textarea id="healthcare-experience" class="textarea-field" placeholder="Briefly describe any specialized experience, such as specific patient populations, medical specialties, or healthcare settings"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="healthcare-back">Back</button>
+                    <button class="next-btn" id="healthcare-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Education Field-Specific Questions -->
+            <div class="question-section hidden" id="education-questions">
+                <h2 class="question-title">Education Career Information</h2>
+                <p class="question-prompt">Let's get some information specific to your education career.</p>
+                
+                <label for="education-level">Education Level</label>
+                <select id="education-level" class="input-field">
+                    <option value="">Select the education level you teach</option>
+                    <option value="early-childhood">Early Childhood</option>
+                    <option value="elementary">Elementary</option>
+                    <option value="middle">Middle School</option>
+                    <option value="high">High School</option>
+                    <option value="higher-ed">Higher Education</option>
+                    <option value="special-ed">Special Education</option>
+                    <option value="adult-ed">Adult Education</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="teaching-subjects">Teaching Subjects</label>
+                <input type="text" id="teaching-subjects" class="input-field" placeholder="e.g., Mathematics, English, Science, History, Art">
+                
+                <label for="teaching-certifications">Teaching Certifications</label>
+                <input type="text" id="teaching-certifications" class="input-field" placeholder="e.g., State Teaching License, TEFL, National Board Certification">
+                
+                <label for="teaching-methods">Teaching Methods & Approaches</label>
+                <textarea id="teaching-methods" class="textarea-field" placeholder="Briefly describe your teaching philosophy, methodologies, or innovative approaches to education"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="education-back">Back</button>
+                    <button class="next-btn" id="education-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Arts & Creative Fields Questions -->
+            <div class="question-section hidden" id="arts-questions">
+                <h2 class="question-title">Arts & Creative Information</h2>
+                <p class="question-prompt">Let's get some information specific to your creative career.</p>
+                
+                <label for="arts-specialty">Creative Specialty</label>
+                <select id="arts-specialty" class="input-field">
+                    <option value="">Select your creative specialty</option>
+                    <option value="visual">Visual Arts (Painting, Drawing, Sculpture)</option>
+                    <option value="graphic-design">Graphic Design</option>
+                    <option value="ux-design">UX/UI Design</option>
+                    <option value="photography">Photography</option>
+                    <option value="film">Film & Video</option>
+                    <option value="music">Music</option>
+                    <option value="writing">Writing & Publishing</option>
+                    <option value="performing">Performing Arts</option>
+                    <option value="fashion">Fashion Design</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="creative-software">Creative Software Proficiency</label>
+                <input type="text" id="creative-software" class="input-field" placeholder="e.g., Adobe Creative Suite, Sketch, Figma, Pro Tools, Final Cut Pro">
+                
+                <label for="portfolio-link">Portfolio Link</label>
+                <input type="text" id="portfolio-link" class="input-field" placeholder="e.g., yourportfolio.com, behance.net/yourname, dribbble.com/yourname">
+                
+                <label for="creative-projects">Significant Projects</label>
+                <textarea id="creative-projects" class="textarea-field" placeholder="Briefly describe 1-2 significant creative projects, including your role, concept, and impact"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="arts-back">Back</button>
+                    <button class="next-btn" id="arts-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Science & Research Questions -->
+            <div class="question-section hidden" id="science-questions">
+                <h2 class="question-title">Science & Research Information</h2>
+                <p class="question-prompt">Let's get some information specific to your scientific career.</p>
+                
+                <label for="science-specialty">Scientific Field</label>
+                <select id="science-specialty" class="input-field">
+                    <option value="">Select your scientific field</option>
+                    <option value="biology">Biology</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="physics">Physics</option>
+                    <option value="environmental">Environmental Science</option>
+                    <option value="astronomy">Astronomy</option>
+                    <option value="earth">Earth Sciences</option>
+                    <option value="material">Materials Science</option>
+                    <option value="mathematics">Mathematics</option>
+                    <option value="computer">Computer Science Research</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="research-methods">Research Methods & Techniques</label>
+                <input type="text" id="research-methods" class="input-field" placeholder="e.g., PCR, CRISPR, Spectroscopy, Monte Carlo Simulations, Statistical Analysis">
+                
+                <label for="publications">Publications</label>
+                <input type="text" id="publications" class="input-field" placeholder="Number of publications or significant papers">
+                
+                <label for="research-projects">Research Projects</label>
+                <textarea id="research-projects" class="textarea-field" placeholder="Briefly describe 1-2 significant research projects, including your methodology and findings"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="science-back">Back</button>
+                    <button class="next-btn" id="science-next">Next</button>
+                </div>
+            </div>
+
             <!-- Summary Section -->
             <div class="question-section hidden" id="summary-section">
                 <h2 class="question-title">Professional Summary</h2>
@@ -383,8 +590,13 @@
 
             // Field-specific sections mapped by career choice
             const fieldSpecificSections = {
-                'engineering': 'engineering-questions'
-                // Add others as needed
+                'engineering': 'engineering-questions',
+                'business': 'business-questions',
+                'technology': 'technology-questions',
+                'healthcare': 'healthcare-questions',
+                'education': 'education-questions',
+                'arts': 'arts-questions',
+                'science': 'science-questions'
             };
 
             // Current workflow of sections
@@ -460,11 +672,59 @@
                     moveToNextSection();
                 });
 
-                // Engineering specific section
+                // Field-specific section event handlers
                 if (document.getElementById('engineering-back')) {
                     document.getElementById('engineering-back').addEventListener('click', moveToPreviousSection);
                     document.getElementById('engineering-next').addEventListener('click', function() {
-                        collectEngineeringInfo();
+                        collectFieldSpecificInfo();
+                        moveToNextSection();
+                    });
+                }
+                
+                if (document.getElementById('business-back')) {
+                    document.getElementById('business-back').addEventListener('click', moveToPreviousSection);
+                    document.getElementById('business-next').addEventListener('click', function() {
+                        collectFieldSpecificInfo();
+                        moveToNextSection();
+                    });
+                }
+                
+                if (document.getElementById('technology-back')) {
+                    document.getElementById('technology-back').addEventListener('click', moveToPreviousSection);
+                    document.getElementById('technology-next').addEventListener('click', function() {
+                        collectFieldSpecificInfo();
+                        moveToNextSection();
+                    });
+                }
+                
+                if (document.getElementById('healthcare-back')) {
+                    document.getElementById('healthcare-back').addEventListener('click', moveToPreviousSection);
+                    document.getElementById('healthcare-next').addEventListener('click', function() {
+                        collectFieldSpecificInfo();
+                        moveToNextSection();
+                    });
+                }
+                
+                if (document.getElementById('education-back')) {
+                    document.getElementById('education-back').addEventListener('click', moveToPreviousSection);
+                    document.getElementById('education-next').addEventListener('click', function() {
+                        collectFieldSpecificInfo();
+                        moveToNextSection();
+                    });
+                }
+                
+                if (document.getElementById('arts-back')) {
+                    document.getElementById('arts-back').addEventListener('click', moveToPreviousSection);
+                    document.getElementById('arts-next').addEventListener('click', function() {
+                        collectFieldSpecificInfo();
+                        moveToNextSection();
+                    });
+                }
+                
+                if (document.getElementById('science-back')) {
+                    document.getElementById('science-back').addEventListener('click', moveToPreviousSection);
+                    document.getElementById('science-next').addEventListener('click', function() {
+                        collectFieldSpecificInfo();
                         moveToNextSection();
                     });
                 }
@@ -567,12 +827,80 @@
                 };
             }
 
-            function collectEngineeringInfo() {
-                resumeData.fieldSpecific.engineering = {
-                    discipline: document.getElementById('engineering-type').value,
-                    software: document.getElementById('engineering-software').value,
-                    projects: document.getElementById('engineering-projects').value
-                };
+            // Function to collect field-specific information based on career
+            function collectFieldSpecificInfo() {
+                // Get the currently selected career
+                const career = selectedCareer;
+                
+                // Initialize the fieldSpecific object if it doesn't exist
+                if (!resumeData.fieldSpecific) {
+                    resumeData.fieldSpecific = {};
+                }
+                
+                // Collect data based on career type
+                switch (career) {
+                    case 'engineering':
+                        resumeData.fieldSpecific.engineering = {
+                            discipline: document.getElementById('engineering-type').value,
+                            software: document.getElementById('engineering-software').value,
+                            projects: document.getElementById('engineering-projects').value
+                        };
+                        break;
+                        
+                    case 'business':
+                        resumeData.fieldSpecific.business = {
+                            specialty: document.getElementById('business-specialty').value,
+                            software: document.getElementById('business-software').value,
+                            certifications: document.getElementById('business-certifications').value,
+                            achievements: document.getElementById('business-achievements').value
+                        };
+                        break;
+                        
+                    case 'technology':
+                        resumeData.fieldSpecific.technology = {
+                            specialty: document.getElementById('tech-specialty').value,
+                            languages: document.getElementById('programming-languages').value,
+                            frameworks: document.getElementById('tech-frameworks').value,
+                            projects: document.getElementById('tech-projects').value
+                        };
+                        break;
+                        
+                    case 'healthcare':
+                        resumeData.fieldSpecific.healthcare = {
+                            specialty: document.getElementById('healthcare-specialty').value,
+                            certifications: document.getElementById('healthcare-certifications').value,
+                            skills: document.getElementById('healthcare-skills').value,
+                            experience: document.getElementById('healthcare-experience').value
+                        };
+                        break;
+                        
+                    case 'education':
+                        resumeData.fieldSpecific.education = {
+                            level: document.getElementById('education-level').value,
+                            subjects: document.getElementById('teaching-subjects').value,
+                            certifications: document.getElementById('teaching-certifications').value,
+                            methods: document.getElementById('teaching-methods').value
+                        };
+                        break;
+                        
+                    case 'arts':
+                        resumeData.fieldSpecific.arts = {
+                            specialty: document.getElementById('arts-specialty').value,
+                            software: document.getElementById('creative-software').value,
+                            portfolio: document.getElementById('portfolio-link').value,
+                            projects: document.getElementById('creative-projects').value
+                        };
+                        break;
+                        
+                    case 'science':
+                        resumeData.fieldSpecific.science = {
+                            field: document.getElementById('science-specialty').value,
+                            methods: document.getElementById('research-methods').value,
+                            publications: document.getElementById('publications').value,
+                            projects: document.getElementById('research-projects').value
+                        };
+                        break;
+                }
             }
 
             function collectSummary() {
