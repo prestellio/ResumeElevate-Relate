@@ -81,39 +81,6 @@
   </footer>
 
   <!-- Personalized script move this code to ResumeElevateScript on you're done -->
-  <script>
-    document.getElementById('resumeForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      // Collect form data and build an object
-      const formData = new FormData(this);
-      const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value;
-      });
-
-      try {
-        // Post the form data to the server
-        const response = await fetch('/submit-resume', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.resumeId) {
-          // Redirect to editor.html with resumeId as a query parameter
-          window.location.href = 'editor.html?resumeId=' + result.resumeId;
-        } else {
-          alert('Error saving resume. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error submitting resume:', error);
-        alert('Error saving resume. Please try again.');
-      }
-    });
-  </script>
   <script src="ResumeElevateScript.js"></script>
 </body>
 </html>

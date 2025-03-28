@@ -1,5 +1,8 @@
 // Original app.js with added debugging
 
+require('dotenv').config();
+
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -41,7 +44,7 @@ app.get('/api/test', (req, res) => {
 });
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://rojerojer24:Limosine1@relate.qorzo.mongodb.net', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Failed to connect to MongoDB:', err));
 
