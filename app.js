@@ -1,3 +1,8 @@
+// Original app.js with added debugging
+
+require('dotenv').config();
+
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -7,9 +12,10 @@ const Resume = require('./models/Resume');
 const app = express();
 const port = 3000;
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+const templateRoutes = require('./routes/templateRoutes');
+const Answer = require('./models/Answer');
 
+// Middleware
 // Parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,8 +27,50 @@ app.use(cors({
     allowedHeaders: ['Content-Type']
 }));
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Debug middleware - log all requests
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
+// Use the template routes - make sure this is after all middleware
+app.use('/api', templateRoutes);
+
+// Add a test route to verify the server is working
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API is working!' });
+});
+
+// Get all questionnaire answers
+app.get('/api/get-answers', async (req, res) => {
+    try {
+        const answers = await Answer.find().sort({ createdAt: -1 });
+        res.json({ success: true, answers });
+    } catch (error) {
+        console.error('Error fetching answers:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch answers' });
+    }
+});
+
+// Get a specific questionnaire answer by ID
+app.get('/api/get-answer/:id', async (req, res) => {
+    try {
+        const answer = await Answer.findById(req.params.id);
+        if (!answer) {
+            return res.status(404).json({ success: false, error: 'Answer not found' });
+        }
+        res.json({ success: true, answer });
+    } catch (error) {
+        console.error('Error fetching answer:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch answer' });
+    }
+});
+
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://rojerojer24:Limosine1@relate.qorzo.mongodb.net', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Failed to connect to MongoDB:', err));
 
@@ -84,6 +132,27 @@ app.post('/submit-resume', async (req, res) => {
     }
 });
 
+// This route should be added to your app.js file, make sure it's before any catch-all handlers
+app.post('/save-answers', async (req, res) => {
+    try {
+        console.log("Received questionnaire data:", req.body); // Log received data
+
+        if (!req.body.answers) {
+            return res.status(400).json({ error: "No answers received" });
+        }
+
+        const newAnswers = new Answer(req.body.answers);
+        await newAnswers.save();
+
+        console.log("Questionnaire answers saved successfully!"); // Log successful save
+        res.status(201).json({ message: "Answers saved successfully!" });
+
+    } catch (error) {
+        console.error("Error saving questionnaire answers:", error);
+        res.status(500).json({ error: "Failed to save answers" });
+    }
+});
+
 
 // Route to fetch a resume by ID
 app.get('/get-resume/:id', async (req, res) => {
@@ -126,7 +195,10 @@ app.post('/save-resume', async (req, res) => {
     }
 });
 
+// Add a catch-all route handler for debugging purposes
+app.use((req, res) => {
+    console.log(`404 - Route not found: ${req.method} ${req.url}`);
+    res.status(404).json({ error: 'Route not found' });
+});
 
 app.listen(port, () => console.log(`Server running at http://localhost:${port}/`));
-
-

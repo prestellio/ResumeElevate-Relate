@@ -16,7 +16,7 @@
 <!-- About page starts -->
 <body>
     <header id="top">
-        <a href="index#top">
+        <a href="index.html">
             <img src="../RelateLogo.png" alt="Resume Relate Logo: green and blue peacock">
         </a>
         
@@ -24,9 +24,9 @@
             <button class="navbar-toggle" id="navbarToggle">&#9776;</button>
             <div class="navbar-menu" id="navbarMenu">
                 <a class="nav-link" href="index.html">Home</a>
-                <a class="nav-link" href="generate.html">Generate Resume</a>
+                <a class="nav-link" href="questionnaire.html">Generate Resume</a>
                 <a class="nav-link active" href="about.html">About</a>
-                <a class="nav-link" href="Login.html">Login page</a> <!-- Add active or not, decide later-->
+                <a class="nav-link" href="login.html">Login page</a> <!-- Add active or not, decide later-->
                 <a class="nav-link" href="editor.html">Edit Resume</a>
             </div>
         </nav>
@@ -38,15 +38,19 @@
         </div>
         <!-- Learn About us -->
         <section>
-            <div class="div-alt-3">
-                <p>
-                    <img class ="float-right" src="../RelateLogo.png" alt="test">
-                    Learn more about how we're building a smarter way to manage and generate resumes.</p>
-                <p>
-                    The first step is to check out our Resume Generator. There you will asked a number of questions 
-                    that will be improved and used to build your resume. Relate wants to make sure that the resume 
-                    is tailored to your profession and that this resume acts as an extention of your interview.
-                </p>
+            <div class="div-alt-3 container-row">
+                <div>
+                    <p>Learn more about how we're building a smarter way to manage and generate resumes.</p>
+                
+                    <p>
+                        The first step is to check out our Resume Generator. There you will asked a number of questions 
+                        that will be improved and used to build your resume. Relate wants to make sure that the resume 
+                        is tailored to your profession and that this resume acts as an extention of your interview.
+                    </p>
+                </div>
+                <div>
+                    <img src="images/RelateLogo.png" alt="test">
+                </div>
             </div>
         </section>
         <!-- Template Selection -->
@@ -91,7 +95,7 @@
                     <h2>Our Vision</h2>
                     <p class="align-left">
                         <!-- Needs an image! -->
-                        <img class="float-right" src="../ResumeWorking.jpg" alt="">
+                        <img class="float-right" src="images/ResumeWorking.jpg" alt="">
                         ResumeElevate is designed to help users create professional resumes effortlessly. Our goal is to 
                         create a platform that not only allows users to generate resumes but also provides tools for secure 
                         login, seamless updates, and document management, all integrated with powerful backend technology.
@@ -154,7 +158,7 @@
     <!-- Personalized script (ResumeElevateScript.js) -->
     <script src="ResumeElevateScript.js"></script>
 
-    <footer>
+    <footer class="container">
         <div>
             <p>&copy; 2024 Resume Elevate</p>
             <ul>

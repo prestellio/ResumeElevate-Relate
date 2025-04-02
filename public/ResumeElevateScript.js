@@ -1,12 +1,6 @@
+//ResumeElevateScript.js - Consolidated JavaScript for Resume Elevate
 
-//Moves the user to the generate.html page
-function toGenerator() {
-    window.location.href="generate.html";
-}
-//Button with id="generator" in index.html
-document.getElementById("generator").addEventListener("click", toGenerator);
-
-//Nav bar collapse
+// Common navigation functions
 function toggleNav() {
     var navList = document.getElementById("nav-btn");
     if (navList.style.display === "none" || navList.style.display === "") {
@@ -16,18 +10,93 @@ function toggleNav() {
     }
 }
 
-//Nav bar mini-button
-document.getElementById('navbarToggle').addEventListener('click', function() {
-    var menu = document.getElementById('navbarMenu');
-    if (menu.style.display === 'block') {
-        menu.style.display = 'none';
-    } else {
-        menu.style.display = 'block';
+// Nav bar mini-button toggle
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if navbarToggle exists before adding event listener
+    const navbarToggle = document.getElementById('navbarToggle');
+    if (navbarToggle) {
+        navbarToggle.addEventListener('click', function() {
+            var menu = document.getElementById('navbarMenu');
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        });
+    }
+
+    // Navigation to generator page
+    const generatorButton = document.getElementById("generator");
+    if (generatorButton) {
+        generatorButton.addEventListener("click", toGenerator);
+    }
+
+    // Login page registration form handler
+    const registrationForm = document.getElementById('registrationForm');
+    if (registrationForm) {
+        registrationForm.addEventListener('submit', handleRegistration);
+    }
+
+    // Generate page form handler
+    const resumeForm = document.getElementById('resumeForm');
+    if (resumeForm) {
+        resumeForm.addEventListener('submit', handleResumeSubmission);
+    }
+
+    // Editor page - Load resume data if the page is editor.html
+    if (window.location.pathname.includes('editor.html')) {
+        loadResumeData();
+    }
+
+    // Editor_review page - Load resume data if the page is editor_review.html
+    if (window.location.pathname.includes('editor_review.html')) {
+        loadResumeDataForReview();
+    }
+
+    // Template selection page initialization
+    if (window.location.pathname.includes('templateselection.html')) {
+        initTemplateSelection();
+    }
+
+    // Questionnaire page initialization
+    if (window.location.pathname.includes('questionnaire.html')) {
+        initQuestionnaire();
     }
 });
 
-//Generate page submit form -------------------------------------------------------------------------
-document.getElementById('resumeForm').addEventListener('submit', async function (event) {
+// Navigation function to the questionnaire page
+function toGenerator() {
+    window.location.href = "questionnaire.html";
+}
+
+// Login/Registration form handling
+async function handleRegistration(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value;
+
+    // Send POST request to the server
+    const response = await fetch('/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password, email })
+    });
+
+    if (response.ok) {
+        // If registration is successful, redirect to the generate page
+        window.location.href = 'generate.html';
+    } else {
+        const result = await response.text();
+        document.getElementById('result').innerText = result;
+    }
+}
+
+// Generate page - Resume form submission
+async function handleResumeSubmission(event) {
     event.preventDefault(); // Prevent default form submission
 
     const formData = new FormData(this); // Capture form data
@@ -44,7 +113,7 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     });
 //Push resume template image to database
     try {
-        const response = await fetch('http://localhost:3000/submit-resume', {
+        const response = await fetch('/submit-resume', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formObject)
@@ -53,7 +122,7 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         if (response.ok) {
             const data = await response.json();
             if (data.resumeId) {
-                // **Redirect to editor.html with resumeId**
+                // Redirect to editor.html with resumeId
                 window.location.href = `editor.html?resumeId=${data.resumeId}`;
             } else {
                 alert('Error: Resume ID not received.');
@@ -107,7 +176,5 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
 
 document.getElementById("template_selection").addEventListener(select)
 
-
-//-------------------------------------------------------------------------------------------------------
 
 

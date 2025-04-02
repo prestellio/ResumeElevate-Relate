@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/RelateLogo_proto_circle.png" type="image/x-icon">
+    <title>Resume Questionnaire | ResumeElevate</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .questionnaire-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .question-section {
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .question-section.hidden {
+            opacity: 0;
+            display: none;
+        }
+
+        .question-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #225bb2;
+        }
+
+        .question-prompt {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            background-color: #9ba2ff;
+            color: black;
+            border: 2px solid #225bb2;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background-color: #225bb2;
+            color: white;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #9ba2ff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .textarea-field {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #9ba2ff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 120px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .back-btn, .next-btn, .submit-btn {
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: opacity 1s;
+            transition-delay: 100ms;
+        }
+
+        .back-btn {
+            background-color: #6d696a;
+            color: white;
+            border: none;
+        }
+
+        .next-btn, .submit-btn {
+            background-color: #225bb2;
+            color: white;
+            border: none;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #225bb2;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .section-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+
+        .add-btn {
+            background-color: #3bceac;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .remove-btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        /* Spinner for the submit button */
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Button click animation */
+    .button-clicked {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+    
+    /* Section container animation */
+    .section-container {
+        transition: all 0.5s ease;
+        overflow: hidden;
+    }
+    
+    /* Section header styling */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .section-header h4 {
+        margin: 0;
+    }
+    
+    /* Enhanced remove button styling */
+    .remove-btn {
+        background-color: #ff6b6b;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .remove-btn:hover {
+        background-color: #ff4757;
+        transform: translateY(-2px);
+    }
+    </style>
+</head>
+<body>
+    <header id="top">
+        <a href="index.html">
+            <img src="images/RelateLogo_proto_square.png" alt="Resume Relate Logo">
+        </a>
+        
+        <nav class="navbar">
+            <button class="navbar-toggle" id="navbarToggle">&#9776;</button>
+            <div class="navbar-menu" id="navbarMenu">
+                <a class="nav-link" href="index.html">Home</a>
+                <a class="nav-link">Generate Resume</a>
+                <a class="nav-link" href="about.html">About</a>
+                <a class="nav-link" href="login.html">Login</a>
+                <a class="nav-link" href="editor.html">Edit Resume</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="questionnaire-container">
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <!-- Career Selection Question -->
+            <div class="question-section" id="career-selection">
+                <h2 class="question-title">Let's Start Building Your Resume</h2>
+                <p class="question-prompt">What career field are you interested in?</p>
+                <button class="option-btn" data-career="engineering">Engineering</button>
+                <button class="option-btn" data-career="business">Business & Finance</button>
+                <button class="option-btn" data-career="technology">Technology & IT</button>
+                <button class="option-btn" data-career="healthcare">Healthcare</button>
+                <button class="option-btn" data-career="education">Education</button>
+                <button class="option-btn" data-career="arts">Arts & Creative Fields</button>
+                <button class="option-btn" data-career="science">Science & Research</button>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="question-section hidden" id="personal-info">
+                <h2 class="question-title">Personal Information</h2>
+                <p class="question-prompt">Tell us a bit about yourself.</p>
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" class="input-field" placeholder="e.g., John Smith">
+                
+                <label for="email">Email Address</label>
+                <input type="email" id="email" class="input-field" placeholder="e.g., johnsmith@example.com">
+                
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" class="input-field" placeholder="e.g., (555) 123-4567">
+                
+                <label for="location">Location</label>
+                <input type="text" id="location" class="input-field" placeholder="e.g., New York, NY">
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="personal-back">Back</button>
+                    <button class="next-btn" id="personal-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Education Information -->
+            <div class="question-section hidden" id="education-info">
+                <h2 class="question-title">Education</h2>
+                <p class="question-prompt">Tell us about your educational background.</p>
+                <div id="education-sections">
+                    <div class="section-container">
+                        <label for="university">University/Institution</label>
+                        <input type="text" id="university" class="input-field" placeholder="e.g., Wichita State University">
+                        
+                        <label for="degree">Degree</label>
+                        <input type="text" id="degree" class="input-field" placeholder="e.g., Bachelor of Science in Computer Science">
+                        
+                        <label for="graduation-date">Graduation Date</label>
+                        <input type="text" id="graduation-date" class="input-field" placeholder="e.g., May 2025">
+                        
+                        <label for="gpa">GPA (Optional)</label>
+                        <input type="text" id="gpa" class="input-field" placeholder="e.g., 3.8/4.0">
+                        
+                        <label for="relevant-courses">Relevant Courses</label>
+                        <input type="text" id="relevant-courses" class="input-field" placeholder="e.g., Data Structures, Algorithms, Database Systems">
+                    </div>
+                </div>
+                <button class="add-btn" id="add-education">+ Add Another Education</button>
+                <div class="nav-buttons">
+                    <button class="back-btn" id="education-back">Back</button>
+                    <button class="next-btn" id="education-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Experience Information -->
+            <div class="question-section hidden" id="experience-info">
+                <h2 class="question-title">Work Experience</h2>
+                <p class="question-prompt">Tell us about your work experience.</p>
+                <div id="experience-sections">
+                    <div class="section-container">
+                        <label for="company-name">Company Name</label>
+                        <input type="text" id="company-name" class="input-field" placeholder="e.g., ABC Corporation">
+                        
+                        <label for="job-title">Job Title</label>
+                        <input type="text" id="job-title" class="input-field" placeholder="e.g., Software Engineer Intern">
+                        
+                        <label for="job-location">Location</label>
+                        <input type="text" id="job-location" class="input-field" placeholder="e.g., Wichita, KS">
+                        
+                        <label for="employment-dates">Employment Dates</label>
+                        <input type="text" id="employment-dates" class="input-field" placeholder="e.g., May 2023 - August 2023">
+                        
+                        <label for="job-responsibilities">Key Responsibilities and Achievements</label>
+                        <textarea id="job-responsibilities" class="textarea-field" placeholder="e.g., Developed and maintained web applications using React and Node.js. Improved application performance by 30%."></textarea>
+                    </div>
+                </div>
+                <button class="add-btn" id="add-experience">+ Add Another Experience</button>
+                <div class="nav-buttons">
+                    <button class="back-btn" id="experience-back">Back</button>
+                    <button class="next-btn" id="experience-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Projects Information -->
+            <div class="question-section hidden" id="projects-info">
+                <h2 class="question-title">Projects</h2>
+                <p class="question-prompt">Tell us about your significant projects.</p>
+                <div id="project-sections">
+                    <div class="section-container">
+                        <label for="project-name">Project Name</label>
+                        <input type="text" id="project-name" class="input-field" placeholder="e.g., E-commerce Website">
+                        
+                        <label for="project-dates">Project Dates</label>
+                        <input type="text" id="project-dates" class="input-field" placeholder="e.g., January 2023 - March 2023">
+                        
+                        <label for="project-description">Project Description</label>
+                        <textarea id="project-description" class="textarea-field" placeholder="e.g., Developed a full-stack e-commerce website using MERN stack. Implemented user authentication, product search, and payment processing."></textarea>
+                    </div>
+                </div>
+                <button class="add-btn" id="add-project">+ Add Another Project</button>
+                <div class="nav-buttons">
+                    <button class="back-btn" id="projects-back">Back</button>
+                    <button class="next-btn" id="projects-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Skills Information -->
+            <div class="question-section hidden" id="skills-info">
+                <h2 class="question-title">Skills</h2>
+                <p class="question-prompt">What technical and soft skills do you possess?</p>
+                <label for="technical-skills">Technical Skills</label>
+                <input type="text" id="technical-skills" class="input-field" placeholder="e.g., JavaScript, React, Node.js, SQL, Git">
+                
+                <label for="soft-skills">Soft Skills</label>
+                <input type="text" id="soft-skills" class="input-field" placeholder="e.g., Team Collaboration, Problem Solving, Communication, Leadership">
+                
+                <label for="languages">Languages (Optional)</label>
+                <input type="text" id="languages" class="input-field" placeholder="e.g., English (Native), Spanish (Intermediate)">
+                
+                <label for="certifications">Certifications (Optional)</label>
+                <input type="text" id="certifications" class="input-field" placeholder="e.g., AWS Certified Developer, Google Analytics Certification">
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="skills-back">Back</button>
+                    <button class="next-btn" id="skills-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Field-Specific Questions (Engineering) -->
+            <div class="question-section hidden" id="engineering-questions">
+                <h2 class="question-title">Engineering-Specific Information</h2>
+                <p class="question-prompt">Let's get some information specific to your engineering field.</p>
+                <label for="engineering-type">Engineering Discipline</label>
+                <select id="engineering-type" class="input-field">
+                    <option value="">Select your engineering discipline</option>
+                    <option value="software">Software Engineering</option>
+                    <option value="mechanical">Mechanical Engineering</option>
+                    <option value="electrical">Electrical Engineering</option>
+                    <option value="civil">Civil Engineering</option>
+                    <option value="aerospace">Aerospace Engineering</option>
+                    <option value="chemical">Chemical Engineering</option>
+                    <option value="biomedical">Biomedical Engineering</option>
+                    <option value="industrial">Industrial Engineering</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="engineering-software">Technical Software Proficiency</label>
+                <input type="text" id="engineering-software" class="input-field" placeholder="e.g., AutoCAD, MATLAB, SolidWorks, ANSYS">
+                
+                <label for="engineering-projects">Significant Engineering Projects</label>
+                <textarea id="engineering-projects" class="textarea-field" placeholder="Briefly describe 1-2 significant engineering projects you've worked on"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="engineering-back">Back</button>
+                    <button class="next-btn" id="engineering-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Business & Finance Field-Specific Questions -->
+            <div class="question-section hidden" id="business-questions">
+                <h2 class="question-title">Business & Finance Information</h2>
+                <p class="question-prompt">Let's get some information specific to your business or finance career.</p>
+                
+                <label for="business-specialty">Business Specialty</label>
+                <select id="business-specialty" class="input-field">
+                    <option value="">Select your business specialty</option>
+                    <option value="accounting">Accounting</option>
+                    <option value="finance">Finance</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="management">Management</option>
+                    <option value="economics">Economics</option>
+                    <option value="hr">Human Resources</option>
+                    <option value="consulting">Consulting</option>
+                    <option value="entrepreneurship">Entrepreneurship</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="business-software">Software Proficiency</label>
+                <input type="text" id="business-software" class="input-field" placeholder="e.g., Excel, QuickBooks, SAP, Tableau, PowerBI">
+                
+                <label for="business-certifications">Professional Certifications</label>
+                <input type="text" id="business-certifications" class="input-field" placeholder="e.g., CPA, CFA, MBA, PMP, Six Sigma">
+                
+                <label for="business-achievements">Key Business Achievements</label>
+                <textarea id="business-achievements" class="textarea-field" placeholder="Briefly describe 1-2 significant business achievements, such as increasing revenue, reducing costs, improving processes, etc."></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="business-back">Back</button>
+                    <button class="next-btn" id="business-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Technology & IT Field-Specific Questions -->
+            <div class="question-section hidden" id="technology-questions">
+                <h2 class="question-title">Technology & IT Information</h2>
+                <p class="question-prompt">Let's get some information specific to your technology career.</p>
+                
+                <label for="tech-specialty">Tech Specialty</label>
+                <select id="tech-specialty" class="input-field">
+                    <option value="">Select your tech specialty</option>
+                    <option value="frontend">Front-end Development</option>
+                    <option value="backend">Back-end Development</option>
+                    <option value="fullstack">Full-stack Development</option>
+                    <option value="mobile">Mobile Development</option>
+                    <option value="data">Data Science/Analytics</option>
+                    <option value="cloud">Cloud Computing</option>
+                    <option value="devops">DevOps</option>
+                    <option value="security">Cybersecurity</option>
+                    <option value="ai">AI/Machine Learning</option>
+                    <option value="network">Network Administration</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="programming-languages">Programming Languages</label>
+                <input type="text" id="programming-languages" class="input-field" placeholder="e.g., JavaScript, Python, Java, C#, Ruby">
+                
+                <label for="tech-frameworks">Frameworks & Technologies</label>
+                <input type="text" id="tech-frameworks" class="input-field" placeholder="e.g., React, Node.js, Django, AWS, Docker, Kubernetes">
+                
+                <label for="tech-projects">Technical Projects</label>
+                <textarea id="tech-projects" class="textarea-field" placeholder="Briefly describe 1-2 significant technical projects you've worked on, including technologies used and your role"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="technology-back">Back</button>
+                    <button class="next-btn" id="technology-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Healthcare Field-Specific Questions -->
+            <div class="question-section hidden" id="healthcare-questions">
+                <h2 class="question-title">Healthcare Information</h2>
+                <p class="question-prompt">Let's get some information specific to your healthcare career.</p>
+                
+                <label for="healthcare-specialty">Healthcare Specialty</label>
+                <select id="healthcare-specialty" class="input-field">
+                    <option value="">Select your healthcare specialty</option>
+                    <option value="nursing">Nursing</option>
+                    <option value="medicine">Medicine</option>
+                    <option value="pharmacy">Pharmacy</option>
+                    <option value="therapy">Physical/Occupational Therapy</option>
+                    <option value="mental-health">Mental Health</option>
+                    <option value="public-health">Public Health</option>
+                    <option value="administration">Healthcare Administration</option>
+                    <option value="research">Medical Research</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="healthcare-certifications">Professional Certifications & Licenses</label>
+                <input type="text" id="healthcare-certifications" class="input-field" placeholder="e.g., RN, MD, PharmD, PT, LCSW">
+                
+                <label for="healthcare-skills">Clinical Skills</label>
+                <input type="text" id="healthcare-skills" class="input-field" placeholder="e.g., Patient Assessment, Medication Administration, Phlebotomy, Wound Care">
+                
+                <label for="healthcare-experience">Specialized Experience</label>
+                <textarea id="healthcare-experience" class="textarea-field" placeholder="Briefly describe any specialized experience, such as specific patient populations, medical specialties, or healthcare settings"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="healthcare-back">Back</button>
+                    <button class="next-btn" id="healthcare-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Education Field-Specific Questions -->
+            <div class="question-section hidden" id="education-questions">
+                <h2 class="question-title">Education Career Information</h2>
+                <p class="question-prompt">Let's get some information specific to your education career.</p>
+                
+                <label for="education-level">Education Level</label>
+                <select id="education-level" class="input-field">
+                    <option value="">Select the education level you teach</option>
+                    <option value="early-childhood">Early Childhood</option>
+                    <option value="elementary">Elementary</option>
+                    <option value="middle">Middle School</option>
+                    <option value="high">High School</option>
+                    <option value="higher-ed">Higher Education</option>
+                    <option value="special-ed">Special Education</option>
+                    <option value="adult-ed">Adult Education</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="teaching-subjects">Teaching Subjects</label>
+                <input type="text" id="teaching-subjects" class="input-field" placeholder="e.g., Mathematics, English, Science, History, Art">
+                
+                <label for="teaching-certifications">Teaching Certifications</label>
+                <input type="text" id="teaching-certifications" class="input-field" placeholder="e.g., State Teaching License, TEFL, National Board Certification">
+                
+                <label for="teaching-methods">Teaching Methods & Approaches</label>
+                <textarea id="teaching-methods" class="textarea-field" placeholder="Briefly describe your teaching philosophy, methodologies, or innovative approaches to education"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="education-back">Back</button>
+                    <button class="next-btn" id="education-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Arts & Creative Fields Questions -->
+            <div class="question-section hidden" id="arts-questions">
+                <h2 class="question-title">Arts & Creative Information</h2>
+                <p class="question-prompt">Let's get some information specific to your creative career.</p>
+                
+                <label for="arts-specialty">Creative Specialty</label>
+                <select id="arts-specialty" class="input-field">
+                    <option value="">Select your creative specialty</option>
+                    <option value="visual">Visual Arts (Painting, Drawing, Sculpture)</option>
+                    <option value="graphic-design">Graphic Design</option>
+                    <option value="ux-design">UX/UI Design</option>
+                    <option value="photography">Photography</option>
+                    <option value="film">Film & Video</option>
+                    <option value="music">Music</option>
+                    <option value="writing">Writing & Publishing</option>
+                    <option value="performing">Performing Arts</option>
+                    <option value="fashion">Fashion Design</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="creative-software">Creative Software Proficiency</label>
+                <input type="text" id="creative-software" class="input-field" placeholder="e.g., Adobe Creative Suite, Sketch, Figma, Pro Tools, Final Cut Pro">
+                
+                <label for="portfolio-link">Portfolio Link</label>
+                <input type="text" id="portfolio-link" class="input-field" placeholder="e.g., yourportfolio.com, behance.net/yourname, dribbble.com/yourname">
+                
+                <label for="creative-projects">Significant Projects</label>
+                <textarea id="creative-projects" class="textarea-field" placeholder="Briefly describe 1-2 significant creative projects, including your role, concept, and impact"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="arts-back">Back</button>
+                    <button class="next-btn" id="arts-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Science & Research Questions -->
+            <div class="question-section hidden" id="science-questions">
+                <h2 class="question-title">Science & Research Information</h2>
+                <p class="question-prompt">Let's get some information specific to your scientific career.</p>
+                
+                <label for="science-specialty">Scientific Field</label>
+                <select id="science-specialty" class="input-field">
+                    <option value="">Select your scientific field</option>
+                    <option value="biology">Biology</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="physics">Physics</option>
+                    <option value="environmental">Environmental Science</option>
+                    <option value="astronomy">Astronomy</option>
+                    <option value="earth">Earth Sciences</option>
+                    <option value="material">Materials Science</option>
+                    <option value="mathematics">Mathematics</option>
+                    <option value="computer">Computer Science Research</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <label for="research-methods">Research Methods & Techniques</label>
+                <input type="text" id="research-methods" class="input-field" placeholder="e.g., PCR, CRISPR, Spectroscopy, Monte Carlo Simulations, Statistical Analysis">
+                
+                <label for="publications">Publications</label>
+                <input type="text" id="publications" class="input-field" placeholder="Number of publications or significant papers">
+                
+                <label for="research-projects">Research Projects</label>
+                <textarea id="research-projects" class="textarea-field" placeholder="Briefly describe 1-2 significant research projects, including your methodology and findings"></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="science-back">Back</button>
+                    <button class="next-btn" id="science-next">Next</button>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="question-section hidden" id="summary-section">
+                <h2 class="question-title">Professional Summary</h2>
+                <p class="question-prompt">Let's create a brief professional summary for your resume.</p>
+                <label for="professional-summary">Professional Summary</label>
+                <textarea id="professional-summary" class="textarea-field" placeholder="e.g., Dedicated Software Engineer with 2 years of experience in web development. Proficient in JavaScript, React, and Node.js. Passionate about creating efficient, scalable applications that solve real-world problems."></textarea>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" id="summary-back">Back</button>
+                    <button class="submit-btn" id="submit-resume">Generate Resume</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="container">
+        <div>
+            <p>&copy; 2024 Resume Elevate</p>
+            <ul>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="careers.html">Careers</a></li>
+            </ul>
+        </div>
+        <div>
+            <p>A Wichita State Project</p>
+            <p>Relate Resume Generator</p>
+        </div>
+    </footer>
+
+    <script src="ResumeElevateScript.js"></script>
+</body>
+</html>
