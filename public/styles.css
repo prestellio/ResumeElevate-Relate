@@ -600,6 +600,8 @@ ul {
     display: block;
 }
 
+/* Questionnair.html fade in and out*/
+
 .fadeIn {
     opacity: 1;
     transition: opacity 1s ease-in;
@@ -609,3 +611,17 @@ ul {
     opacity: 0;
     transition: opacity 1s ease-out;
 }
+
+/* End Questionnair.html fade in... */
+
+
+/* editor.html css */
+
+.editor{
+    display: grid;
+    grid-area: 5 ;
+}
+
+
+
+/* End editor.html css*/
