@@ -13,6 +13,7 @@ const app = express();
 const port = 3000;
 
 const templateRoutes = require('./routes/templateRoutes');
+const Answer = require('./models/Answer');
 
 // Middleware
 // Parse JSON and URL-encoded data
@@ -41,6 +42,31 @@ app.use('/api', templateRoutes);
 // Add a test route to verify the server is working
 app.get('/api/test', (req, res) => {
     res.json({ message: 'API is working!' });
+});
+
+// Get all questionnaire answers
+app.get('/api/get-answers', async (req, res) => {
+    try {
+        const answers = await Answer.find().sort({ createdAt: -1 });
+        res.json({ success: true, answers });
+    } catch (error) {
+        console.error('Error fetching answers:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch answers' });
+    }
+});
+
+// Get a specific questionnaire answer by ID
+app.get('/api/get-answer/:id', async (req, res) => {
+    try {
+        const answer = await Answer.findById(req.params.id);
+        if (!answer) {
+            return res.status(404).json({ success: false, error: 'Answer not found' });
+        }
+        res.json({ success: true, answer });
+    } catch (error) {
+        console.error('Error fetching answer:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch answer' });
+    }
 });
 
 // Connect to MongoDB
@@ -106,22 +132,23 @@ app.post('/submit-resume', async (req, res) => {
     }
 });
 
+// This route should be added to your app.js file, make sure it's before any catch-all handlers
 app.post('/save-answers', async (req, res) => {
     try {
-        console.log("Received request:", req.body); // ✅ Log request data
+        console.log("Received questionnaire data:", req.body); // Log received data
 
-        if (!req.body.answers || req.body.answers.length === 0) {
+        if (!req.body.answers) {
             return res.status(400).json({ error: "No answers received" });
         }
 
-        const newAnswers = new Answer({ answers: req.body.answers });
+        const newAnswers = new Answer(req.body.answers);
         await newAnswers.save();
 
-        console.log("Answers saved successfully!"); // ✅ Log successful save
+        console.log("Questionnaire answers saved successfully!"); // Log successful save
         res.status(201).json({ message: "Answers saved successfully!" });
 
     } catch (error) {
-        console.error("Error saving answers:", error);
+        console.error("Error saving questionnaire answers:", error);
         res.status(500).json({ error: "Failed to save answers" });
     }
 });

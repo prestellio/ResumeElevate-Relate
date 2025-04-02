@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/RelateLogo_proto_circle.png" type="image/x-icon">
+    <title>Questionnaire Answers | ResumeElevate</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .answers-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .answer-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .answer-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #225bb2;
+            padding-bottom: 10px;
+        }
+        
+        .answer-details {
+            display: none;
+        }
+        
+        .answer-details.active {
+            display: block;
+        }
+        
+        .toggle-details {
+            background-color: #225bb2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        .field-section {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+        
+        .field-title {
+            font-weight: bold;
+            color: #225bb2;
+        }
+        
+        .search-bar {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 100%;
+            border: 2px solid #9ba2ff;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header id="top">
+        <a href="index.html">
+            <img src="images/RelateLogo_proto_square.png" alt="Resume Relate Logo">
+        </a>
+        
+        <nav class="navbar">
+            <button class="navbar-toggle" id="navbarToggle">&#9776;</button>
+            <div class="navbar-menu" id="navbarMenu">
+                <a class="nav-link" href="index.html">Home</a>
+                <a class="nav-link" href="questionnaire.html">Generate Resume</a>
+                <a class="nav-link" href="about.html">About</a>
+                <a class="nav-link" href="login.html">Login</a>
+                <a class="nav-link" href="editor.html">Edit Resume</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="answers-container">
+            <h1>Questionnaire Submissions</h1>
+            <p>View all submitted questionnaire answers</p>
+            
+            <input type="text" id="searchBar" class="search-bar" placeholder="Search by name, email, or career field...">
+            
+            <div id="answersContainer">
+                <div class="loading">Loading answers...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="container">
+        <div>
+            <p>&copy; 2024 Resume Elevate</p>
+            <ul>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="careers.html">Careers</a></li>
+            </ul>
+        </div>
+        <div>
+            <p>A Wichita State Project</p>
+            <p>Relate Resume Generator</p>
+        </div>
+    </footer>
+
+    <script>
+        // Fetch and display all questionnaire answers
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchAnswers();
+            
+            document.getElementById('searchBar').addEventListener('input', function() {
+                filterAnswers(this.value.toLowerCase());
+            });
+        });
+        
+        async function fetchAnswers() {
+            const answersContainer = document.getElementById('answersContainer');
+            
+            try {
+                const response = await fetch('/api/get-answers');
+                
+                if (!response.ok) {
+                    throw new Error(`API responded with status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error('Invalid response format from API');
+                }
+                
+                // Clear loading message
+                answersContainer.innerHTML = '';
+                
+                if (data.answers.length === 0) {
+                    answersContainer.innerHTML = '<div class="no-results">No questionnaire submissions found.</div>';
+                    return;
+                }
+                
+                // Create answer cards
+                data.answers.forEach((answer, index) => {
+                    const answerCard = document.createElement('div');
+                    answerCard.className = 'answer-card';
+                    answerCard.dataset.name = answer.personalInfo?.name?.toLowerCase() || '';
+                    answerCard.dataset.email = answer.personalInfo?.email?.toLowerCase() || '';
+                    answerCard.dataset.career = answer.careerField?.toLowerCase() || '';
+                    
+                    const submissionDate = new Date(answer.createdAt).toLocaleString();
+                    
+                    answerCard.innerHTML = `
+                        <div class="answer-header">
+                            <div>
+                                <h3>${answer.personalInfo?.name || 'Unnamed'}</h3>
+                                <p>Career: ${answer.careerField || 'Not specified'}</p>
+                                <p>Submitted: ${submissionDate}</p>
+                            </div>
+                            <button class="toggle-details" data-index="${index}">View Details</button>
+                        </div>
+                        <div class="answer-details" id="details-${index}">
+                            ${generateAnswerDetails(answer)}
+                        </div>
+                    `;
+                    
+                    answersContainer.appendChild(answerCard);
+                });
+                
+                // Add event listeners to toggle buttons
+                document.querySelectorAll('.toggle-details').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const detailsId = `details-${this.dataset.index}`;
+                        const detailsElement = document.getElementById(detailsId);
+                        
+                        if (detailsElement.classList.contains('active')) {
+                            detailsElement.classList.remove('active');
+                            this.textContent = 'View Details';
+                        } else {
+                            detailsElement.classList.add('active');
+                            this.textContent = 'Hide Details';
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error fetching answers:', error);
+                answersContainer.innerHTML = '<div class="no-results">Error loading questionnaire submissions. Please try again later.</div>';
+            }
+        }
+        
+        function generateAnswerDetails(answer) {
+            let detailsHTML = '';
+            
+            // Personal Information
+            detailsHTML += `
+                <div class="field-section">
+                    <h4>Personal Information</h4>
+                    <p><span class="field-title">Name:</span> ${answer.personalInfo?.name || 'Not provided'}</p>
+                    <p><span class="field-title">Email:</span> ${answer.personalInfo?.email || 'Not provided'}</p>
+                    <p><span class="field-title">Phone:</span> ${answer.personalInfo?.phone || 'Not provided'}</p>
+                    <p><span class="field-title">Location:</span> ${answer.personalInfo?.location || 'Not provided'}</p>
+                </div>
+            `;
+            
+            // Education
+            if (answer.education && answer.education.length > 0) {
+                detailsHTML += `
+                    <div class="field-section">
+                        <h4>Education</h4>
+                `;
+                
+                answer.education.forEach((edu, index) => {
+                    detailsHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <p><span class="field-title">University:</span> ${edu.university || 'Not provided'}</p>
+                            <p><span class="field-title">Degree:</span> ${edu.degree || 'Not provided'}</p>
+                            <p><span class="field-title">Graduation Date:</span> ${edu.graduationDate || 'Not provided'}</p>
+                            <p><span class="field-title">GPA:</span> ${edu.gpa || 'Not provided'}</p>
+                            <p><span class="field-title">Relevant Courses:</span> ${edu.relevantCourses || 'Not provided'}</p>
+                        </div>
+                    `;
+                });
+                
+                detailsHTML += `</div>`;
+            }
+            
+            // Experience
+            if (answer.experience && answer.experience.length > 0) {
+                detailsHTML += `
+                    <div class="field-section">
+                        <h4>Work Experience</h4>
+                `;
+                
+                answer.experience.forEach((exp, index) => {
+                    detailsHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <p><span class="field-title">Company:</span> ${exp.companyName || 'Not provided'}</p>
+                            <p><span class="field-title">Position:</span> ${exp.jobTitle || 'Not provided'}</p>
+                            <p><span class="field-title">Location:</span> ${exp.location || 'Not provided'}</p>
+                            <p><span class="field-title">Dates:</span> ${exp.dates || 'Not provided'}</p>
+                            <p><span class="field-title">Responsibilities:</span> ${exp.responsibilities || 'Not provided'}</p>
+                        </div>
+                    `;
+                });
+                
+                detailsHTML += `</div>`;
+            }
+            
+            // Projects
+            if (answer.projects && answer.projects.length > 0) {
+                detailsHTML += `
+                    <div class="field-section">
+                        <h4>Projects</h4>
+                `;
+                
+                answer.projects.forEach((proj, index) => {
+                    detailsHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <p><span class="field-title">Project Name:</span> ${proj.projectName || 'Not provided'}</p>
+                            <p><span class="field-title">Dates:</span> ${proj.dates || 'Not provided'}</p>
+                            <p><span class="field-title">Description:</span> ${proj.description || 'Not provided'}</p>
+                        </div>
+                    `;
+                });
+                
+                detailsHTML += `</div>`;
+            }
+            
+            // Skills
+            if (answer.skills) {
+                detailsHTML += `
+                    <div class="field-section">
+                        <h4>Skills</h4>
+                        <p><span class="field-title">Technical Skills:</span> ${answer.skills.technical || 'Not provided'}</p>
+                        <p><span class="field-title">Soft Skills:</span> ${answer.skills.soft || 'Not provided'}</p>
+                        <p><span class="field-title">Languages:</span> ${answer.skills.languages || 'Not provided'}</p>
+                        <p><span class="field-title">Certifications:</span> ${answer.skills.certifications || 'Not provided'}</p>
+                    </div>
+                `;
+            }
+            
+            // Field-specific information
+            if (answer.fieldSpecific) {
+                detailsHTML += `
+                    <div class="field-section">
+                        <h4>Field-Specific Information</h4>
+                `;
+                
+                // Engineering
+                if (answer.fieldSpecific.engineering) {
+                    const eng = answer.fieldSpecific.engineering;
+                    detailsHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <h5>Engineering</h5>
+                            <p><span class="field-title">Discipline:</span> ${eng.discipline || 'Not provided'}</p>
+                            <p><span class="field-title">Software:</span> ${eng.software || 'Not provided'}</p>
+                            <p><span class="field-title">Projects:</span> ${eng.projects || 'Not provided'}</p>
+                        </div>
+                    `;
+                }
+                
+                // Business
+                if (answer.fieldSpecific.business) {
+                    const bus = answer.fieldSpecific.business;
+                    detailsHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <h5>Business & Finance</h5>
+                            <p><span class="field-title">Specialty:</span> ${bus.specialty || 'Not provided'}</p>
+                            <p><span class="field-title">Software:</span> ${bus.software || 'Not provided'}</p>
+                            <p><span class="field-title">Certifications:</span> ${bus.certifications || 'Not provided'}</p>
+                            <p><span class="field-title">Achievements:</span> ${bus.achievements || 'Not provided'}</p>
+                        </div>
+                    `;
+                }
+                
+                // Technology
+                if (answer.fieldSpecific.technology) {
+                    const tech = answer.fieldSpecific.technology;
+                    detailsHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <h5>Technology & IT</h5>
+                            <p><span class="field-title">Specialty:</span> ${tech.specialty || 'Not provided'}</p>
+                            <p><span class="field-title">Programming Languages:</span> ${tech.programmingLanguages || 'Not provided'}</p>
+                            <p><span class="field-title">Frameworks:</span> ${tech.frameworks || 'Not provided'}</p>
+                            <p><span class="field-title">Projects:</span> ${tech.projects || 'Not provided'}</p>
+                        </div>
+                    `;
+                }
+                
+                // Add other field-specific sections as needed
+                
+                detailsHTML += `</div>`;
+            }
+            
+            // Summary
+            if (answer.summary) {
+                detailsHTML += `
+                    <div class="field-section">
+                        <h4>Professional Summary</h4>
+                        <p>${answer.summary}</p>
+                    </div>
+                `;
+            }
+            
+            return detailsHTML;
+        }
+        
+        function filterAnswers(searchTerm) {
+            const cards = document.querySelectorAll('.answer-card');
+            let hasResults = false;
+            
+            cards.forEach(card => {
+                const name = card.dataset.name;
+                const email = card.dataset.email;
+                const career = card.dataset.career;
+                
+                if (name.includes(searchTerm) || email.includes(searchTerm) || career.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            const noResultsElement = document.querySelector('.no-results');
+            
+            if (!hasResults) {
+                if (!noResultsElement) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    noResults.textContent = 'No matches found for your search.';
+                    document.getElementById('answersContainer').appendChild(noResults);
+                }
+            } else if (noResultsElement) {
+                noResultsElement.remove();
+            }
+        }
+    </script>
+</body>
+</html>

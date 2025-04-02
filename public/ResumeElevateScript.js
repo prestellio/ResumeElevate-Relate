@@ -507,8 +507,13 @@ function initQuestionnaire() {
 
     // Field-specific sections mapped by career choice
     const fieldSpecificSections = {
-        'engineering': 'engineering-questions'
-        // Add others as needed
+        'engineering': 'engineering-questions',
+        'business': 'business-questions',
+        'technology': 'technology-questions',
+        'healthcare': 'healthcare-questions',
+        'education': 'education-questions',
+        'arts': 'arts-questions',
+        'science': 'science-questions'
     };
 
     // Current workflow of sections
@@ -522,6 +527,7 @@ function initQuestionnaire() {
 
     // Resume data object to store all responses
     const resumeData = {
+        careerField: '',
         personalInfo: {},
         education: [],
         experience: [],
@@ -536,6 +542,7 @@ function initQuestionnaire() {
     careerButtons.forEach(button => {
         button.addEventListener('click', function() {
             selectedCareer = this.getAttribute('data-career');
+            resumeData.careerField = selectedCareer;
             
             // Update workflow to include field-specific questions
             if (fieldSpecificSections[selectedCareer]) {
@@ -580,19 +587,13 @@ function initQuestionnaire() {
         moveToNextSection();
     });
 
-    // Engineering specific section
-    if (document.getElementById('engineering-back')) {
-        document.getElementById('engineering-back').addEventListener('click', moveToPreviousSection);
-        document.getElementById('engineering-next').addEventListener('click', function() {
-            collectEngineeringInfo();
-            moveToNextSection();
-        });
-    }
+    // Career-specific section buttons
+    setupFieldSpecificButtons();
 
     document.getElementById('summary-back').addEventListener('click', moveToPreviousSection);
     document.getElementById('submit-resume').addEventListener('click', function() {
         collectSummary();
-        submitResume();
+        submitQuestionnaire();
     });
     
     // Setup "Add More" buttons
@@ -602,6 +603,71 @@ function initQuestionnaire() {
     
     // Update progress bar
     updateProgressBar();
+
+    function setupFieldSpecificButtons() {
+        // Engineering specific section
+        if (document.getElementById('engineering-back')) {
+            document.getElementById('engineering-back').addEventListener('click', moveToPreviousSection);
+            document.getElementById('engineering-next').addEventListener('click', function() {
+                collectEngineeringInfo();
+                moveToNextSection();
+            });
+        }
+
+        // Business specific section
+        if (document.getElementById('business-back')) {
+            document.getElementById('business-back').addEventListener('click', moveToPreviousSection);
+            document.getElementById('business-next').addEventListener('click', function() {
+                collectBusinessInfo();
+                moveToNextSection();
+            });
+        }
+
+        // Technology specific section
+        if (document.getElementById('technology-back')) {
+            document.getElementById('technology-back').addEventListener('click', moveToPreviousSection);
+            document.getElementById('technology-next').addEventListener('click', function() {
+                collectTechnologyInfo();
+                moveToNextSection();
+            });
+        }
+
+        // Healthcare specific section
+        if (document.getElementById('healthcare-back')) {
+            document.getElementById('healthcare-back').addEventListener('click', moveToPreviousSection);
+            document.getElementById('healthcare-next').addEventListener('click', function() {
+                collectHealthcareInfo();
+                moveToNextSection();
+            });
+        }
+
+        // Education specific section
+        if (document.getElementById('education-back')) {
+            document.getElementById('education-back').addEventListener('click', moveToPreviousSection);
+            document.getElementById('education-next').addEventListener('click', function() {
+                collectEducationFieldInfo();
+                moveToNextSection();
+            });
+        }
+
+        // Arts specific section
+        if (document.getElementById('arts-back')) {
+            document.getElementById('arts-back').addEventListener('click', moveToPreviousSection);
+            document.getElementById('arts-next').addEventListener('click', function() {
+                collectArtsInfo();
+                moveToNextSection();
+            });
+        }
+
+        // Science specific section
+        if (document.getElementById('science-back')) {
+            document.getElementById('science-back').addEventListener('click', moveToPreviousSection);
+            document.getElementById('science-next').addEventListener('click', function() {
+                collectScienceInfo();
+                moveToNextSection();
+            });
+        }
+    }
 
     function moveToNextSection() {
         // Hide current section
@@ -686,6 +752,7 @@ function initQuestionnaire() {
         };
     }
 
+    // Field-specific collection functions
     function collectEngineeringInfo() {
         resumeData.fieldSpecific.engineering = {
             discipline: document.getElementById('engineering-type').value,
@@ -694,27 +761,100 @@ function initQuestionnaire() {
         };
     }
 
+    function collectBusinessInfo() {
+        resumeData.fieldSpecific.business = {
+            specialty: document.getElementById('business-specialty').value,
+            software: document.getElementById('business-software').value,
+            certifications: document.getElementById('business-certifications').value,
+            achievements: document.getElementById('business-achievements').value
+        };
+    }
+
+    function collectTechnologyInfo() {
+        resumeData.fieldSpecific.technology = {
+            specialty: document.getElementById('tech-specialty').value,
+            programmingLanguages: document.getElementById('programming-languages').value,
+            frameworks: document.getElementById('tech-frameworks').value,
+            projects: document.getElementById('tech-projects').value
+        };
+    }
+
+    function collectHealthcareInfo() {
+        resumeData.fieldSpecific.healthcare = {
+            specialty: document.getElementById('healthcare-specialty').value,
+            certifications: document.getElementById('healthcare-certifications').value,
+            skills: document.getElementById('healthcare-skills').value,
+            experience: document.getElementById('healthcare-experience').value
+        };
+    }
+
+    function collectEducationFieldInfo() {
+        resumeData.fieldSpecific.education = {
+            level: document.getElementById('education-level').value,
+            subjects: document.getElementById('teaching-subjects').value,
+            certifications: document.getElementById('teaching-certifications').value,
+            methods: document.getElementById('teaching-methods').value
+        };
+    }
+
+    function collectArtsInfo() {
+        resumeData.fieldSpecific.arts = {
+            specialty: document.getElementById('arts-specialty').value,
+            software: document.getElementById('creative-software').value,
+            portfolioLink: document.getElementById('portfolio-link').value,
+            projects: document.getElementById('creative-projects').value
+        };
+    }
+
+    function collectScienceInfo() {
+        resumeData.fieldSpecific.science = {
+            field: document.getElementById('science-specialty').value,
+            methods: document.getElementById('research-methods').value,
+            publications: document.getElementById('publications').value,
+            projects: document.getElementById('research-projects').value
+        };
+    }
+
     function collectSummary() {
         resumeData.summary = document.getElementById('professional-summary').value;
     }
 
-    // Submit resume to backend
-    function submitResume() {
+    // Submit questionnaire to backend
+    function submitQuestionnaire() {
         // Show loading state
-        document.getElementById('submit-resume').textContent = 'Processing...';
-        document.getElementById('submit-resume').disabled = true;
+        const submitButton = document.getElementById('submit-resume');
+        submitButton.innerHTML = '<span class="spinner"></span>Processing...';
+        submitButton.disabled = true;
         
         // Send data to server
-        fetch('/submit-resume', {
+        fetch('/save-answers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(resumeData)
+            body: JSON.stringify({ answers: resumeData })
         })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert('Answers saved successfully!');
+            
+            // Now submit to the resume endpoint to generate a resume
+            return fetch('/submit-resume', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(convertToResumeFormat(resumeData))
+            });
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Resume generation failed');
             }
             return response.json();
         })
@@ -724,16 +864,52 @@ function initQuestionnaire() {
                 window.location.href = `editor.html?resumeId=${data.resumeId}`;
             } else {
                 alert('Error: Failed to generate resume. Please try again.');
-                document.getElementById('submit-resume').textContent = 'Generate Resume';
-                document.getElementById('submit-resume').disabled = false;
+                submitButton.innerHTML = 'Generate Resume';
+                submitButton.disabled = false;
             }
         })
         .catch(error => {
-            console.error('Error submitting resume:', error);
-            alert('Error: Failed to submit resume. Please try again.');
-            document.getElementById('submit-resume').textContent = 'Generate Resume';
-            document.getElementById('submit-resume').disabled = false;
+            console.error('Error submitting questionnaire:', error);
+            alert('Error: Failed to submit questionnaire. Please try again.');
+            submitButton.innerHTML = 'Generate Resume';
+            submitButton.disabled = false;
         });
+    }
+
+    // Convert questionnaire data to resume format expected by the existing submit-resume endpoint
+    function convertToResumeFormat(questionnaire) {
+        const resumeFormat = {
+            name: questionnaire.personalInfo.name,
+            email: questionnaire.personalInfo.email,
+            phone: questionnaire.personalInfo.phone,
+            
+            // Education
+            university: questionnaire.education[0]?.university || "",
+            universityLocation: questionnaire.personalInfo.location,
+            degree: questionnaire.education[0]?.degree || "",
+            gpa: questionnaire.education[0]?.gpa || "",
+            relevantCourse: questionnaire.education[0]?.relevantCourses || "",
+            graduationDate: questionnaire.education[0]?.graduationDate || "",
+            
+            // Technical skills
+            programmingLanguages: questionnaire.skills.technical || "",
+            operatingSystems: questionnaire.skills.soft || "",
+            
+            // Experience fields as arrays for multiple entries
+            companyName: questionnaire.experience.map(exp => exp.companyName),
+            position: questionnaire.experience.map(exp => exp.jobTitle),
+            location: questionnaire.experience.map(exp => exp.location),
+            responsibilities: questionnaire.experience.map(exp => exp.responsibilities),
+            startDate: questionnaire.experience.map(exp => exp.dates.split('-')[0]?.trim() || ""),
+            endDate: questionnaire.experience.map(exp => exp.dates.split('-')[1]?.trim() || ""),
+            
+            // Projects
+            projectName: questionnaire.projects.map(proj => proj.projectName),
+            projectDescription: questionnaire.projects.map(proj => proj.description),
+            projectStartDate: questionnaire.projects.map(proj => proj.dates)
+        };
+        
+        return resumeFormat;
     }
 
     // Section addition functions
