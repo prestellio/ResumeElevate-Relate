@@ -334,8 +334,6 @@ div .div-clear {
     border: solid 1px #fff;
 }
 
-.template-page-grid
-
 .template-page-grid-aside img{
     max-width: 75%;
     max-height: 90%
@@ -681,3 +679,76 @@ ul {
 .submit-btn {
     animation: pulse 2s infinite;
 }
+
+
+
+
+/* editor.html */
+
+.editor {
+    display: flex;
+    flex-direction: column;
+    background-color: #9ba2ff;
+}
+
+.editor header {
+    position: absolute;
+    background-image: none;
+    background-color: #dbddff;
+    border-radius: 0;
+    width: 100vw;
+    height: 15vh;
+}
+
+.editor .header-div {
+    background-color: #225bb2;
+    width: 100%;
+    height: 70%;
+}
+
+.editor ul, li {
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: inset 5px 5px black;
+    width: 40px;
+    height: 40px;
+}
+
+.editor .leftAside {
+    position: absolute;
+    left: 0;
+    top: 15vh;
+    width: 20vw;
+    height: 70vh;
+    border: white 3px solid;
+    box-shadow: 2px 0px 20px black;
+}
+
+.editor main {
+    background-color: #999;
+    display: relative;
+}
+
+.editor .rightAside {
+    position: absolute;
+    right: 0;
+    top: 15vh;
+    width: 20vw;
+    height: 70vh;
+    border: white 3px solid;
+    box-shadow: -2px 0px 20px black;
+}
+
+.editor nav {
+    position: absolute;
+    bottom: 0;
+    width: 100vw;
+    height: 15vh;
+
+    
+}
+
+/*end editor.html */
