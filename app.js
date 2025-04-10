@@ -69,6 +69,34 @@ app.get('/api/get-answer/:id', async (req, res) => {
     }
 });
 
+// Get a questionnaire answer by matching resume data
+app.get('/api/get-answer-by-resume/:resumeId', async (req, res) => {
+    try {
+        const resumeId = req.params.resumeId;
+        
+        // First get the resume
+        const resume = await Resume.findById(resumeId);
+        if (!resume) {
+            return res.status(404).json({ success: false, error: 'Resume not found' });
+        }
+        
+        // Try to find matching answer by name and email
+        const answer = await Answer.findOne({
+            'personalInfo.name': resume.name,
+            'personalInfo.email': resume.email
+        });
+        
+        if (!answer) {
+            return res.status(404).json({ success: false, error: 'Matching answer not found' });
+        }
+        
+        res.json({ success: true, answer });
+    } catch (error) {
+        console.error('Error fetching answer by resume:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch matching answer' });
+    }
+});
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
@@ -171,18 +199,27 @@ app.get('/get-resume/:id', async (req, res) => {
 // Route to save updated resume data
 app.post('/save-resume', async (req, res) => {
     try {
-        const { name, email, phone, resumeContent } = req.body;
+        const { name, email, phone, resumeContent, summary, careerField } = req.body;
         const resumeId = req.body.resumeId;
 
         if (!resumeId) {
             return res.status(400).json({ error: 'Resume ID is required' });
         }
 
+        // Build update object with fields that are provided
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (email) updateData.email = email;
+        if (phone) updateData.phone = phone;
+        if (resumeContent) updateData.resumeContent = resumeContent;
+        if (summary) updateData.summary = summary;
+        if (careerField) updateData.careerField = careerField;
+
         // Find and update the resume in MongoDB
-        const updatedResume = await Resume.findByIdAndUpdate(resumeId, {
-            name, email, phone,
-            resumeContent // Stores the Quill editor content in MongoDB
-        }, { new: true });
+        const updatedResume = await Resume.findByIdAndUpdate(resumeId, 
+            updateData, 
+            { new: true }
+        );
 
         if (!updatedResume) {
             return res.status(404).json({ error: 'Resume not found' });

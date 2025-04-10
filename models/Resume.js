@@ -4,6 +4,9 @@ const resumeSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: String,
+  careerField: String,
+  summary: String,
+  resumeContent: String,
   education: {
       university: String,
       location: String,
@@ -36,6 +39,10 @@ const resumeSchema = new mongoose.Schema({
       leadershipStartDate: String,
       leadershipEndDate: String,
   }],
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 // Prevent OverwriteModelError

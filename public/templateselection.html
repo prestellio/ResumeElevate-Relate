@@ -1,6 +1,20 @@
 <!-- Description: This page is the template selection page for the user to choose a template for their resume. (templateselection.html) -->
+<!-- 
+    Flow: 
+    1. User completes questionnaire.html
+    2. User gets redirected here with resumeId and career parameters
+    3. User selects a template
+    4. User is redirected to editor.html with resumeId and template parameters
+    5. Editor loads resume data and questionnaire answers to prepopulate the template
+-->
 
 <!DOCTYPE html>
+<!-- 
+    Use enhanced redirect mechanisms:
+    1. Form-based redirection for most reliable navigation
+    2. Direct links as backup in case JavaScript fails
+    3. Direct template links for single-click navigation
+-->
 <html lang="en">
 
 <head>
@@ -102,6 +116,35 @@
             align-items: center;
             flex-direction: column;
         }
+        
+        /* New styles for career-based template selection */
+        .template-header {
+            color: #225bb2;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 2px solid #9ba2ff;
+        }
+        
+        .continue-btn {
+            background-color: #225bb2;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .continue-btn:hover {
+            background-color: #1a4585;
+        }
     </style>
 </head>
 
@@ -135,7 +178,62 @@
         <img class="modal-content" id="modalImage">
     </div>
 
+    <!-- Backup links for direct template selection -->
+    <div id="direct-links" style="text-align: center; margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 10px;">
+        <h3>Or Select a Template Directly:</h3>
+        <div id="direct-template-links" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 15px;">
+            <!-- Links will be added here by JavaScript -->
+        </div>
+    </div>
+
     <!-- Script references -->
     <script src="ResumeElevateScript.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get parameters from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const resumeId = urlParams.get('resumeId');
+            
+            if (resumeId) {
+                // Create direct links for common templates
+                const templates = [
+                    { id: 'engineering', name: 'Engineering' },
+                    { id: 'business', name: 'Business' },
+                    { id: 'technology', name: 'Technology' },
+                    { id: 'healthcare', name: 'Healthcare' },
+                    { id: 'education', name: 'Education' },
+                    { id: 'arts', name: 'Arts' },
+                    { id: 'science', name: 'Science' }
+                ];
+                
+                const directLinksContainer = document.getElementById('direct-template-links');
+                
+                templates.forEach(template => {
+                    const link = document.createElement('a');
+                    link.href = `editor.html?resumeId=${resumeId}&template=${template.id}`;
+                    link.textContent = template.name;
+                    link.style.padding = '8px 15px';
+                    link.style.backgroundColor = '#225bb2';
+                    link.style.color = 'white';
+                    link.style.borderRadius = '5px';
+                    link.style.textDecoration = 'none';
+                    link.style.fontWeight = 'bold';
+                    
+                    link.addEventListener('mouseover', function() {
+                        this.style.backgroundColor = '#1a4585';
+                    });
+                    
+                    link.addEventListener('mouseout', function() {
+                        this.style.backgroundColor = '#225bb2';
+                    });
+                    
+                    directLinksContainer.appendChild(link);
+                });
+            } else {
+                // Hide the direct links section if no resumeId
+                document.getElementById('direct-links').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
