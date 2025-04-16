@@ -1,215 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Your Resume</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Quill CSS -->
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #728fb4;
-      padding: 20px;
-    }
-    .resume-container {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    #toolbar-container {
-      background-color: #f8f8f8;
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      border-radius: 5px 5px 0 0;
-    }
-    #editor-container {
-      min-height: 600px;
-      border-radius: 0 0 5px 5px;
-      overflow: hidden; /* Ensures child content styling stays within the container */
-    }
-    /* Remove default Quill borders that interfere with our template styling */
-    .ql-container.ql-snow {
-      border: none !important;
-    }
-    .ql-toolbar.ql-snow {
-      border: none !important;
-      border-bottom: 1px solid #e0e0e0 !important;
-    }
-    .toolbar {
-      width: 100%;
-      text-align: center;
-      margin-top: 20px;
-    }
-    #saveResume, #downloadPDF {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-    }
-    #saveResume:hover, #downloadPDF:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    /* Professional styling for resume preview */
-    #resumeOutput {
-      margin-top: 30px;
-      margin-bottom: 50px;
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      color: #333;
-    }
-    #resumeOutput h2.preview-title {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 10px;
-    }
-    /* Template border styling to highlight the template */
-    .editor-template-container {
-      border-left: 4px solid #225bb2;
-      border-right: 4px solid #225bb2;
-      transition: all 0.3s ease;
-    }
-    .editor-template-header {
-      background-color: #f8f9fa;
-      padding: 15px;
-      text-align: center;
-      font-weight: bold;
-      border-bottom: 1px solid #e9ecef;
-      color: #225bb2;
-    }
-    /* Floating info badge */
-    .template-info {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #225bb2;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      z-index: 100;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/RelateLogo_proto_circle.png" type="image/x-icon">
+    <title>Document Editor | ResumeElevate</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-color: #2b579a;
+            --secondary-color: #f3f3f3;
+            --accent-color: #5b9bd5;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .document-toolbar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .toolbar-title {
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        
+        .toolbar-button {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin: 0 2px;
+            border-radius: 3px;
+        }
+        
+        .toolbar-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .formatting-toolbar {
+            padding: 10px;
+            background-color: var(--secondary-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .format-button {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            margin: 0 2px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        
+        .format-button:hover {
+            background-color: #e6e6e6;
+        }
+        
+        .editor-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .template-sidebar {
+            width: 200px;
+            background-color: var(--secondary-color);
+            border-right: 1px solid var(--border-color);
+            padding: 10px;
+            overflow-y: auto;
+        }
+        
+        .template-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .template-item:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .template-preview {
+            width: 100%;
+            height: 80px;
+            background-color: #f9f9f9;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .template-name {
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .editor-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .document-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #e6e6e6;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .document {
+            width: 21cm;
+            min-height: 29.7cm;
+            padding: 2cm;
+            margin: 1cm auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .document[contenteditable="true"] {
+            outline: none;
+        }
+        
+        .status-bar {
+            padding: 5px 10px;
+            background-color: var(--secondary-color);
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Template styles */
+        .template-business {
+            --template-primary: #003366;
+            --template-accent: #4d94ff;
+            --template-bg: #f0f5ff;
+        }
+        
+        .template-creative {
+            --template-primary: #660066;
+            --template-accent: #cc66cc;
+            --template-bg: #f9f0f9;
+        }
+        
+        .template-modern {
+            --template-primary: #333333;
+            --template-accent: #666666;
+            --template-bg: #f5f5f5;
+        }
+        
+        .template-header {
+            color: var(--template-primary);
+            border-bottom: 2px solid var(--template-accent);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .template-section {
+            background-color: var(--template-bg);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--template-accent);
+        }
+        
+        .template-footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid var(--template-accent);
+            color: var(--template-primary);
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
-  <div class="resume-container">
-    <!-- Template Info -->
-    <div class="editor-template-header">
-      <span id="templateName">Loading template...</span>
-      <span class="template-info">Template</span>
-    </div>
-    
-    <!-- Quill Toolbar -->
-    <div id="toolbar-container"></div>
-    
-    <!-- Quill Editor with template styling -->
-    <div class="editor-template-container">
-      <div id="editor-container"></div>
-    </div>
-  </div>
-
-  <!-- Buttons -->
-  <div class="toolbar">
-    <button id="saveResume" class="btn btn-primary">Save Resume</button>
-    <button id="downloadPDF" class="btn btn-success">Download PDF</button>
-  </div>
-
-  <!-- Container to display the printed resume preview -->
-  <div id="resumeOutput">
-    <h2 class="preview-title">Resume Preview</h2>
-    <!-- The formatted resume will appear here after clicking "Save Resume" -->
-  </div>
-
-  <!-- Debug info for development purposes -->
-  <div id="debugInfo" style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 12px;">
-    <h3>Debug Information</h3>
-    <p>URL Parameters: <span id="urlParams"></span></p>
-    <p>Resume ID: <span id="debugResumeId"></span></p>
-    <p>Template: <span id="debugTemplate"></span></p>
-  </div>
-
-  <!-- Quill JS -->
-  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/editor.js"></script>
-  <script>
-    // Display template information and debug data
-    document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const resumeId = urlParams.get('resumeId');
-      const template = urlParams.get('template') || 'default';
-
-      // Update template name display
-      const templateNameElement = document.getElementById('templateName');
-      // Format the template ID for display (capitalize, replace hyphens with spaces)
-      const formattedTemplateName = template
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
+    <header id="top">
+        <a href="index.html">
+            <img src="images/RelateLogo_proto_square.png" alt="Resume Relate Logo: green and blue peacock">
+        </a>
         
-      templateNameElement.textContent = `${formattedTemplateName} Template`;
-      
-      // Update debug information
-      document.getElementById('urlParams').textContent = window.location.search;
-      document.getElementById('debugResumeId').textContent = resumeId || 'Not found';
-      document.getElementById('debugTemplate').textContent = template || 'Default';
-      
-      // Set container style based on template
-      const templateContainer = document.querySelector('.editor-template-container');
-      const templateHeaderElement = document.querySelector('.editor-template-header');
-      
-      // Customize border colors based on template
-      switch(template) {
-        case 'engineering':
-          templateContainer.style.borderLeftColor = '#3498db';
-          templateContainer.style.borderRightColor = '#3498db';
-          templateHeaderElement.style.color = '#2980b9';
-          break;
-        case 'business':
-          templateContainer.style.borderLeftColor = '#c0392b';
-          templateContainer.style.borderRightColor = '#c0392b';
-          templateHeaderElement.style.color = '#c0392b';
-          break;
-        case 'technology':
-          templateContainer.style.borderLeftColor = '#8e44ad';
-          templateContainer.style.borderRightColor = '#8e44ad';
-          templateHeaderElement.style.color = '#9b59b6';
-          break;
-        case 'healthcare':
-          templateContainer.style.borderLeftColor = '#16a085';
-          templateContainer.style.borderRightColor = '#16a085';
-          templateHeaderElement.style.color = '#1abc9c';
-          break;
-        case 'education':
-          templateContainer.style.borderLeftColor = '#d35400';
-          templateContainer.style.borderRightColor = '#d35400';
-          templateHeaderElement.style.color = '#e67e22';
-          break;
-        case 'arts':
-          templateContainer.style.borderLeftColor = '#f39c12';
-          templateContainer.style.borderRightColor = '#f39c12';
-          templateHeaderElement.style.color = '#f39c12';
-          break;
-        case 'science':
-          templateContainer.style.borderLeftColor = '#27ae60';
-          templateContainer.style.borderRightColor = '#27ae60';
-          templateHeaderElement.style.color = '#2ecc71';
-          break;
-        default:
-          // Keep default blue styling
-          break;
-      }
-    });
-  </script>
+        <nav class="navbar">
+            <button class="navbar-toggle" id="navbarToggle">&#9776;</button>
+            <div class="navbar-menu" id="navbarMenu">
+                <a class="nav-link" href="index.html">Home</a>
+                <a class="nav-link" href="questionnaire.html">Generate Resume</a>
+                <a class="nav-link" href="about.html">About</a>
+                <a class="nav-link" href="login.html">Login page</a>
+                <a class="nav-link active" href="editor.html">Edit Resume</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="document-toolbar">
+                <div class="toolbar-title">Template Document Editor</div>
+                <button class="toolbar-button" id="new-doc">New</button>
+                <button class="toolbar-button" id="save-doc">Save</button>
+                <button class="toolbar-button" id="open-doc">Open</button>
+            </div>
+            
+            <div class="formatting-toolbar">
+                <button class="format-button" data-command="bold"><b>B</b></button>
+                <button class="format-button" data-command="italic"><i>I</i></button>
+                <button class="format-button" data-command="underline"><u>U</u></button>
+                <button class="format-button" data-command="formatBlock" data-value="h1">H1</button>
+                <button class="format-button" data-command="formatBlock" data-value="h2">H2</button>
+                <button class="format-button" data-command="formatBlock" data-value="p">P</button>
+                <button class="format-button" data-command="justifyLeft">Left</button>
+                <button class="format-button" data-command="justifyCenter">Center</button>
+                <button class="format-button" data-command="justifyRight">Right</button>
+                <select class="format-button" id="font-size">
+                    <option value="3">Normal</option>
+                    <option value="1">Small</option>
+                    <option value="5">Large</option>
+                    <option value="7">Very Large</option>
+                </select>
+            </div>
+            
+            <div class="editor-container">
+                <div class="template-sidebar">
+                    <div class="template-item" data-template="default">
+                        <div class="template-preview">Default</div>
+                        <div class="template-name">Blank Document</div>
+                    </div>
+                    <div class="template-item" data-template="business">
+                        <div class="template-preview" style="background-color: #f0f5ff;">Business</div>
+                        <div class="template-name">Business Report</div>
+                    </div>
+                    <div class="template-item" data-template="creative">
+                        <div class="template-preview" style="background-color: #f9f0f9;">Creative</div>
+                        <div class="template-name">Creative Writing</div>
+                    </div>
+                    <div class="template-item" data-template="modern">
+                        <div class="template-preview" style="background-color: #f5f5f5;">Modern</div>
+                        <div class="template-name">Modern Document</div>
+                    </div>
+                </div>
+                
+                <div class="editor-main">
+                    <div class="document-container">
+                        <div class="document" id="document-editor" contenteditable="true">
+                            <h1>Start Typing Your Document</h1>
+                            <p>This is a simple document editor with template support. Click on a template in the sidebar to apply it to your document.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="status-bar">
+                        <div>Word count: <span id="word-count">0</span></div>
+                        <div>Template: <span id="current-template">Default</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="container">
+        <div>
+            <p>&copy; 2024 Resume Elevate</p>
+            <ul>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="careers.html">Careers</a></li>
+            </ul>
+        </div>
+        <div>
+            <p>A Wichita State Project</p>
+            <p>Relate Resume Generator</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript files -->
+    <script src="js/common.js"></script>
+    <script src="js/document-editor.js"></script>
 </body>
 </html>
