@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Resume Template</title>
+    <style>
+        /* Basic styling for the resume */
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .resume {
+            border: 1px solid #ddd;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .entry {
+            margin-bottom: 15px;
+        }
+        
+        .entry-title {
+            font-weight: bold;
+        }
+        
+        .entry-details {
+            display: flex;
+            justify-content: space-between;
+            font-style: italic;
+            margin: 5px 0;
+        }
+        
+        /* Editor styling */
+        .editor-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .editor-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+        
+        .preview-panel {
+            flex: 2;
+            min-width: 300px;
+            padding: 20px;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        button:hover {
+            background: #3367d6;
+        }
+        
+        .field-editable {
+            border-bottom: 1px dashed #999;
+            padding: 2px 5px;
+            margin: 2px 0;
+        }
+        
+        .field-editable:focus {
+            outline: none;
+            border-bottom: 1px dashed #4285f4;
+            background: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resume Builder</h1>
+    
+    <div class="editor-container">
+        <div class="editor-panel">
+            <h2>Personal Information</h2>
+            <form id="resume-form">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="John Doe">
+                
+                <label for="title">Professional Title</label>
+                <input type="text" id="title" placeholder="Software Engineer">
+                
+                <label for="email">Email</label>
+                <input type="email" id="email">
+                
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" placeholder="(123) 456-7890">
+                
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="New York, NY">
+                
+                <label for="summary">Professional Summary</label>
+                <textarea id="summary" rows="4" placeholder="Experienced software engineer with expertise in..."></textarea>
+                
+                <h3>Add Experience</h3>
+                <label for="exp-title">Job Title</label>
+                <input type="text" id="exp-title" placeholder="Senior Developer">
+                
+                <label for="exp-company">Company</label>
+                <input type="text" id="exp-company" placeholder="Tech Company Inc.">
+                
+                <label for="exp-dates">Dates</label>
+                <input type="text" id="exp-dates" placeholder="Jan 2020 - Present">
+                
+                <label for="exp-description">Description</label>
+                <textarea id="exp-description" rows="3" placeholder="Responsibilities and achievements..."></textarea>
+                
+                <button type="button" id="add-experience">Add Experience</button>
+                
+                <h3>Add Education</h3>
+                <label for="edu-degree">Degree</label>
+                <input type="text" id="edu-degree" placeholder="B.S. Computer Science">
+                
+                <label for="edu-school">Institution</label>
+                <input type="text" id="edu-school" placeholder="University of Technology">
+                
+                <label for="edu-dates">Dates</label>
+                <input type="text" id="edu-dates" placeholder="2014 - 2018">
+                
+                <button type="button" id="add-education">Add Education</button>
+                
+                <h3>Skills</h3>
+                <label for="skills">Skills (comma-separated)</label>
+                <input type="text" id="skills" placeholder="JavaScript, HTML, CSS, React">
+                
+                <div style="margin-top: 20px;">
+                    <button type="button" id="update-resume">Update Resume</button>
+                    <button type="button" id="export-html">Export HTML</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="preview-panel">
+            <div class="resume" id="resume-preview">
+                <div class="header">
+                    <h1 id="preview-name" class="field-editable" contenteditable="true">Your Name</h1>
+                    <p id="preview-title" class="field-editable" contenteditable="true">Professional Title</p>
+                    <div>
+                        <span id="preview-email" class="field-editable" contenteditable="true">email@example.com</span> |
+                        <span id="preview-phone" class="field-editable" contenteditable="true">(123) 456-7890</span> |
+                        <span id="preview-location" class="field-editable" contenteditable="true">City, State</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Summary</div>
+                    <p id="preview-summary" class="field-editable" contenteditable="true">
+                        A brief summary of your qualifications and career goals.
+                    </p>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Experience</div>
+                    <div id="experience-container">
+                        <!-- Dynamic content will be added here -->
+                        <div class="entry">
+                            <div class="entry-title field-editable" contenteditable="true">Job Title</div>
+                            <div class="entry-details">
+                                <span class="field-editable" contenteditable="true">Company Name</span>
+                                <span class="field-editable" contenteditable="true">Jan 2020 - Present</span>
+                            </div>
+                            <p class="field-editable" contenteditable="true">Description of responsibilities and achievements.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Education</div>
+                    <div id="education-container">
+                        <!-- Dynamic content will be added here -->
+                        <div class="entry">
+                            <div class="entry-title field-editable" contenteditable="true">Degree</div>
+                            <div class="entry-details">
+                                <span class="field-editable" contenteditable="true">University Name</span>
+                                <span class="field-editable" contenteditable="true">2014 - 2018</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Skills</div>
+                    <p id="preview-skills" class="field-editable" contenteditable="true">
+                        Skill 1, Skill 2, Skill 3, Skill 4
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update the resume preview with form data
+        document.getElementById('update-resume').addEventListener('click', function() {
+            // Update basic information
+            document.getElementById('preview-name').textContent = document.getElementById('fullName').value || 'Your Name';
+            document.getElementById('preview-title').textContent = document.getElementById('title').value || 'Professional Title';
+            document.getElementById('preview-email').textContent = document.getElementById('email').value || 'email@example.com';
+            document.getElementById('preview-phone').textContent = document.getElementById('phone').value || '(123) 456-7890';
+            document.getElementById('preview-location').textContent = document.getElementById('location').value || 'City, State';
+            document.getElementById('preview-summary').textContent = document.getElementById('summary').value || 'A brief summary of your qualifications and career goals.';
+            document.getElementById('preview-skills').textContent = document.getElementById('skills').value || 'Skill 1, Skill 2, Skill 3, Skill 4';
+        });
+        
+        // Add a new experience entry
+        document.getElementById('add-experience').addEventListener('click', function() {
+            const title = document.getElementById('exp-title').value || 'Job Title';
+            const company = document.getElementById('exp-company').value || 'Company Name';
+            const dates = document.getElementById('exp-dates').value || 'Date Range';
+            const description = document.getElementById('exp-description').value || 'Description of responsibilities and achievements.';
+            
+            const experienceHtml = `
+                <div class="entry">
+                    <div class="entry-title field-editable" contenteditable="true">${title}</div>
+                    <div class="entry-details">
+                        <span class="field-editable" contenteditable="true">${company}</span>
+                        <span class="field-editable" contenteditable="true">${dates}</span>
+                    </div>
+                    <p class="field-editable" contenteditable="true">${description}</p>
+                </div>
+            `;
+            
+            document.getElementById('experience-container').innerHTML += experienceHtml;
+            
+            // Clear the form fields
+            document.getElementById('exp-title').value = '';
+            document.getElementById('exp-company').value = '';
+            document.getElementById('exp-dates').value = '';
+            document.getElementById('exp-description').value = '';
+        });
+        
+        // Add a new education entry
+        document.getElementById('add-education').addEventListener('click', function() {
+            const degree = document.getElementById('edu-degree').value || 'Degree';
+            const school = document.getElementById('edu-school').value || 'University Name';
+            const dates = document.getElementById('edu-dates').value || 'Date Range';
+            
+            const educationHtml = `
+                <div class="entry">
+                    <div class="entry-title field-editable" contenteditable="true">${degree}</div>
+                    <div class="entry-details">
+                        <span class="field-editable" contenteditable="true">${school}</span>
+                        <span class="field-editable" contenteditable="true">${dates}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('education-container').innerHTML += educationHtml;
+            
+            // Clear the form fields
+            document.getElementById('edu-degree').value = '';
+            document.getElementById('edu-school').value = '';
+            document.getElementById('edu-dates').value = '';
+        });
+        
+        // Export the resume as HTML
+        document.getElementById('export-html').addEventListener('click', function() {
+            const resumeHtml = document.getElementById('resume-preview').outerHTML;
+            const blob = new Blob([resumeHtml], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resume.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // Make the direct-edit fields update the form
+        document.querySelectorAll('.field-editable').forEach(function(field) {
+            field.addEventListener('blur', function() {
+                // This would be expanded in a real application to update the form fields
+                console.log('Updated field: ' + this.textContent);
+            });
+        });
+    </script>
+</body>
+</html>

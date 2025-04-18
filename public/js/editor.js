@@ -140,7 +140,152 @@ document.addEventListener('DOMContentLoaded', function() {
                     addModernSections();
                     addFooter('Modern Document Template • ' + new Date().toLocaleDateString());
                     break;
+                case 'resume':
+                    addResumeTemplate();
+                    break;
             }
+        }
+    }
+    
+    // Add this new function after the addFooter function:
+    function addResumeTemplate() {
+        // Replace the entire content of the editor with the resume template
+        editor.innerHTML = `<!-- Professional Resume Template -->
+    <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+      <!-- Header Section -->
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="margin-bottom: 5px; color: #2b579a;">Your Full Name</h1>
+        <p style="margin: 5px 0;">
+          <span>youremail@example.com</span> | 
+          <span>(123) 456-7890</span> | 
+          <span>City, State</span> | 
+          <span><a href="https://linkedin.com/in/yourprofile" style="color: #2b579a; text-decoration: none;">LinkedIn Profile</a></span>
+        </p>
+        <hr style="border: 1px solid #2b579a; margin: 10px 0;">
+      </div>
+    
+      <!-- Professional Summary Section -->
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: #2b579a; border-bottom: 1px solid #5b9bd5; padding-bottom: 5px;">Professional Summary</h2>
+        <p>Dedicated professional with experience in [your field]. Skilled in [key skills] with a proven track record of [achievements]. Passionate about [interests/goals] and committed to [values/mission].</p>
+      </div>
+    
+      <!-- Education Section -->
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: #2b579a; border-bottom: 1px solid #5b9bd5; padding-bottom: 5px;">Education</h2>
+        <div style="margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between;">
+            <strong>University Name</strong>
+            <span>Graduation Date</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <em>Degree Earned</em>
+            <span>GPA: 3.X/4.0</span>
+          </div>
+          <ul style="margin-top: 5px;">
+            <li>Relevant coursework: [Course 1], [Course 2], [Course 3]</li>
+            <li>Achievements: [Honor/Award], [Honor/Award]</li>
+          </ul>
+        </div>
+      </div>
+    
+      <!-- Experience Section -->
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: #2b579a; border-bottom: 1px solid #5b9bd5; padding-bottom: 5px;">Work Experience</h2>
+        
+        <!-- Job 1 -->
+        <div style="margin-bottom: 15px;">
+          <div style="display: flex; justify-content: space-between;">
+            <strong>Company Name</strong>
+            <span>Start Date - End Date</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <em>Job Title</em>
+            <span>City, State</span>
+          </div>
+          <ul style="margin-top: 5px;">
+            <li>Responsibility/Achievement that showcases your skills and impact</li>
+            <li>Responsibility/Achievement with quantifiable results (e.g., increased efficiency by 20%)</li>
+            <li>Responsibility/Achievement that demonstrates leadership or problem-solving</li>
+          </ul>
+        </div>
+        
+        <!-- Job 2 -->
+        <div style="margin-bottom: 15px;">
+          <div style="display: flex; justify-content: space-between;">
+            <strong>Company Name</strong>
+            <span>Start Date - End Date</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <em>Job Title</em>
+            <span>City, State</span>
+          </div>
+          <ul style="margin-top: 5px;">
+            <li>Responsibility/Achievement that showcases your skills and impact</li>
+            <li>Responsibility/Achievement with quantifiable results (e.g., reduced costs by 15%)</li>
+            <li>Responsibility/Achievement that demonstrates teamwork or initiative</li>
+          </ul>
+        </div>
+      </div>
+    
+      <!-- Projects Section -->
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: #2b579a; border-bottom: 1px solid #5b9bd5; padding-bottom: 5px;">Projects</h2>
+        
+        <!-- Project 1 -->
+        <div style="margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between;">
+            <strong>Project Name</strong>
+            <span>Completion Date</span>
+          </div>
+          <ul style="margin-top: 5px;">
+            <li>Brief description of the project, its purpose, and your role</li>
+            <li>Technologies/tools used and problems solved</li>
+            <li>Results or impact of the project</li>
+          </ul>
+        </div>
+      </div>
+    
+      <!-- Skills Section -->
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: #2b579a; border-bottom: 1px solid #5b9bd5; padding-bottom: 5px;">Skills</h2>
+        <div style="display: flex; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px; margin-right: 20px;">
+            <h3 style="color: #5b9bd5; margin-bottom: 5px;">Technical Skills</h3>
+            <ul>
+              <li>[Skill 1]</li>
+              <li>[Skill 2]</li>
+              <li>[Skill 3]</li>
+            </ul>
+          </div>
+          <div style="flex: 1; min-width: 200px;">
+            <h3 style="color: #5b9bd5; margin-bottom: 5px;">Soft Skills</h3>
+            <ul>
+              <li>[Skill 1]</li>
+              <li>[Skill 2]</li>
+              <li>[Skill 3]</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Certifications Section -->
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: #2b579a; border-bottom: 1px solid #5b9bd5; padding-bottom: 5px;">Certifications</h2>
+        <ul>
+          <li><strong>[Certification Name]</strong> - Issuing Organization, Date</li>
+          <li><strong>[Certification Name]</strong> - Issuing Organization, Date</li>
+        </ul>
+      </div>
+    </div>`;
+    
+        // Update word count
+        calculateWordCount();
+        
+        // Update the current template name display
+        const currentTemplate = document.getElementById('current-template');
+        if (currentTemplate) {
+            currentTemplate.textContent = 'Professional Resume';
         }
     }
     
