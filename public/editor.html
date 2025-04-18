@@ -3,303 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="images/RelateLogo_proto_circle.png" type="image/x-icon">
-    <title>Document Editor | ResumeElevate</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Resume Editor | ResumeElevate</title>
     <style>
         :root {
-            --primary-color: #2b579a;
-            --secondary-color: #f3f3f3;
-            --accent-color: #5b9bd5;
-            --text-color: #333;
+            --primary-color: #6b87d6;
+            --secondary-color: #9eaeff;
+            --light-color: #f3f3f3;
             --border-color: #ddd;
         }
         
-        .container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            max-width: 100%;
-            margin: 0;
-            padding: 0;
+            overflow: hidden;
         }
         
-        .document-toolbar {
+        .toolbar {
             background-color: var(--primary-color);
             color: white;
-            padding: 10px;
+            padding: 8px;
             display: flex;
             align-items: center;
+            border-bottom: 1px solid #5577cc;
         }
         
-        .toolbar-title {
+        .toolbar-logo {
+            display: flex;
+            align-items: center;
             margin-right: 20px;
-            font-weight: bold;
         }
         
-        .toolbar-button {
-            background: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 5px 10px;
-            margin: 0 2px;
-            border-radius: 3px;
+        .toolbar-logo img {
+            height: 25px;
+            margin-right: 10px;
         }
         
-        .toolbar-button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .formatting-toolbar {
-            padding: 10px;
-            background-color: var(--secondary-color);
-            border-bottom: 1px solid var(--border-color);
+        .menu-bar {
+            background-color: var(--light-color);
+            padding: 5px;
             display: flex;
             flex-wrap: wrap;
+            border-bottom: 1px solid var(--border-color);
         }
         
-        .format-button {
+        .menu-button {
             background: white;
             border: 1px solid var(--border-color);
-            padding: 5px 10px;
+            padding: 3px 8px;
             margin: 0 2px;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 2px;
+            font-size: 12px;
         }
         
-        .format-button:hover {
+        .menu-button:hover {
             background-color: #e6e6e6;
         }
         
-        .editor-container {
+        .main-container {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
         
-        .template-sidebar {
-            width: 200px;
+        .sidebar {
+            width: 120px;
             background-color: var(--secondary-color);
-            border-right: 1px solid var(--border-color);
             padding: 10px;
             overflow-y: auto;
         }
         
-        .template-item {
-            padding: 10px;
+        .sidebar-title {
+            font-weight: bold;
             margin-bottom: 10px;
-            background-color: white;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s;
+            color: #333;
+            font-size: 14px;
         }
         
-        .template-item:hover {
-            border-color: var(--accent-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .properties-panel {
+            width: 120px;
+            background-color: var(--secondary-color);
+            padding: 10px;
+            overflow-y: auto;
+            border-left: 1px solid #8a9ed8;
         }
         
-        .template-preview {
-            width: 100%;
-            height: 80px;
-            background-color: #f9f9f9;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-        
-        .template-name {
-            font-size: 12px;
-            text-align: center;
-        }
-        
-        .editor-main {
+        .editor-area {
             flex: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .document-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #e6e6e6;
-            display: flex;
-            justify-content: center;
+            background-color: var(--secondary-color);
+            padding: 15px;
+            overflow: auto;
         }
         
         .document {
-            width: 21cm;
-            min-height: 29.7cm;
-            padding: 2cm;
-            margin: 1cm auto;
+            flex: 1;
             background-color: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            overflow-y: auto;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 800px;
+            min-height: 200px;
         }
         
         .document[contenteditable="true"] {
             outline: none;
         }
         
-        .status-bar {
-            padding: 5px 10px;
-            background-color: var(--secondary-color);
-            border-top: 1px solid var(--border-color);
+        .right-panel {
+            width: 160px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--light-color);
+            border-left: 1px solid var(--border-color);
+        }
+        
+        .prompt-area {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 50%;
+        }
+        
+        .prompt-input {
+            border: 1px solid var(--border-color);
+            resize: none;
+            padding: 5px;
             font-size: 12px;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+        
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .response-area {
+            height: 50%;
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .response-output {
+            border: 1px solid var(--border-color);
+            padding: 5px;
+            font-size: 12px;
+            flex: 1;
+            overflow-y: auto;
+            background-color: white;
+            margin-bottom: 10px;
+        }
+        
+        .redo-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        /* Resume Styles */
+        .resume-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .resume-section {
+            margin-bottom: 15px;
+        }
+        
+        .resume-section-title {
+            color: #2b579a;
+            border-bottom: 1px solid #5b9bd5;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .resume-item {
+            margin-bottom: 10px;
+        }
+        
+        .resume-item-header {
             display: flex;
             justify-content: space-between;
         }
         
-        /* Template styles */
-        .template-business {
-            --template-primary: #003366;
-            --template-accent: #4d94ff;
-            --template-bg: #f0f5ff;
+        .resume-item-title {
+            font-weight: bold;
         }
         
-        .template-creative {
-            --template-primary: #660066;
-            --template-accent: #cc66cc;
-            --template-bg: #f9f0f9;
+        .resume-item-subtitle {
+            font-style: italic;
         }
         
-        .template-modern {
-            --template-primary: #333333;
-            --template-accent: #666666;
-            --template-bg: #f5f5f5;
+        .resume-item-date {
+            text-align: right;
         }
         
-        .template-header {
-            color: var(--template-primary);
-            border-bottom: 2px solid var(--template-accent);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .template-section {
-            background-color: var(--template-bg);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--template-accent);
-        }
-        
-        .template-footer {
-            margin-top: 30px;
-            padding-top: 10px;
-            border-top: 1px solid var(--template-accent);
-            color: var(--template-primary);
-            font-size: 0.9em;
+        .resume-item-description {
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <header id="top">
-        <a href="index.html">
-            <img src="images/RelateLogo_proto_square.png" alt="Resume Relate Logo: green and blue peacock">
-        </a>
+    <!-- Top Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-logo">
+            <img src="logo.png" alt="Logo">
+            <span>Resume</span>
+        </div>
+        <div style="flex: 1;"></div>
+        <span>Settings</span>
+        <span style="margin-left: 10px;">Edit</span>
+        <span style="margin-left: 10px;">File</span>
+    </div>
+    
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+        <button class="menu-button">Normal</button>
+        <button class="menu-button"><b>B</b></button>
+        <button class="menu-button"><i>I</i></button>
+        <button class="menu-button"><u>U</u></button>
+        <button class="menu-button">–</button>
+        <button class="menu-button">•</button>
+        <button class="menu-button">1.</button>
+        <button class="menu-button" style="width: 20px;">⟳</button>
+        <button class="menu-button" style="width: 20px;">⟲</button>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-title">Additional Tools</div>
+            <!-- Tool content would go here -->
+        </div>
         
-        <nav class="navbar">
-            <button class="navbar-toggle" id="navbarToggle">&#9776;</button>
-            <div class="navbar-menu" id="navbarMenu">
-                <a class="nav-link" href="index.html">Home</a>
-                <a class="nav-link" href="questionnaire.html">Generate Resume</a>
-                <a class="nav-link" href="about.html">About</a>
-                <a class="nav-link" href="login.html">Login page</a>
-                <a class="nav-link active" href="editor.html">Edit Resume</a>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <div class="container">
-            <div class="document-toolbar">
-                <div class="toolbar-title">Template Document Editor</div>
-                <button class="toolbar-button" id="new-doc">New</button>
-                <button class="toolbar-button" id="save-doc">Save</button>
-                <button class="toolbar-button" id="open-doc">Open</button>
-            </div>
-            
-            <div class="formatting-toolbar">
-                <button class="format-button" data-command="bold"><b>B</b></button>
-                <button class="format-button" data-command="italic"><i>I</i></button>
-                <button class="format-button" data-command="underline"><u>U</u></button>
-                <button class="format-button" data-command="formatBlock" data-value="h1">H1</button>
-                <button class="format-button" data-command="formatBlock" data-value="h2">H2</button>
-                <button class="format-button" data-command="formatBlock" data-value="p">P</button>
-                <button class="format-button" data-command="justifyLeft">Left</button>
-                <button class="format-button" data-command="justifyCenter">Center</button>
-                <button class="format-button" data-command="justifyRight">Right</button>
-                <select class="format-button" id="font-size">
-                    <option value="3">Normal</option>
-                    <option value="1">Small</option>
-                    <option value="5">Large</option>
-                    <option value="7">Very Large</option>
-                </select>
-            </div>
-            
-            <div class="editor-container">
-                <div class="template-sidebar">
-                    <div class="template-item" data-template="default">
-                        <div class="template-preview">Default</div>
-                        <div class="template-name">Blank Document</div>
-                    </div>
-                    <div class="template-item" data-template="business">
-                        <div class="template-preview" style="background-color: #f0f5ff;">Business</div>
-                        <div class="template-name">Business Report</div>
-                    </div>
-                    <div class="template-item" data-template="creative">
-                        <div class="template-preview" style="background-color: #f9f0f9;">Creative</div>
-                        <div class="template-name">Creative Writing</div>
-                    </div>
-                    <div class="template-item" data-template="modern">
-                        <div class="template-preview" style="background-color: #f5f5f5;">Modern</div>
-                        <div class="template-name">Modern Document</div>
-                    </div>
-                    <!-- Add this new template option -->
-                    <div class="template-item" data-template="resume">
-                        <div class="template-preview" style="background-color: #e6f0ff;">Resume</div>
-                        <div class="template-name">Professional Resume</div>
+        <!-- Properties Panel -->
+        <div class="properties-panel">
+            <div class="sidebar-title">Properties</div>
+            <!-- Properties content would go here -->
+        </div>
+        
+        <!-- Editor Area -->
+        <div class="editor-area">
+            <div class="document" id="document-editor" contenteditable="true">
+                <!-- Resume Template Content -->
+                <div class="resume-header">
+                    <h1>Your Full Name</h1>
+                    <p>youremail@example.com | (123) 456-7890 | Wichita, Kansas</p>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Professional Summary</h2>
+                    <p>Dedicated professional with experience in [your field]. Skilled in [key skills] with a proven track record of [achievements]. Passionate about [interests/goals] and committed to delivering high-quality results.</p>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Education</h2>
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <div class="resume-item-title">Wichita State University</div>
+                            <div class="resume-item-date">Graduation: May 2024</div>
+                        </div>
+                        <div class="resume-item-subtitle">Bachelor of Science in Computer Science</div>
+                        <div>GPA: 3.8/4.0</div>
+                        <ul>
+                            <li>Relevant coursework: Data Structures, Algorithms, Web Development</li>
+                            <li>Activities: Programming Club, Hackathon Participant</li>
+                        </ul>
                     </div>
                 </div>
                 
-                <div class="editor-main">
-                    <div class="document-container">
-                        <div class="document" id="document-editor" contenteditable="true">
-                            <h1>Start Typing Your Document</h1>
-                            <p>This is a simple document editor with template support. Click on a template in the sidebar to apply it to your document.</p>
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Work Experience</h2>
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <div class="resume-item-title">Software Developer Intern</div>
+                            <div class="resume-item-date">May 2023 - Present</div>
                         </div>
+                        <div class="resume-item-subtitle">ABC Technology, Wichita, KS</div>
+                        <ul>
+                            <li>Developed and maintained web applications using modern JavaScript frameworks</li>
+                            <li>Collaborated with the design team to implement responsive UI components</li>
+                            <li>Optimized database queries resulting in 30% faster page load times</li>
+                        </ul>
                     </div>
                     
-                    <div class="status-bar">
-                        <div>Word count: <span id="word-count">0</span></div>
-                        <div>Template: <span id="current-template">Default</span></div>
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <div class="resume-item-title">IT Support Assistant</div>
+                            <div class="resume-item-date">Jan 2022 - Apr 2023</div>
+                        </div>
+                        <div class="resume-item-subtitle">XYZ Company, Wichita, KS</div>
+                        <ul>
+                            <li>Provided technical support to over 50 employees</li>
+                            <li>Maintained and updated company hardware and software systems</li>
+                            <li>Created documentation for common technical issues</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Skills</h2>
+                    <ul>
+                        <li><strong>Programming:</strong> JavaScript, HTML, CSS, Python, Java</li>
+                        <li><strong>Frameworks:</strong> React, Node.js, Express</li>
+                        <li><strong>Tools:</strong> Git, VS Code, Docker</li>
+                        <li><strong>Soft Skills:</strong> Communication, Problem-solving, Team collaboration</li>
+                    </ul>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Projects</h2>
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <div class="resume-item-title">E-commerce Website</div>
+                            <div class="resume-item-date">Fall 2023</div>
+                        </div>
+                        <ul>
+                            <li>Developed a full-stack e-commerce platform using MERN stack</li>
+                            <li>Implemented user authentication and payment processing</li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
-
-    <footer class="container">
-        <div>
-            <p>&copy; 2024 Resume Elevate</p>
-            <ul>
-                <li><a href="about.html">About Us</a></li>
-                <li><a href="privacy.html">Privacy Policy</a></li>
-                <li><a href="careers.html">Careers</a></li>
-            </ul>
+        
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Prompt Area -->
+            <div class="prompt-area">
+                <textarea class="prompt-input" placeholder="Enter Prompt..."></textarea>
+                <button class="submit-button">Submit Prompt</button>
+            </div>
+            
+            <!-- Response Area -->
+            <div class="response-area">
+                <div class="response-output"></div>
+                <button class="redo-button">Field Box Redo</button>
+            </div>
         </div>
-        <div>
-            <p>A Wichita State Project</p>
-            <p>Relate Resume Generator</p>
-        </div>
-    </footer>
-
-    <!-- JavaScript files -->
-    <script src="js/common.js"></script>
-    <script src="js/document-editor.js"></script>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('document-editor');
+            
+            // Format buttons
+            document.querySelectorAll('.menu-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.innerHTML === '<b>B</b>') {
+                        document.execCommand('bold', false, null);
+                    } else if (this.innerHTML === '<i>I</i>') {
+                        document.execCommand('italic', false, null);
+                    } else if (this.innerHTML === '<u>U</u>') {
+                        document.execCommand('underline', false, null);
+                    } else if (this.innerHTML === '–') {
+                        document.execCommand('insertUnorderedList', false, null);
+                    } else if (this.innerHTML === '•') {
+                        document.execCommand('insertUnorderedList', false, null);
+                    } else if (this.innerHTML === '1.') {
+                        document.execCommand('insertOrderedList', false, null);
+                    } else if (this.innerHTML === '⟳') {
+                        document.execCommand('redo', false, null);
+                    } else if (this.innerHTML === '⟲') {
+                        document.execCommand('undo', false, null);
+                    }
+                    editor.focus();
+                });
+            });
+            
+            // Submit prompt button
+            document.querySelector('.submit-button').addEventListener('click', function() {
+                const promptInput = document.querySelector('.prompt-input');
+                const responseOutput = document.querySelector('.response-output');
+                
+                // Simple demo response
+                responseOutput.textContent = "Based on your resume, I suggest highlighting your technical skills more prominently. Would you like me to update the Skills section for you?";
+                
+                // Clear input after submission
+                promptInput.value = '';
+            });
+            
+            // Redo button
+            document.querySelector('.redo-button').addEventListener('click', function() {
+                const responseOutput = document.querySelector('.response-output');
+                responseOutput.textContent = "What specific areas of your resume would you like me to help with?";
+            });
+        });
+    </script>
 </body>
 </html>
