@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Editor | ResumeElevate</title>
+    <style rel="stylesheet" href="../editorstyles.css"></style>
+</head>
+<body>
+    <!-- Top Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-logo">
+            <img src="../logo.png" alt="Logo">
+            <span>Resume</span>
+        </div>
+        <div style="flex: 1;"></div>
+        <span>Settings</span>
+        <span style="margin-left: 10px;">Edit</span>
+        <span style="margin-left: 10px;">File</span>
+    </div>
+    
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+        <button class="menu-button">Normal</button>
+        <button class="menu-button"><b>B</b></button>
+        <button class="menu-button"><i>I</i></button>
+        <button class="menu-button"><u>U</u></button>
+        <button class="menu-button">–</button>
+        <button class="menu-button">•</button>
+        <button class="menu-button">1.</button>
+        <button class="menu-button" style="width: 20px;">⟳</button>
+        <button class="menu-button" style="width: 20px;">⟲</button>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-title">Additional Tools</div>
+            <!-- Tool content would go here -->
+        </div>
+        
+        <!-- Properties Panel -->
+        <div class="properties-panel">
+            <div class="sidebar-title">Properties</div>
+            <!-- Properties content would go here -->
+        </div>
+        
+        <!-- Editor Area -->
+        <div class="editor-area">
+            <div class="document" id="document-editor" contenteditable="true">
+                <!-- Resume Template Content -->
+                <div class="resume-header">
+                    <h1>Your Full Name</h1>
+                    <p>youremail@example.com | (123) 456-7890 | Wichita, Kansas</p>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Professional Summary</h2>
+                    <p>Dedicated professional with experience in [your field]. Skilled in [key skills] with a proven track record of [achievements]. Passionate about [interests/goals] and committed to delivering high-quality results.</p>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Education</h2>
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <div class="resume-item-title">Wichita State University</div>
+                            <div class="resume-item-date">Graduation: May 2024</div>
+                        </div>
+                        <div class="resume-item-subtitle">Bachelor of Science in Computer Science</div>
+                        <div>GPA: 3.8/4.0</div>
+                        <ul>
+                            <li>Relevant coursework: Data Structures, Algorithms, Web Development</li>
+                            <li>Activities: Programming Club, Hackathon Participant</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Work Experience</h2>
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <div class="resume-item-title">Software Developer Intern</div>
+                            <div class="resume-item-date">May 2023 - Present</div>
+                        </div>
+                        <div class="resume-item-subtitle">ABC Technology, Wichita, KS</div>
+                        <ul>
+                            <li>Developed and maintained web applications using modern JavaScript frameworks</li>
+                            <li>Collaborated with the design team to implement responsive UI components</li>
+                            <li>Optimized database queries resulting in 30% faster page load times</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <div class="resume-item-title">IT Support Assistant</div>
+                            <div class="resume-item-date">Jan 2022 - Apr 2023</div>
+                        </div>
+                        <div class="resume-item-subtitle">XYZ Company, Wichita, KS</div>
+                        <ul>
+                            <li>Provided technical support to over 50 employees</li>
+                            <li>Maintained and updated company hardware and software systems</li>
+                            <li>Created documentation for common technical issues</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Skills</h2>
+                    <ul>
+                        <li><strong>Programming:</strong> JavaScript, HTML, CSS, Python, Java</li>
+                        <li><strong>Frameworks:</strong> React, Node.js, Express</li>
+                        <li><strong>Tools:</strong> Git, VS Code, Docker</li>
+                        <li><strong>Soft Skills:</strong> Communication, Problem-solving, Team collaboration</li>
+                    </ul>
+                </div>
+                
+                <div class="resume-section">
+                    <h2 class="resume-section-title">Projects</h2>
+                    <div class="resume-item">
+                        <div class="resume-item-header">
+                            <div class="resume-item-title">E-commerce Website</div>
+                            <div class="resume-item-date">Fall 2023</div>
+                        </div>
+                        <ul>
+                            <li>Developed a full-stack e-commerce platform using MERN stack</li>
+                            <li>Implemented user authentication and payment processing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Prompt Area -->
+            <div class="prompt-area">
+                <textarea class="prompt-input" placeholder="Enter Prompt..."></textarea>
+                <button class="submit-button">Submit Prompt</button>
+            </div>
+            
+            <!-- Response Area -->
+            <div class="response-area">
+                <div class="response-output"></div>
+                <button class="redo-button">Field Box Redo</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('document-editor');
+            
+            // Format buttons
+            document.querySelectorAll('.menu-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.innerHTML === '<b>B</b>') {
+                        document.execCommand('bold', false, null);
+                    } else if (this.innerHTML === '<i>I</i>') {
+                        document.execCommand('italic', false, null);
+                    } else if (this.innerHTML === '<u>U</u>') {
+                        document.execCommand('underline', false, null);
+                    } else if (this.innerHTML === '–') {
+                        document.execCommand('insertUnorderedList', false, null);
+                    } else if (this.innerHTML === '•') {
+                        document.execCommand('insertUnorderedList', false, null);
+                    } else if (this.innerHTML === '1.') {
+                        document.execCommand('insertOrderedList', false, null);
+                    } else if (this.innerHTML === '⟳') {
+                        document.execCommand('redo', false, null);
+                    } else if (this.innerHTML === '⟲') {
+                        document.execCommand('undo', false, null);
+                    }
+                    editor.focus();
+                });
+            });
+            
+            // Submit prompt button
+            document.querySelector('.submit-button').addEventListener('click', function() {
+                const promptInput = document.querySelector('.prompt-input');
+                const responseOutput = document.querySelector('.response-output');
+                
+                // Simple demo response
+                responseOutput.textContent = "Based on your resume, I suggest highlighting your technical skills more prominently. Would you like me to update the Skills section for you?";
+                
+                // Clear input after submission
+                promptInput.value = '';
+            });
+            
+            // Redo button
+            document.querySelector('.redo-button').addEventListener('click', function() {
+                const responseOutput = document.querySelector('.response-output');
+                responseOutput.textContent = "What specific areas of your resume would you like me to help with?";
+            });
+        });
+    </script>
+</body>
+</html>
