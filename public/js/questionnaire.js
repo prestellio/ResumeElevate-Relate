@@ -205,7 +205,7 @@ function initQuestionnaire() {
 
     function updateProgressBar() {
         const progressPercentage = ((currentSectionIndex) / (currentWorkflow.length - 1)) * 100;
-        document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+        document.getElementById('progressBar').style.width = `${progressPercentage}%` ;
     }
 
     // Data collection functions
