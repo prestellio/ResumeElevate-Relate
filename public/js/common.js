@@ -12,6 +12,8 @@ function toggleNav() {
 document.addEventListener('DOMContentLoaded', function() {
     // Check if navbarToggle exists before adding event listener
     NavigationGeneration();
+    FooterGeneration();
+
     const navbarToggle = document.getElementById('navbarToggle');
     if (navbarToggle) {
         navbarToggle.addEventListener('click', function() {
@@ -85,4 +87,47 @@ function NavigationGeneration() {
     nav.appendChild(div);
     header.appendChild(nav);
 
+}
+
+function FooterGeneration () {
+    let pages = ["about.html", "privacy.html","careers.html"];
+    let pageTitle = ["About Us", "Privacy Policy", "Careers"];
+
+    let footer = document.getElementById('bottom');
+    let div = document.createElement('div');
+    let para = document.createElement('p');
+    let ul = document.createElement('ul');
+
+    para.innerHTML = "&copy; 2024 Resume Elevate";
+
+    div.appendChild(para);
+
+    let count = 0;
+
+    pages.forEach( page => {
+        let li = document.createElement('li');
+        let a = document.createElement('a');
+        a.setAttribute('href', page);
+        a.innerHTML = pageTitle[count];
+
+        li.appendChild(a);
+        ul.appendChild(li);
+        count += 1
+    });
+
+    div.appendChild(ul);
+    footer.appendChild(div);
+
+    div = document.createElement('div');
+    para = document.createElement('p')
+    let para2 = document.createElement('p');
+
+    para.innerHTML = "A Wichita State Project";
+    para2.innerHTML = "Relate Resume Generator";
+
+    div.appendChild(para);
+    div.appendChild(para2);
+
+    footer.appendChild(div);
+   
 }
