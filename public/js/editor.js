@@ -36,6 +36,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 editor.focus();
             });
         });
+
+        document.querySelectorAll('.menu-bar-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.value === '⟳') {
+                    document.execCommand('redo', false, null);
+                } else if (this.value === '⟲') {
+                    document.execCommand('undo', false, null);
+                }
+                editor.focus();
+            });
+
+            
+        });
         
         // Submit prompt button
         document.querySelector('.submit-button').addEventListener('click', function() {
