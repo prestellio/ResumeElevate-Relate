@@ -89,6 +89,7 @@ function NavigationGeneration() {
 
 }
 
+// Generate the footer for pages
 function FooterGeneration () {
     let pages = ["about.html", "privacy.html","careers.html"];
     let pageTitle = ["About Us", "Privacy Policy", "Careers"];
