@@ -217,3 +217,62 @@ body {
 .resume-item-description {
     margin-top: 5px;
 }
+
+/* AI Enhancement Button Styles */
+.menu-button.ai-enhance {
+    background-color: #4CAF50;
+    color: white;
+    padding: 3px 10px;
+    margin-left: 10px;
+}
+
+.menu-button.ai-enhance:hover {
+    background-color: #45a049;
+}
+
+.menu-button.ai-enhance:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Highlight effect for sections being enhanced */
+.enhancing {
+    background-color: rgba(76, 175, 80, 0.1);
+    transition: background-color 0.5s ease;
+}
+
+/* Apply Button Styles */
+.apply-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.apply-button:hover {
+    background-color: #45a049;
+}
+
+/* Success Message Styles */
+.success-message {
+    color: #4CAF50;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Enhanced Content Highlight */
+.enhanced-content {
+    border-left: 3px solid #4CAF50;
+    padding-left: 10px;
+    animation: fadeGlow 2s ease-in-out;
+}
+
+@keyframes fadeGlow {
+    0% { background-color: rgba(76, 175, 80, 0.2); }
+    100% { background-color: transparent; }
+}

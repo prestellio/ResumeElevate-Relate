@@ -13,6 +13,145 @@ document.addEventListener('DOMContentLoaded', function() {
     initEditor();
     
     function initEditor() {
+        // Add to your editor.js file, inside the initEditor() function
+
+// Add a new button to the menu bar for AI enhancement
+    const menuBar = document.querySelector('.menu-bar');
+    const aiEnhanceButton = document.createElement('button');
+    aiEnhanceButton.className = 'menu-button';
+    aiEnhanceButton.style.backgroundColor = '#4CAF50';
+    aiEnhanceButton.style.color = 'white';
+    aiEnhanceButton.textContent = 'AI Enhance';
+    menuBar.appendChild(aiEnhanceButton);
+
+// Add event listener for the AI enhance button
+aiEnhanceButton.addEventListener('click', async function() {
+    // Show loading state
+    this.textContent = 'Enhancing...';
+    this.disabled = true;
+    
+    try {
+        // Get the currently selected text (or section)
+        const selection = window.getSelection();
+        let selectedText = '';
+        let selectedElement = null;
+        
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            selectedText = range.toString();
+            
+            // If no text is selected, try to get the element under cursor
+            if (!selectedText) {
+                selectedElement = findClosestSection(range.startContainer);
+                if (selectedElement) {
+                    selectedText = selectedElement.innerHTML;
+                }
+            } else {
+                // If text is selected, find its containing section
+                selectedElement = findClosestSection(range.startContainer);
+            }
+        }
+        
+        if (!selectedText) {
+            alert('Please select some text or click inside a section to enhance');
+            this.textContent = 'AI Enhance';
+            this.disabled = false;
+            return;
+        }
+        
+        // Send to the AI for enhancement
+        const response = await fetch('/api/ai/enhance-section', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: selectedText,
+                sectionType: getSectionType(selectedElement)
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to enhance content');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.enhancedContent) {
+            // Apply the enhanced content
+            if (selectedElement) {
+                // If we're enhancing a whole section
+                selectedElement.innerHTML = data.enhancedContent;
+            } else if (selection.rangeCount > 0) {
+                // If we're enhancing just the selected text
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                const fragment = document.createDocumentFragment();
+                const div = document.createElement('div');
+                div.innerHTML = data.enhancedContent;
+                while (div.firstChild) {
+                    fragment.appendChild(div.firstChild);
+                }
+                range.insertNode(fragment);
+            }
+            
+            // Show success message in the response output
+            const responseOutput = document.querySelector('.response-output');
+            responseOutput.textContent = "✓ Content enhanced successfully! I've improved the professional language and formatting.";
+        } else {
+            throw new Error('Invalid response from AI');
+        }
+    } catch (error) {
+        console.error('Error enhancing content:', error);
+        alert('An error occurred while enhancing the content. Please try again.');
+    }
+    
+    // Reset button state
+    this.textContent = 'AI Enhance';
+    this.disabled = false;
+});
+
+// Helper function to find the closest section element
+function findClosestSection(element) {
+    let current = element;
+    
+    // Navigate up the DOM tree until we find a resume section
+    while (current && !current.classList?.contains('resume-section') && 
+           !current.classList?.contains('resume-item') && 
+           current !== editor) {
+        current = current.parentElement;
+    }
+    
+    return current;
+}
+
+// Helper function to determine section type
+function getSectionType(element) {
+    if (!element) return 'unknown';
+    
+    // Determine section type based on content or class
+    if (element.querySelector('.resume-section-title')) {
+        const titleText = element.querySelector('.resume-section-title').textContent.toLowerCase();
+        
+        if (titleText.includes('summary')) return 'summary';
+        if (titleText.includes('education')) return 'education';
+        if (titleText.includes('experience') || titleText.includes('work')) return 'experience';
+        if (titleText.includes('skill')) return 'skills';
+        if (titleText.includes('project')) return 'projects';
+    }
+    
+    // If we can't determine from title, try from class names
+    const className = element.className || '';
+    if (className.includes('summary')) return 'summary';
+    if (className.includes('education')) return 'education';
+    if (className.includes('experience')) return 'experience';
+    if (className.includes('skill')) return 'skills';
+    if (className.includes('project')) return 'projects';
+    
+    return 'unknown';
+}
+
+
         // Format buttons
         document.querySelectorAll('.menu-button').forEach(button => {
             button.addEventListener('click', function() {
@@ -68,17 +207,75 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Handle prompt submission
-    function handlePromptSubmission() {
+    async function handlePromptSubmission() {
         const promptInput = document.querySelector('.prompt-input');
         const responseOutput = document.querySelector('.response-output');
         const prompt = promptInput.value.trim();
         
         if (!prompt) return;
         
-        // Process the prompt and generate appropriate response
-        // This is a simplified demo - in a real app, this would call an AI API
-        let response = processPrompt(prompt);
-        responseOutput.textContent = response;
+        // Show loading state
+        responseOutput.textContent = "Analyzing your request...";
+        
+        try {
+            // Get the current resume content
+            const resumeContent = editor.innerHTML;
+            
+            // Send to Claude AI for assistance
+            const response = await fetch('/api/ai/resume-assistant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    prompt: prompt,
+                    resumeContent: resumeContent
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to get AI assistance');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Display AI response
+                responseOutput.textContent = data.response;
+                
+                // If the AI suggested edits, provide a button to apply them
+                if (data.suggestedEdits) {
+                    // Create and add an "Apply Changes" button
+                    const applyButton = document.createElement('button');
+                    applyButton.textContent = 'Apply Suggested Changes';
+                    applyButton.className = 'apply-button';
+                    applyButton.style.backgroundColor = '#4CAF50';
+                    applyButton.style.color = 'white';
+                    applyButton.style.border = 'none';
+                    applyButton.style.padding = '8px';
+                    applyButton.style.marginTop = '10px';
+                    applyButton.style.cursor = 'pointer';
+                    applyButton.style.width = '100%';
+                    
+                    applyButton.addEventListener('click', function() {
+                        // Apply the suggested changes to the editor
+                        if (data.suggestedHTML) {
+                            editor.innerHTML = data.suggestedHTML;
+                            responseOutput.textContent = "Changes applied successfully! Feel free to make additional edits.";
+                            this.remove(); // Remove the button after applying
+                        }
+                    });
+                    
+                    responseOutput.appendChild(document.createElement('br'));
+                    responseOutput.appendChild(applyButton);
+                }
+            } else {
+                responseOutput.textContent = "I couldn't process your request. Please try again with more details about what you'd like help with.";
+            }
+        } catch (error) {
+            console.error('Error getting AI assistance:', error);
+            responseOutput.textContent = "Sorry, I encountered an error while processing your request. Please try again.";
+        }
         
         // Clear input after submission
         promptInput.value = '';

@@ -1,24 +1,24 @@
-// Original app.js with added debugging
-
 require('dotenv').config();
-
 
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 const Resume = require('./models/Resume');
+const Answer = require('./models/Answer');
 
 const app = express();
 const port = 3000;
 
+// Import routes
 const templateRoutes = require('./routes/templateRoutes');
-const Answer = require('./models/Answer');
+const aiRoutes = require('./routes/aiRoutes');
+const resumeAssistantRoutes = require('./routes/resumeAssistantRoutes');
 
 // Middleware
-// Parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 // Configure CORS
 app.use(cors({
@@ -36,8 +36,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// Use the template routes - make sure this is after all middleware
-app.use('/api', templateRoutes);
+// Mount route handlers - Note the different paths to avoid conflicts
+app.use('/api/templates', templateRoutes);
+app.use('/api/ai/resume', aiRoutes);
+app.use('/api/ai/assistant', resumeAssistantRoutes);
 
 // Add a test route to verify the server is working
 app.get('/api/test', (req, res) => {
@@ -127,7 +129,7 @@ app.post('/submit-resume', async (req, res) => {
         // Save the resume to the database
         const newResume = new Resume({
             name, email, phone,
-            education, // ✅ Ensuring education is included
+            education,
             technicalSkills: { programmingLanguages, operatingSystems },
             experiences: companyName.map((_, i) => ({
                 companyName: companyName[i],
@@ -160,10 +162,10 @@ app.post('/submit-resume', async (req, res) => {
     }
 });
 
-// This route should be added to your app.js file, make sure it's before any catch-all handlers
+// Route to save questionnaire answers
 app.post('/save-answers', async (req, res) => {
     try {
-        console.log("Received questionnaire data:", req.body); // Log received data
+        console.log("Received questionnaire data:", req.body);
 
         if (!req.body.answers) {
             return res.status(400).json({ error: "No answers received" });
@@ -172,7 +174,7 @@ app.post('/save-answers', async (req, res) => {
         const newAnswers = new Answer(req.body.answers);
         await newAnswers.save();
 
-        console.log("Questionnaire answers saved successfully!"); // Log successful save
+        console.log("Questionnaire answers saved successfully!");
         res.status(201).json({ message: "Answers saved successfully!" });
 
     } catch (error) {
@@ -180,7 +182,6 @@ app.post('/save-answers', async (req, res) => {
         res.status(500).json({ error: "Failed to save answers" });
     }
 });
-
 
 // Route to fetch a resume by ID
 app.get('/get-resume/:id', async (req, res) => {

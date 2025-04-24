@@ -326,103 +326,178 @@ function initQuestionnaire() {
     }
 
     // Submit questionnaire to backend
-    function submitQuestionnaire() {
-        // Show loading state
-        const submitButton = document.getElementById('submit-resume');
-        submitButton.innerHTML = '<span class="spinner"></span>Processing...';
-        submitButton.disabled = true;
+// Modify the submitQuestionnaire function in questionnaire.js
+function submitQuestionnaire() {
+    // Show loading state
+    sessionStorage.setItem('userName', resumeData.personalInfo.name || '');
+    sessionStorage.setItem('userEmail', resumeData.personalInfo.email || '');
+    sessionStorage.setItem('userPhone', resumeData.personalInfo.phone || '');
+    sessionStorage.setItem('userLocation', resumeData.personalInfo.location || '');
+    
+    const submitButton = document.getElementById('submit-resume');
+    submitButton.innerHTML = '<span class="spinner"></span>Processing...';
+    submitButton.disabled = true;
+    
+    // First save the user's answers
+    fetch('/save-answers', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ answers: resumeData })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Answers saved successfully');
         
-        // Send data to server
-        fetch('/save-answers', {
+        // Now send data to Claude AI for enhancement
+        return fetch('/api/ai/resume/generate-resume', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ answers: resumeData })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Answers saved successfully');
+            body: JSON.stringify(resumeData)
+        });
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('AI enhancement failed');
+        }
+        return response.json();
+    })
+    .then(aiData => {
+        // Store enhanced content in session storage for use in template selection
+        if (aiData.success && aiData.enhancedContent) {
+            sessionStorage.setItem('enhancedContent', JSON.stringify(aiData.enhancedContent));
             
-            // Now submit to the resume endpoint to generate a resume
+            // Now submit to the resume endpoint with the enhanced content
             return fetch('/submit-resume', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(convertToResumeFormat(resumeData))
+                body: JSON.stringify(convertToResumeFormat(resumeData, aiData.enhancedContent))
             });
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Resume generation failed');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.resumeId) {
-                // Redirect to template selection with the resume ID and career field
-                window.location.href = `templateselection.html?resumeId=${data.resumeId}&career=${selectedCareer}`;
-            } else {
-                alert('Error: Failed to generate resume. Please try again.');
-                submitButton.innerHTML = 'Generate Resume';
-                submitButton.disabled = false;
-            }
-        })
-        .catch(error => {
-            console.error('Error submitting questionnaire:', error);
-            alert('Error: Failed to submit questionnaire. Please try again.');
+        } else {
+            throw new Error('Invalid AI response format');
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Resume generation failed');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.resumeId) {
+            // Redirect to template selection with the resume ID and career field
+            window.location.href = `templateselection.html?resumeId=${data.resumeId}&career=${selectedCareer}`;
+        } else {
+            alert('Error: Failed to generate resume. Please try again.');
             submitButton.innerHTML = 'Generate Resume';
             submitButton.disabled = false;
-        });
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting questionnaire:', error);
+        alert('Error: Failed to submit questionnaire. Please try again.');
+        submitButton.innerHTML = 'Generate Resume';
+        submitButton.disabled = false;
+    });
+}
+// Now send data to Claude AI for enhancement
+console.log('Sending data to Claude AI endpoint...');
+return fetch('/api/ai/resume/generate-resume', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(resumeData)
+})
+.then(response => {
+    console.log('AI response status:', response.status);
+    if (!response.ok) {
+        console.error('AI response not OK:', response.statusText);
+        throw new Error('AI enhancement failed');
     }
-
-    // Convert questionnaire data to resume format expected by the existing submit-resume endpoint
-    function convertToResumeFormat(questionnaire) {
-        const resumeFormat = {
-            name: questionnaire.personalInfo.name,
-            email: questionnaire.personalInfo.email,
-            phone: questionnaire.personalInfo.phone,
-            
-            // Store career field
-            careerField: questionnaire.careerField,
-            
-            // Education
-            university: questionnaire.education[0]?.university || "",
-            universityLocation: questionnaire.personalInfo.location,
-            degree: questionnaire.education[0]?.degree || "",
-            gpa: questionnaire.education[0]?.gpa || "",
-            relevantCourse: questionnaire.education[0]?.relevantCourses || "",
-            graduationDate: questionnaire.education[0]?.graduationDate || "",
-            
-            // Technical skills
-            programmingLanguages: questionnaire.skills.technical || "",
-            operatingSystems: questionnaire.skills.soft || "",
-            
-            // Store summary
-            summary: questionnaire.summary || "",
-            
-            // Experience fields as arrays for multiple entries
-            companyName: questionnaire.experience.map(exp => exp.companyName),
-            position: questionnaire.experience.map(exp => exp.jobTitle),
-            location: questionnaire.experience.map(exp => exp.location),
-            responsibilities: questionnaire.experience.map(exp => exp.responsibilities),
-            startDate: questionnaire.experience.map(exp => exp.dates.split('-')[0]?.trim() || ""),
-            endDate: questionnaire.experience.map(exp => exp.dates.split('-')[1]?.trim() || ""),
-            
-            // Projects
-            projectName: questionnaire.projects.map(proj => proj.projectName),
-            projectDescription: questionnaire.projects.map(proj => proj.description),
-            projectStartDate: questionnaire.projects.map(proj => proj.dates)
-        };
+    return response.json();
+})
+.then(aiData => {
+    console.log('AI data received:', aiData);
+    // Rest of your code...
+});
+// Add this function to convert both original and AI-enhanced data to resume format
+function convertToResumeFormat(questionnaire, enhancedContent) {
+    // Start with the original conversion
+    const resumeFormat = {
+        name: questionnaire.personalInfo.name,
+        email: questionnaire.personalInfo.email,
+        phone: questionnaire.personalInfo.phone,
         
-        return resumeFormat;
-    }
+        // Store career field
+        careerField: questionnaire.careerField,
+        
+        // Enhanced summary from AI
+        summary: enhancedContent.summary || questionnaire.summary || "",
+        
+        // Basic education info
+        university: questionnaire.education[0]?.university || "",
+        universityLocation: questionnaire.personalInfo.location,
+        degree: questionnaire.education[0]?.degree || "",
+        gpa: questionnaire.education[0]?.gpa || "",
+        
+        // Enhanced relevant courses
+        relevantCourse: enhancedContent.education[0]?.relevantCourses || 
+            questionnaire.education[0]?.relevantCourses || "",
+        
+        graduationDate: questionnaire.education[0]?.graduationDate || "",
+        
+        // Enhanced skills
+        programmingLanguages: enhancedContent.skills?.technical?.join(", ") || 
+            questionnaire.skills.technical || "",
+        
+        operatingSystems: enhancedContent.skills?.soft?.join(", ") || 
+            questionnaire.skills.soft || "",
+        
+        // Enhanced experience fields as arrays for multiple entries
+        companyName: enhancedContent.experience?.map(exp => exp.companyName) || 
+            questionnaire.experience.map(exp => exp.companyName),
+        
+        position: enhancedContent.experience?.map(exp => exp.jobTitle) || 
+            questionnaire.experience.map(exp => exp.jobTitle),
+        
+        location: enhancedContent.experience?.map(exp => exp.location) || 
+            questionnaire.experience.map(exp => exp.location),
+        
+        // Enhanced responsibilities as bullet points
+        responsibilities: enhancedContent.experience?.map(exp => 
+            Array.isArray(exp.responsibilities) ? exp.responsibilities.join("\n") : exp.responsibilities) || 
+            questionnaire.experience.map(exp => exp.responsibilities),
+        
+        startDate: questionnaire.experience.map(exp => exp.dates.split('-')[0]?.trim() || ""),
+        endDate: questionnaire.experience.map(exp => exp.dates.split('-')[1]?.trim() || ""),
+        
+        // Enhanced projects
+        projectName: enhancedContent.projects?.map(proj => proj.projectName) || 
+            questionnaire.projects.map(proj => proj.projectName),
+        
+        projectDescription: enhancedContent.projects?.map(proj => 
+            Array.isArray(proj.description) ? proj.description.join("\n") : proj.description) || 
+            questionnaire.projects.map(proj => proj.description),
+        
+        projectStartDate: questionnaire.projects.map(proj => proj.dates)
+    };
+    
+    // Also store the full enhanced content for template filling
+    resumeFormat.enhancedContent = enhancedContent;
+    
+    return resumeFormat;
+}
 
     // Section addition functions
     function addEducationSection() {
@@ -445,3 +520,4 @@ document.addEventListener('DOMContentLoaded', function() {
         initQuestionnaire();
     }
 });
+
