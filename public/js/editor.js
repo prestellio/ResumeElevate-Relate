@@ -156,24 +156,43 @@ function getSectionType(element) {
         document.querySelectorAll('.menu-button').forEach(button => {
             button.addEventListener('click', function() {
                 if (this.innerHTML === '<b>B</b>') {
-                    document.execCommand('bold', false, null);
+                    document.execCommand('bold', false, null); // Bold
                 } else if (this.innerHTML === '<i>I</i>') {
-                    document.execCommand('italic', false, null);
+                    document.execCommand('italic', false, null); // Italic
                 } else if (this.innerHTML === '<u>U</u>') {
-                    document.execCommand('underline', false, null);
+                    document.execCommand('underline', false, null); // Underline
                 } else if (this.innerHTML === '–') {
-                    document.execCommand('insertUnorderedList', false, null);
+                    document.execCommand('insertUnorderedList', false, null); // Unordered list dash
                 } else if (this.innerHTML === '•') {
-                    document.execCommand('insertUnorderedList', false, null);
+                    document.execCommand('insertUnorderedList', false, null); // Unordered list dot
                 } else if (this.innerHTML === '1.') {
-                    document.execCommand('insertOrderedList', false, null);
+                    document.execCommand('insertOrderedList', false, null); // Ordered list
                 } else if (this.innerHTML === '⟳') {
-                    document.execCommand('redo', false, null);
+                    document.execCommand('redo', false, null); // Redo
                 } else if (this.innerHTML === '⟲') {
+                    document.execCommand('undo', false, null); // Undo
+                } else if (this.innerHTML === '←') {
+                    document.execCommand('align', 'left', false, null); // Left align
+                } else if (this.innerHTML === '→') {
+                    document.execCommand('align', 'right', false, null); // Right align
+                } else if (this.innerHTML === '↔') {
+                    document.execCommand('align', 'center', false, null); // Middle align
+                }
+                editor.focus();
+            });
+        });
+
+        document.querySelectorAll('.menu-bar-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.value === '⟳') {
+                    document.execCommand('redo', false, null);
+                } else if (this.value === '⟲') {
                     document.execCommand('undo', false, null);
                 }
                 editor.focus();
             });
+
+            
         });
         
         // Submit prompt button
@@ -201,6 +220,10 @@ function getSectionType(element) {
                 editor.focus();
             }
         });
+
+        // document.getElementById('prompt-submit').addEventListener('click', function () {
+        //     document.getElementById('response-output').setAttribute('style', 'color: white;');
+        // });
         
         // Load resume data from URL params if available
         loadResumeFromParams();

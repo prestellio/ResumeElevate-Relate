@@ -147,7 +147,7 @@
         }
         
         .right-panel {
-            width: 160px;
+            width: 20vw;
             display: flex;
             flex-direction: column;
             background-color: var(--light-color);
@@ -166,7 +166,7 @@
             resize: none;
             padding: 5px;
             font-size: 12px;
-            height: 80px;
+            height: 140px;
             margin-bottom: 10px;
         }
         
@@ -256,9 +256,9 @@
     <div class="menu-bar">
         <div>
             <ul class="toolbar-logo">
-                <li><button class="menu-bar-btn" action="index.html"><img src="../images/Home_Logo.png" alt="Home button"></button></li>
-                <li><button class="menu-bar-btn"></button><img src="../images/Undo_Logo.png" alt="Undo button"></li>
-                <li><button class="menu-bar-btn"></button><img src="../images/Redo_Logo.png" alt="Redo button"></li>
+                <li><button class="menu-bar-btn"><a href="index.html"><img src="../images/Home_Logo.png" alt="Home button"></a></button></li>
+                <li><button class="menu-bar-btn" value="⟲" ><img src="../images/Undo_Logo.png" alt="Undo button"></button></li>
+                <li><button class="menu-bar-btn" value="⟳"><img src="../images/Redo_Logo.png" alt="Redo button"></button></li>
             </ul>
         </div>
         <div style="text-align: right; margin-left: auto; font-size: large;">
@@ -278,8 +278,13 @@
             <button class="menu-button">–</button>
             <button class="menu-button">•</button>
             <button class="menu-button">1.</button>
-            <button class="menu-button" style="width: 20px;">⟳</button>
-            <button class="menu-button" style="width: 20px;">⟲</button>
+            <button class="menu-button" style="width: 30px;">⟳</button>
+            <button class="menu-button" style="width: 30px;">⟲</button>
+            <select class="menu-button" style="width: 60px;">
+                <option>←</option>
+                <option>↔</option>
+                <option>→</option>
+            </select>
         </div>
     </div>
     
@@ -387,12 +392,12 @@
             <!-- Prompt Area -->
             <div class="prompt-area">
                 <textarea class="prompt-input" placeholder="Enter Prompt..."></textarea>
-                <button class="submit-button">Submit Prompt</button>
+                <button class="submit-button" id="prompt-submit">Submit Prompt</button>
             </div>
             
             <!-- Response Area -->
             <div class="response-area">
-                <div class="response-output"></div>
+                <div class="response-output" id="response-output"></div>
                 <button class="redo-button">Field Box Redo</button>
             </div>
         </div>
