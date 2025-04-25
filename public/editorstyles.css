@@ -21,6 +21,7 @@ body {
 
 .toolbar {
     background-color: var(--primary-color);
+    height: 13vh;
     color: white;
     padding: 8px;
     display: flex;
@@ -28,23 +29,47 @@ body {
     border-bottom: 1px solid #5577cc;
 }
 
+.toolbar div {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 7px #888;
+    height: 100%;
+    padding: 10px;
+}
+
 .toolbar-logo {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    margin-right: 20px;
+    margin: 0 5px;
 }
 
 .toolbar-logo img {
     height: 25px;
-    margin-right: 10px;
+    /* margin-right: 10px; */
+}
+
+.toolbar-logo li {
+    list-style-type: none;
+    margin-left: 10px;
+}
+
+.toolbar-logo button {
+    cursor: pointer;
 }
 
 .menu-bar {
     background-color: var(--light-color);
     padding: 5px;
+    font-size: large;
+    font-weight: bold;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
     border-bottom: 1px solid var(--border-color);
+}
+
+.menu-bar span {
+    margin: auto 5px;
 }
 
 .menu-button {
@@ -115,7 +140,7 @@ body {
 }
 
 .right-panel {
-    width: 160px;
+    width: 20vw;
     display: flex;
     flex-direction: column;
     background-color: var(--light-color);
@@ -134,7 +159,7 @@ body {
     resize: none;
     padding: 5px;
     font-size: 12px;
-    height: 80px;
+    height: 140px;
     margin-bottom: 10px;
 }
 
@@ -218,61 +243,8 @@ body {
     margin-top: 5px;
 }
 
-/* AI Enhancement Button Styles */
-.menu-button.ai-enhance {
-    background-color: #4CAF50;
-    color: white;
-    padding: 3px 10px;
-    margin-left: 10px;
-}
-
-.menu-button.ai-enhance:hover {
-    background-color: #45a049;
-}
-
-.menu-button.ai-enhance:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-/* Highlight effect for sections being enhanced */
-.enhancing {
-    background-color: rgba(76, 175, 80, 0.1);
-    transition: background-color 0.5s ease;
-}
-
-/* Apply Button Styles */
-.apply-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 8px;
-    text-align: center;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 10px;
-    transition: background-color 0.3s;
-}
-
-.apply-button:hover {
-    background-color: #45a049;
-}
-
-/* Success Message Styles */
-.success-message {
-    color: #4CAF50;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-/* Enhanced Content Highlight */
-.enhanced-content {
-    border-left: 3px solid #4CAF50;
-    padding-left: 10px;
-    animation: fadeGlow 2s ease-in-out;
-}
-
-@keyframes fadeGlow {
-    0% { background-color: rgba(76, 175, 80, 0.2); }
-    100% { background-color: transparent; }
+.toolbar-options {
+    text-align: right;
+    margin-left: auto;
+    font-size: large;
 }

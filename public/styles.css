@@ -7,6 +7,14 @@
 #540d6e - Purple
 
 */
+
+:root {
+    --primary-color: #3BCEAC;
+    --secondary-color: #9BA2FF;
+    --primary-highlight: #225BB2;
+    --secondary-highlight: #540D6E;
+}
+
 .about-background {
     background-image: url("images/AboutPageGradient.jpg");
 }
@@ -28,7 +36,9 @@ body {
     display: flex;
     margin: 0;
     flex-direction: column;
-    background-color: #3bceac;
+    background-color: var(--primary-color); 
+    background-image: radial-gradient(circle, #2b967d 50%, var(--primary-color) 70%);
+    background-position: 0px 100px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 1.4rem;
 }
@@ -36,7 +46,7 @@ body {
 button {
     font-weight: 500;
     color: white;
-    background-color: #225bb2;
+    background-color: var(--primary-highlight);
     border-radius: 15px;
     padding: 10px;
     font-size: 1.5rem;
@@ -59,11 +69,11 @@ button {
     width: 25%;
     border: solid 3px #540d6e;
     border-radius: 10px;
-    background-color: #9ba2ff;
+    background-color: var(--secondary-color);
 }
 
 div {
-    color:#225bb2;
+    color: var(--primary-highlight);
     border-radius: 3px;
     padding: 0 20px;
 }
@@ -71,7 +81,7 @@ div {
 div h1 {
     color: black;
     font-weight: 900;
-    text-shadow: 4px 2px 0px #3bceac;
+    text-shadow: 4px 2px 0px var(--primary-color);
     
 }
 
@@ -101,7 +111,7 @@ div .div-clear {
 }
 
 .div-alt-1 {
-    background-color: #3bceac;
+    background-color: var(--primary-color);
     background-image: url("images/HexGrid.png");
     background-repeat: repeat;
     background-size: 10%;
@@ -119,7 +129,7 @@ div .div-clear {
 
 .div-alt-1 section {
     padding: 20px;
-    background-color: #9ba2ff;
+    background-color: var(--secondary-color);
     border: solid 10px white;
     border-radius: 10px;
     box-shadow: inset 0px 0px 10px black;
@@ -134,7 +144,7 @@ div .div-clear {
 .div-alt-2 h1 {
     font-size: 3.5rem;
     font-weight: 1000;
-    color: #225bb2;
+    color: var(--primary-highlight);
     text-shadow: 2px 1px 0px white;
     text-align: center;
 }
@@ -153,7 +163,7 @@ div .div-clear {
 
 .span-alt-1 {
     background-color: #540d6e;
-    color: #9ba2ff;
+    color: var(--secondary-color);
     text-shadow: none;
 }
 
@@ -161,12 +171,12 @@ div .div-clear {
     background-color: white;
     border-radius: 10px;
     padding: 30px;
-    color: #225bb2;
+    color: var(--primary-highlight);
 }
 
 .div-alt-4 {
     background-color: #540d6e;
-    color: #9ba2ff;
+    color: var(--secondary-color);
     text-shadow: none;
 }
 
@@ -174,12 +184,12 @@ div .div-clear {
     background-color: white;
     border-radius: 10px;
     padding: 30px;
-    color: #225bb2;
+    color: var(--primary-highlight);
 }
 
 .div-questions {
     box-shadow: -10px 0px 20px;
-    background-color: #9ba2ff;
+    background-color: var(--secondary-color);
     color: black;
     padding: 50px 20%;
 }
@@ -283,7 +293,7 @@ div .div-clear {
 /* Template page css: needs special css since it is a different kind of page */
 
 .template-page-grid {
-    background-color: #9ba2ff;
+    background-color: var(--secondary-color);
     display: grid;
     position: fixed;
     justify-content: stretch;
@@ -297,7 +307,7 @@ div .div-clear {
 .template-page-grid header {
     grid-area: 1 / 1 / 2 / 4;
     background-image: none;
-    background: linear-gradient(#225bb2,#000) ;
+    background: linear-gradient(var(--primary-highlight),#000) ;
     margin: 0;
 }
 
@@ -428,7 +438,7 @@ footer div {
 }
 
 h1 {
-    color: #9ba2ff;
+    color: var(--secondary-color);
 }
 
 .container header {
@@ -438,7 +448,7 @@ h1 {
 header {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-    background-color: #225bb2;
+    background-color: var(--primary-highlight);
     background-image: url("images/WichitaHeaderImage.png");
     background-size: 100%;
     background-position-y: center;
@@ -487,7 +497,7 @@ header img {
 }
 
 .inner-div-1 {
-    background-color: #3bceac;
+    background-color: var(--primary-color);
     color: white;
     border-radius: 10px;
     padding: 30px;

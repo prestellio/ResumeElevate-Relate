@@ -184,9 +184,9 @@ function getSectionType(element) {
 
         document.querySelectorAll('.menu-bar-btn').forEach(button => {
             button.addEventListener('click', function() {
-                if (this.value === '⟳') {
+                if (this.getAttribute('data-value') === '⟳') {
                     document.execCommand('redo', false, null);
-                } else if (this.value === '⟲') {
+                } else if (this.getAttribute('data-value') === '⟲') {
                     document.execCommand('undo', false, null);
                 }
                 editor.focus();
