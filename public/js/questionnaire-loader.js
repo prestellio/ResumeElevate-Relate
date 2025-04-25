@@ -5,14 +5,14 @@ const { Storage } = require('@google-cloud/storage');
 // Initialize Google Cloud Storage
 const storage = new Storage();
 const bucketName = 'project-relate'; // Your bucket name
-questions = [];
+let questions = [];
 
-// GET endpoint to list all template images in the bucket
+// GET endpoint to list all questions in the bucket
 router.get('/', async (req, res) => {
   try {
     console.log('Fetching questions from Google Cloud Storage bucket:', bucketName);
     
-    // Create template objects manually based on the files you have in your bucket
+    // Create question objects manually based on the files you have in your bucket
 
     questions = [
       {
