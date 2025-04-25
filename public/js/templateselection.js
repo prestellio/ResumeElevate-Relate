@@ -1,7 +1,7 @@
 // Template selection page initialization
 function initTemplateSelection() {
     // Configuration
-    const apiEndpoint = '/api/templates'; // The endpoint we've defined in templateRoutes.js
+    const apiEndpoint = '/api/templates'; // The endpoint we've defined in routes/templateRoutes.js
     
     // Get career field from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
