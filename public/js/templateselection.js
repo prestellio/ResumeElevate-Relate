@@ -1,7 +1,7 @@
 // Template selection page initialization
 function initTemplateSelection() {
     // Configuration
-    const apiEndpoint = '/api/get-templates'; // The endpoint we've defined in templateRoutes.js
+    const apiEndpoint = '/api/templates'; // The endpoint we've defined in templateRoutes.js
     
     // Get career field from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -14,11 +14,15 @@ function initTemplateSelection() {
     headerElement.textContent = `${careerField ? careerField.charAt(0).toUpperCase() + careerField.slice(1) : 'All'} Resume Templates`;
     
     const templateList = document.getElementById('template-select-ul');
-    templateList.parentNode.insertBefore(headerElement, templateList);
+    if (templateList) {
+        templateList.parentNode.insertBefore(headerElement, templateList);
+    }
     
     // Function to fetch images from Google Cloud Storage via our API
     async function fetchImagesFromGCS() {
-        templateList.innerHTML = '<div class="loading">Loading templates...</div>';
+        if (templateList) {
+            templateList.innerHTML = '<div class="loading">Loading templates...</div>';
+        }
         
         try {
             // Fetch templates from our backend API
@@ -29,13 +33,16 @@ function initTemplateSelection() {
             }
             
             const data = await response.json();
+            console.log('Template data received:', data);
             
             if (!data.success || !data.templates || !Array.isArray(data.templates)) {
                 throw new Error('Invalid response format from API');
             }
             
             // Remove loading message
-            templateList.innerHTML = '';
+            if (templateList) {
+                templateList.innerHTML = '';
+            }
             
             // Filter templates based on career field if specified
             let filteredTemplates = data.templates;
@@ -52,28 +59,32 @@ function initTemplateSelection() {
                            templateId.includes(careerField.toLowerCase()) ||
                            // For demo purposes, ensure some templates are always shown
                            templateId.includes('general') || 
-                           Math.random() > 0.5; // Randomly include some templates to ensure there's always content
+                           true; // Show all templates for now
                 });
             }
             
             // Create template options from the filtered templates
             if (filteredTemplates.length === 0) {
-                templateList.innerHTML = '<p>No templates found for this career field. Please select from our general templates:</p>';
+                if (templateList) {
+                    templateList.innerHTML = '<p>No templates found for this career field. Please select from our general templates:</p>';
+                }
                 // If no templates match the filter, show all templates
                 filteredTemplates = data.templates;
             }
             
-            filteredTemplates.forEach(template => {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `
-                    <label>
-                        <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}">
-                        <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
-                    </label>
-                `;
-                
-                templateList.appendChild(listItem);
-            });
+            if (templateList) {
+                filteredTemplates.forEach(template => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <label>
+                            <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}" data-html-url="${template.htmlUrl || ''}">
+                            <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
+                        </label>
+                    `;
+                    
+                    templateList.appendChild(listItem);
+                });
+            }
             
             // Add click events to all template thumbnails
             document.querySelectorAll('.preview-image').forEach(img => {
@@ -84,7 +95,9 @@ function initTemplateSelection() {
                     
                     // Also select the radio button
                     const radioBtn = this.nextElementSibling;
-                    radioBtn.checked = true;
+                    if (radioBtn) {
+                        radioBtn.checked = true;
+                    }
                 });
             });
             
@@ -112,7 +125,7 @@ function initTemplateSelection() {
             continueButton.id = 'continue-to-editor';
             continueButton.className = 'continue-btn';
             continueButton.type = 'submit';
-            continueButton.style.backgroundColor = '#ff3860'; // Make it red to stand out
+            continueButton.style.backgroundColor = '#ff3860'; 
             continueButton.style.color = 'white';
             continueButton.style.fontWeight = 'bold';
             continueButton.style.padding = '15px 30px';
@@ -121,6 +134,7 @@ function initTemplateSelection() {
             continueButton.style.marginBottom = '30px';
             continueButton.style.cursor = 'pointer';
             continueButton.textContent = '→ Use Selected Template (Click Here!) ←';
+            
             // Add form submit handler 
             redirectForm.addEventListener('submit', function(event) {
                 console.log("Form submission triggered");
@@ -144,23 +158,11 @@ function initTemplateSelection() {
             redirectForm.appendChild(continueButton);
             
             // Add the form to the page
-            templateList.parentNode.appendChild(redirectForm);
+            if (templateList) {
+                templateList.parentNode.appendChild(redirectForm);
+            }
             
-            // Add a backup direct link in case the form doesn't work
-            const directLink = document.createElement('div');
-            directLink.style.textAlign = 'center';
-            directLink.style.marginTop = '10px';
-            directLink.innerHTML = `<p>If the button doesn't work, <a href="editor.html?resumeId=${resumeId}&template=default" id="direct-editor-link">click here</a> and select a template on the next page.</p>`;
-            templateList.parentNode.appendChild(directLink);
-            
-            // Set up direct link to dynamically update based on selection
-            document.querySelectorAll('input[name="template-select"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.getElementById('direct-editor-link').href = `editor.html?resumeId=${resumeId}&template=${this.value}`;
-                });
-            });
-            
-            // Show the first template by default
+            // Show the first template by default if any exist
             if (filteredTemplates.length > 0) {
                 const firstTemplate = filteredTemplates[0];
                 showFullsizeTemplate(firstTemplate.url, firstTemplate.name);
@@ -173,7 +175,9 @@ function initTemplateSelection() {
             
         } catch (error) {
             console.error('Error fetching templates:', error);
-            templateList.innerHTML = '<p>Error loading templates. Please try again later.</p>';
+            if (templateList) {
+                templateList.innerHTML = `<p>Error loading templates: ${error.message}. Please try again later.</p>`;
+            }
         }
     }
     
@@ -181,26 +185,36 @@ function initTemplateSelection() {
     function showFullsizeTemplate(imageUrl, imageName) {
         const fullsizeContainer = document.getElementById('fullsizeContainer');
         
-        fullsizeContainer.innerHTML = `
-            <img src="${imageUrl}" alt="${imageName}" id="fullsizeImage" class="fullsize-image">
-            <div class="image-title">${imageName}</div>
-        `;
-        
-        // Add click event to open the modal with an even larger view
-        document.getElementById('fullsizeImage').addEventListener('click', function() {
-            const modal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImage');
+        if (fullsizeContainer) {
+            fullsizeContainer.innerHTML = `
+                <img src="${imageUrl}" alt="${imageName}" id="fullsizeImage" class="fullsize-image">
+                <div class="image-title">${imageName}</div>
+            `;
             
-            modalImg.src = imageUrl;
-            modal.style.display = 'flex';
-        });
+            // Add click event to open the modal with an even larger view
+            const fullsizeImage = document.getElementById('fullsizeImage');
+            if (fullsizeImage) {
+                fullsizeImage.addEventListener('click', function() {
+                    const modal = document.getElementById('imageModal');
+                    const modalImg = document.getElementById('modalImage');
+                    
+                    if (modal && modalImg) {
+                        modalImg.src = imageUrl;
+                        modal.style.display = 'flex';
+                    }
+                });
+            }
+        }
     }
     
     // Close the modal when clicking the X
     const modalClose = document.getElementById('modalClose');
     if (modalClose) {
         modalClose.addEventListener('click', function() {
-            document.getElementById('imageModal').style.display = 'none';
+            const imageModal = document.getElementById('imageModal');
+            if (imageModal) {
+                imageModal.style.display = 'none';
+            }
         });
     }
     

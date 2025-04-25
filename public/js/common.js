@@ -34,18 +34,25 @@ function toGenerator() {
 
 // Generate the navigation bar for pages
 function NavigationGeneration() {
+    let header = document.getElementById("top");
+    
+    // Check if the header element exists before proceeding
+    if (!header) {
+        console.error("Header element with id 'top' not found");
+        return; // Exit the function if header is not found
+    }
+    
+    // Rest of your function remains the same
     let pages = ["index.html","questionnaire.html","about.html", "login.html", "editor.html"];
     let pageTitle = ["Home", "Generate Resume", "About", "Login page", "Edit Resume"];
-
-    let header = document.getElementById("top");
+    
     let link = document.createElement('a');
     let img = document.createElement('img');
-
+    
     link.setAttribute('href', 'index.html');
-
     img.setAttribute('src', '../images/RelateLogo_proto_square.png');
     img.setAttribute('alt', 'Resume Relate Logo: green and blue peacock');
-
+    
     link.appendChild(img);
     header.appendChild(link);
 
@@ -89,11 +96,17 @@ function NavigationGeneration() {
 
 }
 
-function FooterGeneration () {
+function FooterGeneration() {
+    let footer = document.getElementById('bottom');
+    
+    // Check if the footer element exists before proceeding
+    if (!footer) {
+        console.error("Footer element with id 'bottom' not found");
+        return; // Exit the function if footer is not found
+    }
     let pages = ["about.html", "privacy.html","careers.html"];
     let pageTitle = ["About Us", "Privacy Policy", "Careers"];
 
-    let footer = document.getElementById('bottom');
     let div = document.createElement('div');
     let para = document.createElement('p');
     let ul = document.createElement('ul');

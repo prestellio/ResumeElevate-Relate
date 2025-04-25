@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { generateResumeContent } = require('../utils/utils/claudeApiHelper.js');
+const { generateResumeContent } = require('../utils/claudeApiHelper.js');
 
 // Endpoint to generate resume content
 router.post('/generate-resume', async (req, res) => {
