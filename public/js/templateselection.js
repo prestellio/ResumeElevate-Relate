@@ -18,168 +18,168 @@ function initTemplateSelection() {
         templateList.parentNode.insertBefore(headerElement, templateList);
     }
     
-    // Function to fetch images from Google Cloud Storage via our API
-    // async function fetchImagesFromGCS() {
-    //     if (templateList) {
-    //         templateList.innerHTML = '<div class="loading">Loading templates...</div>';
-    //     }
+    // Function to fetch images from our backend API
+    async function fetchImagesFromGCS() {
+        if (templateList) {
+            templateList.innerHTML = '<div class="loading">Loading templates...</div>';
+        }
         
-    //     try {
-    //         // Fetch templates from our backend API
-    //         const response = await fetch(apiEndpoint);
+        try {
+            // Fetch templates from our backend API
+            const response = await fetch(apiEndpoint);
             
-    //         if (!response.ok) {
-    //             throw new Error(`API responded with status: ${response.status}`);
-    //         }
+            if (!response.ok) {
+                throw new Error(`API responded with status: ${response.status}`);
+            }
             
-    //         const data = await response.json();
-    //         console.log('Template data received:', data);
+            const data = await response.json();
+            console.log('Template data received:', data);
             
-    //         if (!data.success || !data.templates || !Array.isArray(data.templates)) {
-    //             throw new Error('Invalid response format from API');
-    //         }
+            if (!data.success || !data.templates || !Array.isArray(data.templates)) {
+                throw new Error('Invalid response format from API');
+            }
             
-    //         // Remove loading message
-    //         if (templateList) {
-    //             templateList.innerHTML = '';
-    //         }
+            // Remove loading message
+            if (templateList) {
+                templateList.innerHTML = '';
+            }
             
-    //         // Filter templates based on career field if specified
-    //         let filteredTemplates = data.templates;
+            // Filter templates based on career field if specified
+            let filteredTemplates = data.templates;
             
-    //         if (careerField) {
-    //             // This is a simplified example. In a real implementation, your template data would include
-    //             // metadata about which career fields each template is suitable for.
-    //             // For now, we'll just filter based on template name/id containing the career field
-    //             filteredTemplates = data.templates.filter(template => {
-    //                 // Example: if a template has 'engineering' in the name/id, show it for engineering careers
-    //                 const templateName = template.name.toLowerCase();
-    //                 const templateId = template.id.toLowerCase();
-    //                 return templateName.includes(careerField.toLowerCase()) || 
-    //                        templateId.includes(careerField.toLowerCase()) ||
-    //                        // For demo purposes, ensure some templates are always shown
-    //                        templateId.includes('general') || 
-    //                        true; // Show all templates for now
-    //             });
-    //         }
+            if (careerField) {
+                // This is a simplified example. In a real implementation, your template data would include
+                // metadata about which career fields each template is suitable for.
+                // For now, we'll just filter based on template name/id containing the career field
+                filteredTemplates = data.templates.filter(template => {
+                    // Example: if a template has 'engineering' in the name/id, show it for engineering careers
+                    const templateName = template.name.toLowerCase();
+                    const templateId = template.id.toLowerCase();
+                    return templateName.includes(careerField.toLowerCase()) || 
+                           templateId.includes(careerField.toLowerCase()) ||
+                           // For demo purposes, ensure some templates are always shown
+                           templateId.includes('general') || 
+                           true; // Show all templates for now
+                });
+            }
             
-    //         // Create template options from the filtered templates
-    //         if (filteredTemplates.length === 0) {
-    //             if (templateList) {
-    //                 templateList.innerHTML = '<p>No templates found for this career field. Please select from our general templates:</p>';
-    //             }
-    //             // If no templates match the filter, show all templates
-    //             filteredTemplates = data.templates;
-    //         }
+            // Create template options from the filtered templates
+            if (filteredTemplates.length === 0) {
+                if (templateList) {
+                    templateList.innerHTML = '<p>No templates found for this career field. Please select from our general templates:</p>';
+                }
+                // If no templates match the filter, show all templates
+                filteredTemplates = data.templates;
+            }
             
-    //         if (templateList) {
-    //             filteredTemplates.forEach(template => {
-    //                 const listItem = document.createElement('li');
-    //                 listItem.innerHTML = `
-    //                     <label>
-    //                         <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}" data-html-url="${template.htmlUrl || ''}">
-    //                         <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
-    //                     </label>
-    //                 `;
+            if (templateList) {
+                filteredTemplates.forEach(template => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <label>
+                            <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}" data-html-url="${template.htmlUrl || ''}">
+                            <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
+                        </label>
+                    `;
                     
-    //                 templateList.appendChild(listItem);
-    //             });
-    //         }
+                    templateList.appendChild(listItem);
+                });
+            }
             
-    //         // Add click events to all template thumbnails
-    //         document.querySelectorAll('.preview-image').forEach(img => {
-    //             img.addEventListener('click', function() {
-    //                 const fullsizeUrl = this.dataset.fullsize;
-    //                 const templateName = this.alt;
-    //                 showFullsizeTemplate(fullsizeUrl, templateName);
+            // Add click events to all template thumbnails
+            document.querySelectorAll('.preview-image').forEach(img => {
+                img.addEventListener('click', function() {
+                    const fullsizeUrl = this.dataset.fullsize;
+                    const templateName = this.alt;
+                    showFullsizeTemplate(fullsizeUrl, templateName);
                     
-    //                 // Also select the radio button
-    //                 const radioBtn = this.nextElementSibling;
-    //                 if (radioBtn) {
-    //                     radioBtn.checked = true;
-    //                 }
-    //             });
-    //         });
+                    // Also select the radio button
+                    const radioBtn = this.nextElementSibling;
+                    if (radioBtn) {
+                        radioBtn.checked = true;
+                    }
+                });
+            });
             
-    //         // Create a form for proper redirection
-    //         const redirectForm = document.createElement('form');
-    //         redirectForm.action = 'editor.html';
-    //         redirectForm.method = 'GET';
+            // Create a form for proper redirection
+            const redirectForm = document.createElement('form');
+            redirectForm.action = 'editor.html';
+            redirectForm.method = 'GET';
             
-    //         // Create hidden inputs for resumeId
-    //         const resumeIdInput = document.createElement('input');
-    //         resumeIdInput.type = 'hidden';
-    //         resumeIdInput.name = 'resumeId';
-    //         resumeIdInput.value = resumeId;
-    //         redirectForm.appendChild(resumeIdInput);
+            // Create hidden inputs for resumeId
+            const resumeIdInput = document.createElement('input');
+            resumeIdInput.type = 'hidden';
+            resumeIdInput.name = 'resumeId';
+            resumeIdInput.value = resumeId;
+            redirectForm.appendChild(resumeIdInput);
             
-    //         // Create dynamic template input that will be set on submit
-    //         const templateInput = document.createElement('input');
-    //         templateInput.type = 'hidden';
-    //         templateInput.name = 'template';
-    //         templateInput.id = 'template-input';
-    //         redirectForm.appendChild(templateInput);
+            // Create dynamic template input that will be set on submit
+            const templateInput = document.createElement('input');
+            templateInput.type = 'hidden';
+            templateInput.name = 'template';
+            templateInput.id = 'template-input';
+            redirectForm.appendChild(templateInput);
             
-    //         // Add a continue button
-    //         const continueButton = document.createElement('button');
-    //         continueButton.id = 'continue-to-editor';
-    //         continueButton.className = 'continue-btn';
-    //         continueButton.type = 'submit';
-    //         continueButton.style.backgroundColor = '#ff3860'; 
-    //         continueButton.style.color = 'white';
-    //         continueButton.style.fontWeight = 'bold';
-    //         continueButton.style.padding = '15px 30px';
-    //         continueButton.style.fontSize = '1.3rem';
-    //         continueButton.style.marginTop = '30px';
-    //         continueButton.style.marginBottom = '30px';
-    //         continueButton.style.cursor = 'pointer';
-    //         continueButton.textContent = '→ Use Selected Template (Click Here!) ←';
+            // Add a continue button
+            const continueButton = document.createElement('button');
+            continueButton.id = 'continue-to-editor';
+            continueButton.className = 'continue-btn';
+            continueButton.type = 'submit';
+            continueButton.style.backgroundColor = '#ff3860'; 
+            continueButton.style.color = 'white';
+            continueButton.style.fontWeight = 'bold';
+            continueButton.style.padding = '15px 30px';
+            continueButton.style.fontSize = '1.3rem';
+            continueButton.style.marginTop = '30px';
+            continueButton.style.marginBottom = '30px';
+            continueButton.style.cursor = 'pointer';
+            continueButton.textContent = '→ Use Selected Template (Click Here!) ←';
             
-    //         // Add form submit handler 
-    //         redirectForm.addEventListener('submit', function(event) {
-    //             console.log("Form submission triggered");
-    //             const selectedTemplate = document.querySelector('input[name="template-select"]:checked');
-    //             if (selectedTemplate) {
-    //                 console.log("Selected template:", selectedTemplate.value);
-    //                 console.log("Resume ID:", resumeId);
+            // Add form submit handler 
+            redirectForm.addEventListener('submit', function(event) {
+                console.log("Form submission triggered");
+                const selectedTemplate = document.querySelector('input[name="template-select"]:checked');
+                if (selectedTemplate) {
+                    console.log("Selected template:", selectedTemplate.value);
+                    console.log("Resume ID:", resumeId);
                     
-    //                 // Set the template value in the hidden input
-    //                 document.getElementById('template-input').value = selectedTemplate.value;
+                    // Set the template value in the hidden input
+                    document.getElementById('template-input').value = selectedTemplate.value;
                     
-    //                 // Let the form submit naturally to editor.html
-    //                 console.log("Form submitting with:", this.action + "?" + new URLSearchParams(new FormData(this)).toString());
-    //             } else {
-    //                 event.preventDefault();
-    //                 alert('Please select a template first');
-    //             }
-    //         });
+                    // Let the form submit naturally to editor.html
+                    console.log("Form submitting with:", this.action + "?" + new URLSearchParams(new FormData(this)).toString());
+                } else {
+                    event.preventDefault();
+                    alert('Please select a template first');
+                }
+            });
             
-    //         // Add button to form
-    //         redirectForm.appendChild(continueButton);
+            // Add button to form
+            redirectForm.appendChild(continueButton);
             
-    //         // Add the form to the page
-    //         if (templateList) {
-    //             templateList.parentNode.appendChild(redirectForm);
-    //         }
+            // Add the form to the page
+            if (templateList) {
+                templateList.parentNode.appendChild(redirectForm);
+            }
             
-    //         // Show the first template by default if any exist
-    //         if (filteredTemplates.length > 0) {
-    //             const firstTemplate = filteredTemplates[0];
-    //             showFullsizeTemplate(firstTemplate.url, firstTemplate.name);
-    //             // Select the first radio button
-    //             const firstRadio = document.querySelector('input[name="template-select"]');
-    //             if (firstRadio) {
-    //                 firstRadio.checked = true;
-    //             }
-    //         }
+            // Show the first template by default if any exist
+            if (filteredTemplates.length > 0) {
+                const firstTemplate = filteredTemplates[0];
+                showFullsizeTemplate(firstTemplate.url, firstTemplate.name);
+                // Select the first radio button
+                const firstRadio = document.querySelector('input[name="template-select"]');
+                if (firstRadio) {
+                    firstRadio.checked = true;
+                }
+            }
             
-    //     } catch (error) {
-    //         console.error('Error fetching templates:', error);
-    //         if (templateList) {
-    //             templateList.innerHTML = `<p>Error loading templates: ${error.message}. Please try again later.</p>`;
-    //         }
-    //     }
-    // }
+        } catch (error) {
+            console.error('Error fetching templates:', error);
+            if (templateList) {
+                templateList.innerHTML = `<p>Error loading templates: ${error.message}. Please try again later.</p>`;
+            }
+        }
+    }
     
     // Function to display fullsize template
     function showFullsizeTemplate(imageUrl, imageName) {

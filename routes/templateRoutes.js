@@ -1,48 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const { Storage } = require('@google-cloud/storage');
+const fs = require('fs').promises;
+const path = require('path');
 
-// Initialize Google Cloud Storage
-const storage = new Storage();
-const bucketName = 'project-relate'; // Your bucket name
-
-// GET endpoint to list all template images in the bucket
+// GET endpoint to list all template images
 router.get('/', async (req, res) => {
   try {
-    console.log('Fetching templates from Google Cloud Storage bucket:', bucketName);
+    const templatesPath = path.join(__dirname, '../public/templates');
+    const templateFiles = await fs.readdir(templatesPath);
     
-    // Create template objects manually based on the files you have in your bucket
-    const templates = [
-      {
-        id: 'template1',
-        name: 'Template 1',
-        url: `https://storage.googleapis.com/${bucketName}/template1.jpg`,
-        htmlUrl: `https://storage.googleapis.com/${bucketName}/template1.html`
-      },
-      {
-        id: 'template2',
-        name: 'Template 2',
-        url: `https://storage.googleapis.com/${bucketName}/template2.jpg`,
-        htmlUrl: `https://storage.googleapis.com/${bucketName}/template2.html`
-      },
-      {
-        id: 'template3',
-        name: 'Template 3',
-        url: `https://storage.googleapis.com/${bucketName}/template3.jpg`,
-        htmlUrl: `https://storage.googleapis.com/${bucketName}/template3.html`
-      },
-      {
-        id: 'template4',
-        name: 'Template 4',
-        url: `https://storage.googleapis.com/${bucketName}/template4.jpg`,
-        htmlUrl: `https://storage.googleapis.com/${bucketName}/template4.html`
-      }
-    ];
+    // Filter for HTML templates
+    const htmlTemplates = templateFiles.filter(file => 
+      file.endsWith('.html') && file !== 'resume_template.html'
+    );
+
+    const templates = htmlTemplates.map(file => {
+      const id = file.replace('.html', '');
+      return {
+        id: id,
+        name: `Template ${id.replace('template', '')}`,
+        url: `/templates/${id}.jpg`,
+        htmlUrl: `/templates/${file}`
+      };
+    });
     
-    console.log(`Returning ${templates.length} templates`);
     res.json({ success: true, templates });
   } catch (error) {
-    console.error('Error fetching templates from GCS:', error);
+    console.error('Error fetching templates:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Failed to fetch templates',
@@ -56,17 +40,10 @@ router.get('/:id', async (req, res) => {
   const templateId = req.params.id;
   
   try {
-    // Create the URL to the HTML file
-    const htmlUrl = `https://storage.googleapis.com/${bucketName}/${templateId}.html`;
+    const templatePath = path.join(__dirname, `../public/templates/${templateId}.html`);
     
-    // Fetch the HTML content from GCS
-    const response = await fetch(htmlUrl);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch template: ${response.status}`);
-    }
-    
-    const content = await response.text();
+    // Read the template file
+    const content = await fs.readFile(templatePath, 'utf8');
     
     res.json({
       success: true,
@@ -74,7 +51,7 @@ router.get('/:id', async (req, res) => {
       content: content
     });
   } catch (error) {
-    console.error('Error reading template file from GCS:', error);
+    console.error('Error reading template file:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve template',
