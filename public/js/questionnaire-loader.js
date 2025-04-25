@@ -7,73 +7,74 @@ const storage = new Storage();
 const bucketName = 'project-relate'; // Your bucket name
 let questions = [];
 
-// GET endpoint to list all questions in the bucket
-router.get('/', async (req, res) => {
-  try {
-    console.log('Fetching questions from Google Cloud Storage bucket:', bucketName);
+// // GET endpoint to list all questions in the bucket
+// router.get('/', async (req, res) => {
+//   try {
+//     console.log('Fetching questions from Google Cloud Storage bucket:', bucketName);
     
-    // Create question objects manually based on the files you have in your bucket
+//     // Create question objects manually based on the files you have in your bucket
 
-    questions = [
-      {
-        id: 'question1',
-        name: 'Question 1',
-        url: `https://storage.googleapis.com/${bucketName}/questions/question1.html`
-      },
-      {
-        id: 'question2',
-        name: 'Template 2',
-        url: `https://storage.googleapis.com/${bucketName}/questions/question2.html`,
-      }
-    ];
+//     questions = [
+//       {
+//         id: 'question1',
+//         name: 'Question 1',
+//         url: `https://storage.googleapis.com/${bucketName}/questions/question1.html`
+//       },
+//       {
+//         id: 'question2',
+//         name: 'Template 2',
+//         url: `https://storage.googleapis.com/${bucketName}/questions/question2.html`,
+//       }
+//     ];
     
-    console.log(`Returning ${questions.length} questions`);
-    res.json({ success: true, questions });
-  } catch (error) {
-    console.error('Error fetching questions from GCS:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to fetch questions',
-      error: error.message
-    });
-  }
-});
+//     console.log(`Returning ${questions.length} questions`);
+//     res.json({ success: true, questions });
+//   } catch (error) {
+//     console.error('Error fetching questions from GCS:', error);
+//     res.status(500).json({ 
+//       success: false, 
+//       message: 'Failed to fetch questions',
+//       error: error.message
+//     });
+//   }
+// });
 
-// Route to get a specific question
-router.get('/:id', async (req, res) => {
-  const questionId = req.params.id;
+// // Route to get a specific question
+// router.get('/:id', async (req, res) => {
+//   const questionId = req.params.id;
   
-  try {
-    // Create the URL to the HTML file
-    const url = `https://storage.googleapis.com/${bucketName}/questions/${questionId}.html`;
+//   try {
+//     // Create the URL to the HTML file
+//     const url = `https://storage.googleapis.com/${bucketName}/questions/${questionId}.html`;
     
-    // Fetch the HTML content from GCS
-    const response = await fetch(url);
+//     // Fetch the HTML content from GCS
+//     const response = await fetch(url);
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch question: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`Failed to fetch question: ${response.status}`);
+//     }
     
-    const content = await response.text();
+//     const content = await response.text();
     
-    res.json({
-      success: true,
-      questionId,
-      content: content
-    });
-  } catch (error) {
-    console.error('Error reading question file from GCS:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve question',
-      error: error.message
-    });
-  }
-});
+//     res.json({
+//       success: true,
+//       questionId,
+//       content: content
+//     });
+//   } catch (error) {
+//     console.error('Error reading question file from GCS:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to retrieve question',
+//       error: error.message
+//     });
+//   }
+// });
 
-module.exports = router;
+// module.exports = router;
 
 async function InitQuestionnaire() {
+    let questionId = [1, 2]
         
     const questionContainer = document.getElementById('question-loader');
 
@@ -94,7 +95,7 @@ async function InitQuestionnaire() {
 }
 
 async function FetchQuestion(questionId) {
-    response = await fetch(`api/questions/${questionId}`);
+    response = await fetch(`https://storage.googleapis.com/${bucketName}/questions/${questionId}.html`);
     return await response.json();
 }
 
