@@ -1,68 +1,67 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const editor = document.getElementById('document-editor');
+// Update/create the prompt handling in the editor
+document.querySelector('.submit-button').addEventListener('click', function() {
+    const promptInput = document.querySelector('.prompt-input');
+    const responseOutput = document.querySelector('.response-output');
+    const prompt = promptInput.value;
     
-    // Format buttons
-    document.querySelectorAll('.menu-button').forEach(button => {
-        button.addEventListener('click', function() {
-            if (this.innerHTML === '<b>B</b>') {
-                document.execCommand('bold', false, null);                  // Bold
-            } else if (this.innerHTML === '<i>I</i>') {
-                document.execCommand('italic', false, null);                //Italic
-            } else if (this.innerHTML === '<u>U</u>') {
-                document.execCommand('underline', false, null);             // Underline
-            } else if (this.innerHTML === '–') {
-                document.execCommand('insertUnorderedList', false, null);   // Unordered list dash
-            } else if (this.innerHTML === '•') {
-                document.execCommand('insertUnorderedList', false, null);   // Unordered list dot
-            } else if (this.innerHTML === '1.') {
-                document.execCommand('insertOrderedList', false, null);     // Ordered list number
-            } else if (this.innerHTML === '⟳') {
-                document.execCommand('redo', false, null);                  // Redo
-            } else if (this.innerHTML === '⟲') {
-                document.execCommand('undo', false, null);                  // Undo
-            } else if (this.innerHTML === '←') {
-                document.execCommand('justifyLeft', false, null);            // Left align 
-            } else if (this.innerHTML === '↔') {
-                document.execCommand('justifyCenter', false, null);
-            } else if (this.innerHTML === '→') {
-                document.execCommand('justifyRight', false, null);
-            }
-            editor.focus();
-        });
-    });
-
-    document.getElementById('undo-button').addEventListener("click", function () {
-        document.execCommand('undo', false, null);
-    });
-    document.getElementById('redo-button').addEventListener("click", function () {
-        document.execCommand('redo', false, null);
-    });
+    if (!prompt) {
+      responseOutput.textContent = "Please enter a question or request for assistance with your resume.";
+      return;
+    }
+    
+    // Show loading state
+    responseOutput.textContent = "Analyzing your resume and generating a response...";
+    
+    // Get the current resume content
+    const resumeContent = document.getElementById('document-editor').innerHTML;
+    
+    // Call the AI assistant API
+    fetch('/api/ai/assistant/resume-assistant', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        resumeContent: resumeContent,
+        enhancedData: window.enhancedResumeData || null
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        responseOutput.textContent = data.response;
         
-    // Submit prompt button
-    document.querySelector('.submit-button').addEventListener('click', function() {
-        const promptInput = document.querySelector('.prompt-input');
-        const responseOutput = document.querySelector('.response-output');
-        
-        // Simple demo response
-        responseOutput.textContent = "Based on your resume, I suggest highlighting your technical skills more prominently. Would you like me to update the Skills section for you?";
-        
-        // Clear input after submission
-        promptInput.value = '';
+        // If the AI suggested edits and provided HTML, offer to apply them
+        if (data.suggestEdits && data.suggestedHTML) {
+          const applyButton = document.createElement('button');
+          applyButton.textContent = "Apply Changes";
+          applyButton.className = "apply-changes-btn";
+          applyButton.style.backgroundColor = "#4CAF50";
+          applyButton.style.color = "white";
+          applyButton.style.border = "none";
+          applyButton.style.padding = "8px 12px";
+          applyButton.style.marginTop = "10px";
+          applyButton.style.cursor = "pointer";
+          
+          applyButton.addEventListener('click', function() {
+            document.getElementById('document-editor').innerHTML = data.suggestedHTML;
+            this.remove(); // Remove the button after clicking
+            responseOutput.textContent += "\n\nChanges applied successfully!";
+          });
+          
+          responseOutput.appendChild(document.createElement('br'));
+          responseOutput.appendChild(applyButton);
+        }
+      } else {
+        responseOutput.textContent = "I couldn't process your request. Please try again with a different prompt.";
+      }
+      
+      // Clear input after submission
+      promptInput.value = '';
+    })
+    .catch(error => {
+      console.error('Error getting AI assistance:', error);
+      responseOutput.textContent = "There was an error processing your request. Please try again later.";
     });
-        
-    // Redo button
-    document.querySelector('.redo-button').addEventListener('click', function() {
-        const responseOutput = document.querySelector('.response-output');
-        responseOutput.textContent = "What specific areas of your resume would you like me to help with?";
-    });
-});
-
-// Show the info panel after a short delay
-setTimeout(function() {
-    document.getElementById('ai-info-panel').style.display = 'block';
-}, 2000);
-
-// Close button functionality
-document.getElementById('close-info').addEventListener('click', function() {
-    document.getElementById('ai-info-panel').style.display = 'none';
-});
+  });

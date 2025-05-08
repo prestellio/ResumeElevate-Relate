@@ -1,12 +1,18 @@
-// Template selection page initialization
 function initTemplateSelection() {
     // Configuration
     const apiEndpoint = '/api/templates'; // The endpoint we've defined in routes/templateRoutes.js
     
-    // Get career field from URL parameters
+    // Get parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
     const careerField = urlParams.get('career') || '';
     const resumeId = urlParams.get('resumeId') || '';
+    
+    if (!resumeId) {
+        console.error('No resumeId provided in URL parameters');
+        alert('Error: No resume ID provided. Please complete the questionnaire first.');
+        window.location.href = 'questionnaire.html';
+        return;
+    }
     
     // Add career field as a header
     const headerElement = document.createElement('h2');
@@ -18,8 +24,8 @@ function initTemplateSelection() {
         templateList.parentNode.insertBefore(headerElement, templateList);
     }
     
-    // Function to fetch images from our backend API
-    async function fetchImagesFromGCS() {
+    // Function to fetch templates
+    async function fetchTemplates() {
         if (templateList) {
             templateList.innerHTML = '<div class="loading">Loading templates...</div>';
         }
@@ -48,16 +54,12 @@ function initTemplateSelection() {
             let filteredTemplates = data.templates;
             
             if (careerField) {
-                // This is a simplified example. In a real implementation, your template data would include
-                // metadata about which career fields each template is suitable for.
-                // For now, we'll just filter based on template name/id containing the career field
+                // Filter templates by career field
                 filteredTemplates = data.templates.filter(template => {
-                    // Example: if a template has 'engineering' in the name/id, show it for engineering careers
                     const templateName = template.name.toLowerCase();
                     const templateId = template.id.toLowerCase();
                     return templateName.includes(careerField.toLowerCase()) || 
                            templateId.includes(careerField.toLowerCase()) ||
-                           // For demo purposes, ensure some templates are always shown
                            templateId.includes('general') || 
                            true; // Show all templates for now
                 });
@@ -77,8 +79,9 @@ function initTemplateSelection() {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <label>
-                            <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}" data-html-url="${template.htmlUrl || ''}">
+                            <img src="${template.url}" alt="${template.name}" class="preview-image" data-template-id="${template.id}">
                             <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
+                            <span>${template.name}</span>
                         </label>
                     `;
                     
@@ -89,12 +92,11 @@ function initTemplateSelection() {
             // Add click events to all template thumbnails
             document.querySelectorAll('.preview-image').forEach(img => {
                 img.addEventListener('click', function() {
-                    const fullsizeUrl = this.dataset.fullsize;
-                    const templateName = this.alt;
-                    showFullsizeTemplate(fullsizeUrl, templateName);
+                    const templateId = this.dataset.templateId;
+                    showFullsizeTemplate(this.src, this.alt);
                     
                     // Also select the radio button
-                    const radioBtn = this.nextElementSibling;
+                    const radioBtn = document.querySelector(`input[value="${templateId}"]`);
                     if (radioBtn) {
                         radioBtn.checked = true;
                     }
@@ -125,29 +127,21 @@ function initTemplateSelection() {
             continueButton.id = 'continue-to-editor';
             continueButton.className = 'continue-btn';
             continueButton.type = 'submit';
-            continueButton.style.backgroundColor = '#ff3860'; 
-            continueButton.style.color = 'white';
-            continueButton.style.fontWeight = 'bold';
-            continueButton.style.padding = '15px 30px';
-            continueButton.style.fontSize = '1.3rem';
-            continueButton.style.marginTop = '30px';
-            continueButton.style.marginBottom = '30px';
-            continueButton.style.cursor = 'pointer';
-            continueButton.textContent = '→ Use Selected Template (Click Here!) ←';
+            continueButton.textContent = 'Use Selected Template';
             
             // Add form submit handler 
             redirectForm.addEventListener('submit', function(event) {
-                console.log("Form submission triggered");
                 const selectedTemplate = document.querySelector('input[name="template-select"]:checked');
                 if (selectedTemplate) {
-                    console.log("Selected template:", selectedTemplate.value);
-                    console.log("Resume ID:", resumeId);
-                    
                     // Set the template value in the hidden input
                     document.getElementById('template-input').value = selectedTemplate.value;
                     
+                    // Show loading message
+                    continueButton.textContent = 'Generating Your Resume...';
+                    continueButton.disabled = true;
+                    
                     // Let the form submit naturally to editor.html
-                    console.log("Form submitting with:", this.action + "?" + new URLSearchParams(new FormData(this)).toString());
+                    console.log("Redirecting to editor with template:", selectedTemplate.value);
                 } else {
                     event.preventDefault();
                     alert('Please select a template first');
@@ -190,49 +184,14 @@ function initTemplateSelection() {
                 <img src="${imageUrl}" alt="${imageName}" id="fullsizeImage" class="fullsize-image">
                 <div class="image-title">${imageName}</div>
             `;
-            
-            // Add click event to open the modal with an even larger view
-            const fullsizeImage = document.getElementById('fullsizeImage');
-            if (fullsizeImage) {
-                fullsizeImage.addEventListener('click', function() {
-                    const modal = document.getElementById('imageModal');
-                    const modalImg = document.getElementById('modalImage');
-                    
-                    if (modal && modalImg) {
-                        modalImg.src = imageUrl;
-                        modal.style.display = 'flex';
-                    }
-                });
-            }
         }
     }
     
-    // Close the modal when clicking the X
-    const modalClose = document.getElementById('modalClose');
-    if (modalClose) {
-        modalClose.addEventListener('click', function() {
-            const imageModal = document.getElementById('imageModal');
-            if (imageModal) {
-                imageModal.style.display = 'none';
-            }
-        });
-    }
-    
-    // Close the modal when clicking outside the image
-    const imageModal = document.getElementById('imageModal');
-    if (imageModal) {
-        imageModal.addEventListener('click', function(event) {
-            if (event.target === this) {
-                this.style.display = 'none';
-            }
-        });
-    }
-    
     // Initial load of template images
-    fetchImagesFromGCS();
+    fetchTemplates();
 }
 
-// Initialize event listeners for template selection page
+// Initialize event listeners
 document.addEventListener('DOMContentLoaded', function() {
     // Template selection page initialization
     if (window.location.pathname.includes('templateselection.html')) {

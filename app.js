@@ -14,6 +14,7 @@ const port = 3000;
 const templateRoutes = require('./routes/templateRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const resumeAssistantRoutes = require('./routes/resumeAssistantRoutes');
+const { generateEnhancedResume } = require('./utils/resumeGenerator');
 
 // Middleware
 app.use(express.json());
@@ -41,6 +42,52 @@ app.use('/api/templates', templateRoutes);
 app.use('/api/ai/resume', aiRoutes);
 app.use('/api/ai/assistant', resumeAssistantRoutes);
 
+
+// API endpoint to generate a complete resume
+app.get('/api/generate-resume/:resumeId/:templateId', async (req, res) => {
+    try {
+        const { resumeId, templateId } = req.params;
+        
+        // Validate parameters
+        if (!resumeId || !templateId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing resumeId or templateId'
+            });
+        }
+        
+        // Get the template HTML
+        const templateResponse = await fetch(`http://localhost:${process.env.PORT || 3000}/api/templates/${templateId}`);
+        
+        if (!templateResponse.ok) {
+            throw new Error(`Failed to fetch template: ${templateResponse.status}`);
+        }
+        
+        const templateData = await templateResponse.json();
+        
+        if (!templateData.success || !templateData.content) {
+            throw new Error('Invalid template data');
+        }
+        
+        // Generate the enhanced resume
+        const result = await generateEnhancedResume(
+            resumeId,
+            templateId,
+            templateData.content
+        );
+        
+        res.json(result);
+    } catch (error) {
+        console.error('Error generating resume:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to generate resume',
+            error: error.message
+        });
+    }
+});
+
+
 // Add a test route to verify the server is working
 app.get('/api/test', (req, res) => {
     res.json({ message: 'API is working!' });
@@ -57,6 +104,33 @@ app.get('/api/get-answers', async (req, res) => {
     }
 });
 
+// Route to get all saved answers
+app.get('/api/answers', async (req, res) => {
+    try {
+        const answers = await Answer.find().sort({ createdAt: -1 }).limit(10);
+        res.json({ success: true, count: answers.length, answers });
+    } catch (error) {
+        console.error('Error fetching answers:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch answers' });
+    }
+});
+
+// Route to get a specific answer by ID
+app.get('/api/answers/:id', async (req, res) => {
+    try {
+        const answer = await Answer.findById(req.params.id);
+        if (!answer) {
+            return res.status(404).json({ success: false, message: 'Answer not found' });
+        }
+        res.json({ success: true, answer });
+    } catch (error) {
+        console.error('Error fetching answer:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch answer' });
+    }
+});
+
+
+
 // Get a specific questionnaire answer by ID
 app.get('/api/get-answer/:id', async (req, res) => {
     try {
@@ -70,6 +144,33 @@ app.get('/api/get-answer/:id', async (req, res) => {
         res.status(500).json({ success: false, error: 'Failed to fetch answer' });
     }
 });
+
+// Add this to your app.js or create a new route file
+
+app.get('/api/generate-complete-resume/:resumeId/:templateId', async (req, res) => {
+    try {
+      const { resumeId, templateId } = req.params;
+      
+      if (!resumeId || !templateId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing resumeId or templateId'
+        });
+      }
+      
+      const { generateCompleteResume } = require('./utils/resumeGenerator');
+      const result = await generateCompleteResume(resumeId, templateId);
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error generating complete resume:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to generate complete resume',
+        error: error.message
+      });
+    }
+  });
 
 // Get a questionnaire answer by matching resume data
 app.get('/api/get-answer-by-resume/:resumeId', async (req, res) => {
@@ -165,21 +266,143 @@ app.post('/submit-resume', async (req, res) => {
 // Route to save questionnaire answers
 app.post('/save-answers', async (req, res) => {
     try {
-        console.log("Received questionnaire data:", req.body);
+        // Log initial data without detailed formatting
+        console.log("Received initial questionnaire data");
 
         if (!req.body.answers) {
             return res.status(400).json({ error: "No answers received" });
         }
 
-        const newAnswers = new Answer(req.body.answers);
-        await newAnswers.save();
+        // Make sure education and projects arrays contain all the necessary fields
+        const answerData = req.body.answers;
+        
+        // Ensure education is properly formatted
+        if (answerData.education && Array.isArray(answerData.education)) {
+            answerData.education = answerData.education.map(edu => {
+                return {
+                    university: edu.university || '',
+                    degree: edu.degree || '',
+                    graduationDate: edu.graduationDate || '',
+                    gpa: edu.gpa || '',
+                    relevantCourses: edu.relevantCourses || ''
+                };
+            });
+        }
+        
+        // Ensure projects are properly formatted
+        if (answerData.projects && Array.isArray(answerData.projects)) {
+            answerData.projects = answerData.projects.map(proj => {
+                return {
+                    projectName: proj.projectName || '',
+                    dates: proj.dates || '',
+                    description: proj.description || ''
+                };
+            });
+        }
+        
+        // Ensure experience is properly formatted
+        if (answerData.experience && Array.isArray(answerData.experience)) {
+            answerData.experience = answerData.experience.map(exp => {
+                return {
+                    companyName: exp.companyName || '',
+                    jobTitle: exp.jobTitle || '',
+                    location: exp.location || '',
+                    dates: exp.dates || '',
+                    responsibilities: exp.responsibilities || ''
+                };
+            });
+        }
+        
+        // Ensure field-specific data is properly formatted
+        if (answerData.fieldSpecific) {
+            // Handle engineering field
+            if (answerData.fieldSpecific.engineering) {
+                answerData.fieldSpecific.engineering = {
+                    discipline: answerData.fieldSpecific.engineering.discipline || '',
+                    software: answerData.fieldSpecific.engineering.software || '',
+                    projects: answerData.fieldSpecific.engineering.projects || ''
+                };
+            }
+            
+            // Handle education field
+            if (answerData.fieldSpecific.education) {
+                answerData.fieldSpecific.education = {
+                    level: answerData.fieldSpecific.education.level || '',
+                    subjects: answerData.fieldSpecific.education.subjects || '',
+                    certifications: answerData.fieldSpecific.education.certifications || '',
+                    methods: answerData.fieldSpecific.education.methods || ''
+                };
+            }
+            
+            // Add similar blocks for other field-specific data if needed
+        }
 
-        console.log("Questionnaire answers saved successfully!");
-        res.status(201).json({ message: "Answers saved successfully!" });
+        // Now log the fully processed data with detailed formatting
+        console.log("Processed questionnaire data:");
+        console.log("- Career Field:", answerData.careerField);
+        console.log("- Personal Info:", JSON.stringify(answerData.personalInfo, null, 2));
+        console.log("- Education:", JSON.stringify(answerData.education, null, 2));
+        console.log("- Experience:", JSON.stringify(answerData.experience, null, 2));
+        console.log("- Projects:", JSON.stringify(answerData.projects, null, 2));
+        console.log("- Skills:", JSON.stringify(answerData.skills, null, 2));
+        console.log("- Field Specific:", JSON.stringify(answerData.fieldSpecific, null, 2));
+        console.log("- Summary:", answerData.summary);
+
+        // Create new answer document
+        const newAnswers = new Answer(answerData);
+        
+        // Log the document before saving
+        console.log("About to save document to MongoDB:", newAnswers);
+        
+        // Save to MongoDB and store the result
+        const savedAnswer = await newAnswers.save();
+        
+        // Log success with the document ID for verification
+        console.log("MongoDB save successful! Document ID:", savedAnswer._id);
+        console.log("Document saved to MongoDB:", savedAnswer);
+
+        // Return the ID to the client for reference
+        res.status(201).json({ 
+            message: "Answers saved successfully!", 
+            answerId: savedAnswer._id.toString()
+        });
 
     } catch (error) {
         console.error("Error saving questionnaire answers:", error);
-        res.status(500).json({ error: "Failed to save answers" });
+        
+        // Provide more detailed error information
+        if (error.name === 'ValidationError') {
+            // Mongoose validation error
+            console.error("MongoDB validation error:", error.message);
+            const validationErrors = {};
+            for (const field in error.errors) {
+                validationErrors[field] = error.errors[field].message;
+            }
+            return res.status(400).json({ 
+                error: "Validation error", 
+                details: validationErrors 
+            });
+        } else if (error.name === 'MongoServerError' && error.code === 11000) {
+            // Duplicate key error
+            console.error("MongoDB duplicate key error:", error);
+            return res.status(400).json({ 
+                error: "Duplicate entry", 
+                details: error.keyValue 
+            });
+        } else if (error.name === 'MongoNetworkError') {
+            // Network error - could not connect to MongoDB
+            console.error("MongoDB network error - check connection:", error);
+            return res.status(500).json({ 
+                error: "Database connection error", 
+                details: "Could not connect to the database" 
+            });
+        }
+        
+        // Generic error response
+        res.status(500).json({ 
+            error: "Failed to save answers", 
+            message: error.message 
+        });
     }
 });
 

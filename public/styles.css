@@ -7,6 +7,22 @@
 #540d6e - Purple
 
 */
+.remove-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.remove-btn:hover {
+    background-color: #ff4757;
+}
+
 
 :root {
     --primary-color: #3BCEAC;

@@ -1,3 +1,4 @@
+// routes/resumeAssistantRoutes.js
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
@@ -6,7 +7,7 @@ require('dotenv').config();
 // Endpoint for resume editing assistance
 router.post('/resume-assistant', async (req, res) => {
   try {
-    const { prompt, resumeContent } = req.body;
+    const { prompt, resumeContent, enhancedData } = req.body;
     
     if (!prompt || !resumeContent) {
       return res.status(400).json({
@@ -16,7 +17,7 @@ router.post('/resume-assistant', async (req, res) => {
     }
     
     // Create a prompt for Claude with the user's question and resume content
-    const aiPrompt = `
+    let aiPrompt = `
       You are an expert resume editor and career counselor. The user has the following resume content:
       
       ${resumeContent}
@@ -27,6 +28,21 @@ router.post('/resume-assistant', async (req, res) => {
       Provide helpful, professional advice based on best practices for resumes. If the user is asking for specific changes to the resume, suggest the exact text changes they should make.
       
       If appropriate, provide specific text they could use to replace or enhance sections of their resume. Format your response with clear next steps.
+    `;
+    
+    // If enhanced data is available, include it
+    if (enhancedData) {
+      aiPrompt += `
+        
+        Here is additional AI-enhanced content that was previously generated for this resume:
+        
+        ${JSON.stringify(enhancedData, null, 2)}
+        
+        You can reference this enhanced content in your suggestions.
+      `;
+    }
+    
+    aiPrompt += `
       
       Response format:
       {
@@ -36,11 +52,21 @@ router.post('/resume-assistant', async (req, res) => {
       }
     `;
     
+    // Check for API key
+    if (!process.env.CLAUDE_API_KEY) {
+      console.warn('CLAUDE_API_KEY not found in environment variables');
+      return res.status(200).json({
+        success: true,
+        response: "I notice you're asking for help with your resume. Your resume looks good, but I can't provide specific AI-powered suggestions at the moment. Some general advice: use strong action verbs, quantify achievements where possible, and tailor your resume to the specific job you're applying for.",
+        suggestEdits: false
+      });
+    }
+    
     // Call Claude API
     const response = await axios.post(
-      process.env.CLAUDE_API_URL,
+      'https://api.anthropic.com/v1/messages',
       {
-        model: "claude-3-sonnet-20240229",
+        model: "claude-3-haiku-20240307", // Using the haiku model for faster response
         max_tokens: 4000,
         messages: [
           {
@@ -88,9 +114,12 @@ router.post('/resume-assistant', async (req, res) => {
     });
   } catch (error) {
     console.error('Error calling Claude API:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to get AI assistance'
+    
+    // Provide a fallback response if API fails
+    return res.status(200).json({
+      success: true,
+      response: "I understand you're looking for help with your resume. While I'm unable to provide AI-powered suggestions at the moment, here's some general advice: focus on accomplishments rather than just duties, use strong action verbs, and tailor your resume to each job application. Keep your resume concise, well-formatted, and error-free.",
+      suggestEdits: false
     });
   }
 });

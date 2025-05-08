@@ -219,34 +219,86 @@ function initQuestionnaire() {
     }
 
     function collectEducationInfo() {
-        // Simple version - just collect the first education entry
-        resumeData.education = [{
-            university: document.getElementById('university').value,
-            degree: document.getElementById('degree').value,
-            graduationDate: document.getElementById('graduation-date').value,
-            gpa: document.getElementById('gpa').value,
-            relevantCourses: document.getElementById('relevant-courses').value
-        }];
+        // Get all education sections
+        const educationSections = document.querySelectorAll('#education-sections .section-container');
+        
+        resumeData.education = []; // Clear existing education data
+        
+        // Iterate through each education section
+        educationSections.forEach(section => {
+            // Find the inputs within this section specifically
+            const university = section.querySelector('input[id^="university"]')?.value || '';
+            const degree = section.querySelector('input[id^="degree"]')?.value || '';
+            const graduationDate = section.querySelector('input[id^="graduation-date"]')?.value || '';
+            const gpa = section.querySelector('input[id^="gpa"]')?.value || '';
+            const relevantCourses = section.querySelector('input[id^="relevant-courses"]')?.value || '';
+            
+            const edu = {
+                university,
+                degree,
+                graduationDate,
+                gpa,
+                relevantCourses
+            };
+            
+            resumeData.education.push(edu);
+        });
+        
+        console.log("Collected education data:", JSON.stringify(resumeData.education));
     }
-
+    
     function collectExperienceInfo() {
-        // Simple version - just collect the first experience entry
-        resumeData.experience = [{
-            companyName: document.getElementById('company-name').value,
-            jobTitle: document.getElementById('job-title').value,
-            location: document.getElementById('job-location').value,
-            dates: document.getElementById('employment-dates').value,
-            responsibilities: document.getElementById('job-responsibilities').value
-        }];
+        // Get all experience sections
+        const experienceSections = document.querySelectorAll('#experience-sections .section-container');
+        
+        resumeData.experience = []; // Clear existing experience data
+        
+        // Iterate through each experience section
+        experienceSections.forEach(section => {
+            // Find the inputs within this section specifically
+            const companyName = section.querySelector('input[id^="company-name"]')?.value || '';
+            const jobTitle = section.querySelector('input[id^="job-title"]')?.value || '';
+            const location = section.querySelector('input[id^="job-location"]')?.value || '';
+            const dates = section.querySelector('input[id^="employment-dates"]')?.value || '';
+            const responsibilities = section.querySelector('textarea[id^="job-responsibilities"]')?.value || '';
+            
+            const exp = {
+                companyName,
+                jobTitle,
+                location,
+                dates,
+                responsibilities
+            };
+            
+            resumeData.experience.push(exp);
+        });
+        
+        console.log("Collected experience data:", JSON.stringify(resumeData.experience));
     }
-
+    
     function collectProjectsInfo() {
-        // Simple version - just collect the first project entry
-        resumeData.projects = [{
-            projectName: document.getElementById('project-name').value,
-            dates: document.getElementById('project-dates').value,
-            description: document.getElementById('project-description').value
-        }];
+        // Get all project sections
+        const projectSections = document.querySelectorAll('#project-sections .section-container');
+        
+        resumeData.projects = []; // Clear existing projects data
+        
+        // Iterate through each project section
+        projectSections.forEach(section => {
+            // Find the inputs within this section specifically
+            const projectName = section.querySelector('input[id^="project-name"]')?.value || '';
+            const dates = section.querySelector('input[id^="project-dates"]')?.value || '';
+            const description = section.querySelector('textarea[id^="project-description"]')?.value || '';
+            
+            const proj = {
+                projectName,
+                dates,
+                description
+            };
+            
+            resumeData.projects.push(proj);
+        });
+        
+        console.log("Collected projects data:", JSON.stringify(resumeData.projects));
     }
 
     function collectSkillsInfo() {
@@ -325,97 +377,127 @@ function initQuestionnaire() {
         resumeData.summary = document.getElementById('professional-summary').value;
     }
 
-    // UPDATED: Enhanced version of submitQuestionnaire with AI integration
-    function submitQuestionnaire() {
-        // Show loading state
-        const submitButton = document.getElementById('submit-resume');
-        submitButton.innerHTML = '<span class="spinner"></span>Processing...';
-        submitButton.disabled = true;
+// UPDATED: Enhanced version of submitQuestionnaire with AI integration
+function submitQuestionnaire() {
+    // Collect all data before submitting
+    collectPersonalInfo();
+    collectEducationInfo();
+    collectExperienceInfo();
+    collectProjectsInfo();
+    collectSkillsInfo();
+    
+    // If a field-specific collection function exists for the selected career field, call it
+    if (resumeData.careerField === 'engineering' && typeof collectEngineeringInfo === 'function') {
+        collectEngineeringInfo();
+    } else if (resumeData.careerField === 'business' && typeof collectBusinessInfo === 'function') {
+        collectBusinessInfo();
+    } else if (resumeData.careerField === 'technology' && typeof collectTechnologyInfo === 'function') {
+        collectTechnologyInfo();
+    } else if (resumeData.careerField === 'healthcare' && typeof collectHealthcareInfo === 'function') {
+        collectHealthcareInfo();
+    } else if (resumeData.careerField === 'education' && typeof collectEducationFieldInfo === 'function') {
+        collectEducationFieldInfo();
+    } else if (resumeData.careerField === 'arts' && typeof collectArtsInfo === 'function') {
+        collectArtsInfo();
+    } else if (resumeData.careerField === 'science' && typeof collectScienceInfo === 'function') {
+        collectScienceInfo();
+    }
+    
+    // Collect summary information
+    collectSummary();
+
+    // Log the complete data to verify it's all there
+    console.log('Complete resume data to submit:', JSON.stringify(resumeData, null, 2));
+    
+    // Show loading state
+    const submitButton = document.getElementById('submit-resume');
+    submitButton.innerHTML = '<span class="spinner"></span>Processing...';
+    submitButton.disabled = true;
+    
+    // Save key information in session storage for easy access
+    sessionStorage.setItem('userName', resumeData.personalInfo.name || '');
+    sessionStorage.setItem('userEmail', resumeData.personalInfo.email || '');
+    sessionStorage.setItem('userPhone', resumeData.personalInfo.phone || '');
+    sessionStorage.setItem('userLocation', resumeData.personalInfo.location || '');
+    sessionStorage.setItem('careerField', resumeData.careerField || '');
+    
+    // First save the user's answers to the database
+    fetch('/save-answers', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ answers: resumeData })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Answers saved successfully');
         
-        // Save key information in session storage for easy access
-        sessionStorage.setItem('userName', resumeData.personalInfo.name || '');
-        sessionStorage.setItem('userEmail', resumeData.personalInfo.email || '');
-        sessionStorage.setItem('userPhone', resumeData.personalInfo.phone || '');
-        sessionStorage.setItem('userLocation', resumeData.personalInfo.location || '');
-        sessionStorage.setItem('careerField', resumeData.careerField || '');
-        
-        // First save the user's answers to the database
-        fetch('/save-answers', {
+        // Now send data to Claude AI for enhancement
+        console.log('Sending data to Claude AI endpoint...');
+        return fetch('/api/ai/resume/generate-resume', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ answers: resumeData })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Answers saved successfully');
+            body: JSON.stringify(resumeData)
+        });
+    })
+    .then(response => {
+        console.log('AI response status:', response.status);
+        if (!response.ok) {
+            console.error('AI response not OK:', response.statusText);
+            throw new Error('AI enhancement failed');
+        }
+        return response.json();
+    })
+    .then(aiData => {
+        console.log('AI data received:', aiData);
+        
+        // Store enhanced content in session storage for use in template selection
+        if (aiData.success && aiData.enhancedContent) {
+            sessionStorage.setItem('enhancedContent', JSON.stringify(aiData.enhancedContent));
             
-            // Now send data to Claude AI for enhancement
-            console.log('Sending data to Claude AI endpoint...');
-            return fetch('/api/ai/resume/generate-resume', {
+            // Now submit to the resume endpoint with the enhanced content
+            return fetch('/submit-resume', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(resumeData)
+                body: JSON.stringify(convertToResumeFormat(resumeData, aiData.enhancedContent))
             });
-        })
-        .then(response => {
-            console.log('AI response status:', response.status);
-            if (!response.ok) {
-                console.error('AI response not OK:', response.statusText);
-                throw new Error('AI enhancement failed');
-            }
-            return response.json();
-        })
-        .then(aiData => {
-            console.log('AI data received:', aiData);
-            
-            // Store enhanced content in session storage for use in template selection
-            if (aiData.success && aiData.enhancedContent) {
-                sessionStorage.setItem('enhancedContent', JSON.stringify(aiData.enhancedContent));
-                
-                // Now submit to the resume endpoint with the enhanced content
-                return fetch('/submit-resume', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(convertToResumeFormat(resumeData, aiData.enhancedContent))
-                });
-            } else {
-                throw new Error('Invalid AI response format');
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Resume generation failed');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.resumeId) {
-                // Add the career field to the redirect URL
-                window.location.href = `templateselection.html?resumeId=${data.resumeId}&career=${resumeData.careerField}`;
-            } else {
-                alert('Error: Failed to generate resume. Please try again.');
-                submitButton.innerHTML = 'Generate Resume';
-                submitButton.disabled = false;
-            }
-        })
-        .catch(error => {
-            console.error('Error submitting questionnaire:', error);
-            alert('Error: Failed to submit questionnaire. Please try again.');
+        } else {
+            throw new Error('Invalid AI response format');
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Resume generation failed');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.resumeId) {
+            // Add the career field to the redirect URL
+            window.location.href = `templateselection.html?resumeId=${data.resumeId}&career=${resumeData.careerField}`;
+        } else {
+            alert('Error: Failed to generate resume. Please try again.');
             submitButton.innerHTML = 'Generate Resume';
             submitButton.disabled = false;
-        });
-    }
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting questionnaire:', error);
+        alert('Error: Failed to submit questionnaire. Please try again.');
+        submitButton.innerHTML = 'Generate Resume';
+        submitButton.disabled = false;
+    });
+}
 
     // NEW: Function to convert data to the resume format
     function convertToResumeFormat(questionnaire, enhancedContent) {
@@ -499,15 +581,81 @@ function initQuestionnaire() {
 
     // Section addition functions
     function addEducationSection() {
-        alert("This function will add another education section. For simplicity, this feature is disabled in the demo.");
+        const educationSections = document.getElementById('education-sections');
+        const existingSections = educationSections.querySelectorAll('.section-container');
+        const newSection = existingSections[0].cloneNode(true);
+        
+        // Clear input values in the new section
+        newSection.querySelectorAll('input, textarea').forEach(input => {
+            input.value = '';
+            // Update IDs to make them unique
+            if (input.id) {
+                input.id = input.id + '-' + (existingSections.length + 1);
+            }
+        });
+        
+        // Add a remove button to the new section
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = 'Remove';
+        removeBtn.className = 'remove-btn';
+        removeBtn.onclick = function() {
+            this.parentNode.remove();
+        };
+        newSection.appendChild(removeBtn);
+        
+        educationSections.appendChild(newSection);
     }
 
     function addExperienceSection() {
-        alert("This function will add another experience section. For simplicity, this feature is disabled in the demo.");
+        const experienceSections = document.getElementById('experience-sections');
+        const existingSections = experienceSections.querySelectorAll('.section-container');
+        const newSection = existingSections[0].cloneNode(true);
+        
+        // Clear input values in the new section
+        newSection.querySelectorAll('input, textarea').forEach(input => {
+            input.value = '';
+            // Update IDs to make them unique
+            if (input.id) {
+                input.id = input.id + '-' + (existingSections.length + 1);
+            }
+        });
+        
+        // Add a remove button to the new section
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = 'Remove';
+        removeBtn.className = 'remove-btn';
+        removeBtn.onclick = function() {
+            this.parentNode.remove();
+        };
+        newSection.appendChild(removeBtn);
+        
+        experienceSections.appendChild(newSection);
     }
 
     function addProjectSection() {
-        alert("This function will add another project section. For simplicity, this feature is disabled in the demo.");
+        const projectSections = document.getElementById('project-sections');
+        const existingSections = projectSections.querySelectorAll('.section-container');
+        const newSection = existingSections[0].cloneNode(true);
+        
+        // Clear input values in the new section
+        newSection.querySelectorAll('input, textarea').forEach(input => {
+            input.value = '';
+            // Update IDs to make them unique
+            if (input.id) {
+                input.id = input.id + '-' + (existingSections.length + 1);
+            }
+        });
+        
+        // Add a remove button to the new section
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = 'Remove';
+        removeBtn.className = 'remove-btn';
+        removeBtn.onclick = function() {
+            this.parentNode.remove();
+        };
+        newSection.appendChild(removeBtn);
+        
+        projectSections.appendChild(newSection);
     }
 }
 
