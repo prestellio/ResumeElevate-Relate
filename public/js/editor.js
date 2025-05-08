@@ -27,52 +27,52 @@ document.addEventListener('DOMContentLoaded', function() {
 */
 async function loadTemplateWithResumeData(templateId, resumeId) {
   try {
-      console.log(`Loading template ${templateId} with resume data ${resumeId}`);
+    console.log(`Loading template ${templateId} with resume data ${resumeId}`);
+    
+    // Show loading state
+    const editor = document.getElementById('document-editor');
+    if (editor) {
+      editor.innerHTML = '<div style="text-align:center; padding:50px;"><h3>Generating your AI-enhanced resume...</h3><p>Please wait while we prepare your professional resume...</p></div>';
+    }
+    
+    // Call our API to generate the enhanced resume
+    const response = await fetch(`/api/generate-complete-resume/${resumeId}/${templateId}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to generate resume: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error('Failed to generate resume');
+    }
+    
+    // Insert the populated HTML into the editor
+    if (editor) {
+      editor.innerHTML = data.html;
+      console.log('Editor populated with AI-enhanced content');
       
-      // Show loading state
-      const editor = document.getElementById('document-editor');
-      if (editor) {
-          editor.innerHTML = '<div style="text-align:center; padding:50px;"><h3>Generating your AI-enhanced resume...</h3><p>Please wait while we prepare your professional resume...</p></div>';
+      // Store the enhanced content for the AI assistant to use
+      window.enhancedResumeData = data.enhancedContent;
+      
+      // Show success message in the response output
+      const responseOutput = document.querySelector('.response-output');
+      if (responseOutput) {
+        responseOutput.textContent = "✓ Your resume has been created with AI-enhanced content. Feel free to make additional edits or ask for specific improvements in the prompt area.";
       }
-      
-      // Call our API to generate the enhanced resume
-      const response = await fetch(`/api/generate-resume/${resumeId}/${templateId}`);
-      
-      if (!response.ok) {
-          throw new Error(`Failed to generate resume: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-          throw new Error('Failed to generate resume');
-      }
-      
-      // Insert the populated HTML into the editor
-      if (editor) {
-          editor.innerHTML = data.html;
-          console.log('Editor populated with AI-enhanced content');
-          
-          // Store the enhanced content for the AI assistant to use
-          window.enhancedResumeData = data.enhancedContent;
-          
-          // Show success message in the response output
-          const responseOutput = document.querySelector('.response-output');
-          if (responseOutput) {
-              responseOutput.textContent = "✓ Your resume has been created with AI-enhanced content. Feel free to make additional edits or ask for specific improvements in the prompt area.";
-          }
-      } else {
-          console.error('Editor element not found');
-      }
-      
+    } else {
+      console.error('Editor element not found');
+    }
+    
   } catch (error) {
-      console.error('Error loading template with user data:', error);
-      alert(`Could not load the selected template with your data. Using default template instead.`);
-      
-      // Fallback to default template
-      if (templateId) {
-          loadTemplateFromGCS(templateId);
-      }
+    console.error('Error loading template with user data:', error);
+    alert(`Could not load the selected template with your data. Using default template instead.`);
+    
+    // Fallback to default template
+    if (templateId) {
+      loadTemplateFromGCS(templateId);
+    }
   }
 }
 
