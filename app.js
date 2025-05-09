@@ -69,6 +69,109 @@ app.get('/api/generate-complete-resume/:resumeId/:templateId', async (req, res) 
   }
 });
 
+app.get('/api/debug/integration-flow', async (req, res) => {
+  try {
+    const { resumeId, templateId } = req.query;
+    
+    if (!resumeId || !templateId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing resumeId or templateId'
+      });
+    }
+    
+    // Check if resume data exists
+    let resumeExists = false;
+    let resumeData = null;
+    try {
+      const resume = await Resume.findById(resumeId);
+      resumeExists = !!resume;
+      if (resume) {
+        resumeData = {
+          id: resume._id,
+          name: resume.name,
+          email: resume.email,
+          hasEducation: !!resume.education,
+          hasExperiences: Array.isArray(resume.experiences) && resume.experiences.length > 0,
+          hasProjects: Array.isArray(resume.projects) && resume.projects.length > 0
+        };
+      }
+    } catch (e) {
+      console.error('Error checking resume:', e);
+    }
+    
+    // Check if template exists
+    let templateExists = false;
+    let templateContent = '';
+    try {
+      const templateResponse = await axios.get(`http://localhost:${process.env.PORT || 3000}/api/templates/${templateId}`);
+      templateExists = templateResponse.data.success;
+      templateContent = templateResponse.data.content ? 
+                       (templateResponse.data.content.length + ' chars') : 'Empty';
+    } catch (e) {
+      console.error('Error checking template:', e);
+    }
+    
+    // Check Claude API
+    let claudeApiWorking = false;
+    try {
+      const { testClaudeApi } = require('./utils/testClaudeApi');
+      claudeApiWorking = await testClaudeApi();
+    } catch (e) {
+      console.error('Error testing Claude API:', e);
+    }
+    
+    // Check for matching questionnaire
+    let questionnaireData = null;
+    if (resumeExists && resumeData) {
+      try {
+        const answer = await Answer.findOne({
+          $or: [
+            { 'personalInfo.name': resumeData.name, 'personalInfo.email': resumeData.email },
+            { 'personalInfo.email': resumeData.email }
+          ]
+        });
+        
+        if (answer) {
+          questionnaireData = {
+            id: answer._id,
+            hasData: true,
+            careerField: answer.careerField,
+            createdAt: answer.createdAt
+          };
+        }
+      } catch (e) {
+        console.error('Error finding questionnaire:', e);
+      }
+    }
+    
+    res.json({
+      success: true,
+      diagnostics: {
+        timestamp: new Date().toISOString(),
+        resumeExists,
+        resumeData,
+        templateExists,
+        templateContent,
+        claudeApiWorking,
+        questionnaireData,
+        environmentVariables: {
+          hasMongoUri: !!process.env.MONGODB_URI,
+          hasClaudeApiKey: !!process.env.CLAUDE_API_KEY,
+          hasGcsBucket: !!process.env.GCS_BUCKET_NAME,
+          nodeEnv: process.env.NODE_ENV,
+          port: process.env.PORT || 3000
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error in integration flow debug:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 
 // Add a test route to verify the server is working
 app.get('/api/test', (req, res) => {

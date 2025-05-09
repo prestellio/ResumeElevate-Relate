@@ -1,7 +1,10 @@
 // public/js/templateselection.js
+// Improved implementation with better UI feedback and error handling
+
 // Global variables to track templates and current selection
 let allTemplates = [];
 let currentTemplateIndex = 0;
+let templateLoadTimeout = null;
 
 function initTemplateSelection() {
     // Configuration
@@ -12,10 +15,14 @@ function initTemplateSelection() {
     const careerField = urlParams.get('career') || '';
     const resumeId = urlParams.get('resumeId') || '';
     
+    console.log('Template selection initialized with:', { careerField, resumeId });
+    
     if (!resumeId) {
         console.error('No resumeId provided in URL parameters');
-        alert('Error: No resume ID provided. Please complete the questionnaire first.');
-        window.location.href = 'questionnaire.html';
+        showError('Error: No resume ID provided. Please complete the questionnaire first.');
+        setTimeout(() => {
+            window.location.href = 'questionnaire.html';
+        }, 3000);
         return;
     }
     
@@ -32,11 +39,44 @@ function initTemplateSelection() {
     setupNavigationControls();
     
     // Function to fetch templates
+    fetchTemplates();
+    
+    // Set a timeout to show fallback options if API is slow
+    templateLoadTimeout = setTimeout(() => {
+        const templateGrid = document.getElementById('template-grid');
+        if (templateGrid && !templateGrid.querySelector('.template-item')) {
+            console.log('Template loading timeout reached - showing fallback options');
+            document.getElementById('fallback-selection').style.display = 'block';
+        }
+    }, 8000);
+    
     async function fetchTemplates() {
         console.log('Fetching templates from API...');
         const templateGrid = document.getElementById('template-grid');
         
+        if (!templateGrid) {
+            console.error('Template grid not found in DOM');
+            return;
+        }
+        
         try {
+            // Show loading indicator
+            templateGrid.innerHTML = '<div class="loading">Loading templates<span class="loading-dots">...</span></div>';
+            
+            // Add animated dots to loading message
+            const loadingDotsInterval = setInterval(() => {
+                const loadingDots = document.querySelector('.loading-dots');
+                if (loadingDots) {
+                    if (loadingDots.textContent === '...') {
+                        loadingDots.textContent = '.';
+                    } else {
+                        loadingDots.textContent += '.';
+                    }
+                } else {
+                    clearInterval(loadingDotsInterval);
+                }
+            }, 500);
+            
             // Fetch templates from our backend API
             console.log(`Requesting templates from ${apiEndpoint}`);
             const response = await fetch(apiEndpoint);
@@ -52,21 +92,26 @@ function initTemplateSelection() {
                 throw new Error('Invalid response format from API');
             }
             
+            // Clear the loading interval
+            clearInterval(loadingDotsInterval);
+            
             // Remove loading message
             templateGrid.innerHTML = '';
+            
+            // Clear the fallback timeout since we got a response
+            if (templateLoadTimeout) {
+                clearTimeout(templateLoadTimeout);
+                templateLoadTimeout = null;
+            }
             
             // Use the templates returned by the API
             allTemplates = data.templates;
             
             if (allTemplates.length === 0) {
                 templateGrid.innerHTML = '<div class="error-message">No templates found. Please try a different career field or contact support.</div>';
+                document.getElementById('fallback-selection').style.display = 'block';
                 return;
             }
-            
-            // Log each template for debugging
-            allTemplates.forEach(template => {
-                console.log(`Creating template element: ${template.id} with URL: ${template.url}`);
-            });
             
             // Create template cards in the grid
             allTemplates.forEach((template, index) => {
@@ -80,8 +125,11 @@ function initTemplateSelection() {
                     templateCard.classList.add('selected');
                 }
                 
+                // Prepare for image error handling
+                const imgUrl = template.url || '../images/RelateLogo_proto_square.png';
+                
                 templateCard.innerHTML = `
-                    <img src="${template.url}" alt="${template.name}" 
+                    <img src="${imgUrl}" alt="${template.name}" 
                         onerror="this.onerror=null; this.src='../images/RelateLogo_proto_square.png'; 
                         console.error('Failed to load template image: ${template.url}');">
                     <div class="template-name">
@@ -104,25 +152,11 @@ function initTemplateSelection() {
             // Set up form submission
             const templateForm = document.getElementById('template-form');
             
-            templateForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                if (allTemplates.length > 0) {
-                    // Set the template value in the hidden input
-                    document.getElementById('template-input').value = allTemplates[currentTemplateIndex].id;
-                    
-                    // Show loading message
-                    const continueBtn = document.getElementById('continue-btn');
-                    continueBtn.textContent = 'Generating Your Resume...';
-                    continueBtn.disabled = true;
-                    
-                    // Submit the form
-                    console.log("Redirecting to editor with template:", allTemplates[currentTemplateIndex].id);
-                    this.submit();
-                } else {
-                    alert('Please select a template first');
-                }
-            });
+            if (templateForm) {
+                templateForm.addEventListener('submit', handleTemplateSubmission);
+            } else {
+                console.error('Template form not found in DOM');
+            }
             
             // Show the first template by default
             selectTemplate(0);
@@ -142,6 +176,50 @@ function initTemplateSelection() {
             
             // Show fallback template selection
             document.getElementById('fallback-selection').style.display = 'block';
+        }
+    }
+    
+    // Handle template form submission
+    function handleTemplateSubmission(event) {
+        event.preventDefault();
+        
+        if (allTemplates.length > 0) {
+            // Add visual loading state
+            const continueBtn = document.getElementById('continue-btn');
+            continueBtn.innerHTML = '<span class="spinner"></span> Generating Your AI Resume...';
+            continueBtn.disabled = true;
+            
+            // Add a loading overlay
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="loading-message">
+                    <div class="spinner-large"></div>
+                    <p>Please wait while we generate your resume with AI enhancement...</p>
+                    <p class="loading-subtitle">This may take up to 30 seconds</p>
+                </div>
+            `;
+            document.body.appendChild(loadingOverlay);
+            
+            // Set the template value in the hidden input
+            document.getElementById('template-input').value = allTemplates[currentTemplateIndex].id;
+            
+            // Set 15-second timeout in case of backend failure
+            setTimeout(() => {
+                console.log("Timeout reached, proceeding anyway");
+                this.submit();
+            }, 15000);
+            
+            // Log what we're submitting
+            console.log("Redirecting to editor with:", {
+                templateId: allTemplates[currentTemplateIndex].id,
+                resumeId: document.getElementById('resumeId-input').value
+            });
+            
+            // Submit the form
+            this.submit();
+        } else {
+            alert('Please select a template first');
         }
     }
     
@@ -194,7 +272,7 @@ function initTemplateSelection() {
         // Update the template indicator
         const templateIndicator = document.getElementById('template-indicator');
         if (templateIndicator) {
-            templateIndicator.textContent = `Template ${index + 1}`;
+            templateIndicator.textContent = `Template ${index + 1} of ${allTemplates.length}`;
         }
         
         // Update hidden input
@@ -236,9 +314,21 @@ function initTemplateSelection() {
             nextBtn.disabled = currentTemplateIndex === allTemplates.length - 1;
         }
     }
+}
+
+// Function to show error messages
+function showError(message) {
+    const templateGrid = document.getElementById('template-grid');
+    if (templateGrid) {
+        templateGrid.innerHTML = `
+            <div class="error-message">
+                <p>${message}</p>
+            </div>
+        `;
+    }
     
-    // Initial load of template images
-    fetchTemplates();
+    // Also show in an alert for better visibility
+    alert(message);
 }
 
 // Initialize event listeners
@@ -292,18 +382,25 @@ function setupFallbackTemplates() {
             button.className = 'fallback-button';
             button.textContent = template.name;
             
+            // Add loading state when clicked
+            button.addEventListener('click', function(e) {
+                this.innerHTML = '<span class="spinner"></span> Loading...';
+                this.style.pointerEvents = 'none';
+                
+                // Add loading overlay
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'loading-overlay';
+                loadingOverlay.innerHTML = `
+                    <div class="loading-message">
+                        <div class="spinner-large"></div>
+                        <p>Please wait while we generate your resume with AI enhancement...</p>
+                        <p class="loading-subtitle">This may take up to 30 seconds</p>
+                    </div>
+                `;
+                document.body.appendChild(loadingOverlay);
+            });
+            
             fallbackContainer.appendChild(button);
         });
     }
-    
-    // Check for template loading issues after 5 seconds
-    setTimeout(function() {
-        const templateItems = document.querySelectorAll('.template-item');
-        const loadingElement = document.querySelector('.loading');
-        
-        if (templateItems.length === 0 && loadingElement) {
-            console.log('No templates loaded after timeout, showing fallback options');
-            document.getElementById('fallback-selection').style.display = 'block';
-        }
-    }, 5000);
 }

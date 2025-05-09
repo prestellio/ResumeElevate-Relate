@@ -9,12 +9,16 @@ const { Storage } = require('@google-cloud/storage');
 let storage;
 try {
   storage = new Storage();
+  console.log('Google Cloud Storage initialized successfully');
 } catch (error) {
   console.warn('Google Cloud Storage initialization failed:', error.message);
   console.warn('Falling back to local file system for templates');
 }
 
 const bucketName = process.env.GCS_BUCKET_NAME || 'project-relate';
+
+// Template cache to avoid repeated fetches
+const TEMPLATE_CACHE = {};
 
 // GET endpoint to list all templates
 router.get('/', async (req, res) => {
@@ -67,9 +71,12 @@ router.get('/', async (req, res) => {
               htmlUrl: htmlUrl
             };
           });
+          
+          console.log('Successfully created template objects from GCS');
         }
       } catch (gcsError) {
         console.error('Error fetching from GCS:', gcsError);
+        console.error('Stack trace:', gcsError.stack);
       }
     }
     
@@ -86,6 +93,7 @@ router.get('/', async (req, res) => {
         }
         
         const templateFiles = fs.readdirSync(templatesDir);
+        console.log(`Found ${templateFiles.length} files in templates directory`);
         
         // Filter for image and HTML files
         const imageTemplates = templateFiles.filter(file => 
@@ -96,7 +104,7 @@ router.get('/', async (req, res) => {
           file.endsWith('.html')
         );
         
-        console.log(`Found ${imageTemplates.length} local template images`);
+        console.log(`Found ${imageTemplates.length} local template images and ${htmlTemplates.length} HTML templates`);
         
         // If no image templates found, create fallback templates
         if (imageTemplates.length === 0) {
@@ -119,8 +127,21 @@ router.get('/', async (req, res) => {
               name: 'Technical Layout',
               url: '/images/template3-thumbnail.jpg',
               htmlUrl: '/templates/template3.html'
+            },
+            {
+              id: 'template4',
+              name: 'Creative Resume',
+              url: '/images/template4-thumbnail.jpg',
+              htmlUrl: '/templates/template4.html'
+            },
+            {
+              id: 'template5',
+              name: 'Minimal Style',
+              url: '/images/template5-thumbnail.jpg',
+              htmlUrl: '/templates/template5.html'
             }
           ];
+          console.log('Created fallback template objects');
         } else {
           // Map image files to template objects
           templates = imageTemplates.map(file => {
@@ -134,9 +155,11 @@ router.get('/', async (req, res) => {
               htmlUrl: htmlFile ? `/templates/${htmlFile}` : ''
             };
           });
+          console.log('Created template objects from local files');
         }
       } catch (localError) {
         console.error('Error with local templates:', localError);
+        console.error('Stack trace:', localError.stack);
         
         // Create fallback templates if all else fails
         templates = [
@@ -159,6 +182,7 @@ router.get('/', async (req, res) => {
             htmlUrl: ''
           }
         ];
+        console.log('Created emergency fallback template objects');
       }
     }
     
@@ -166,6 +190,7 @@ router.get('/', async (req, res) => {
     res.json({ success: true, templates });
   } catch (error) {
     console.error('Error fetching templates:', error);
+    console.error('Stack trace:', error.stack);
     res.status(500).json({ 
       success: false, 
       message: 'Failed to fetch templates',
@@ -181,7 +206,19 @@ router.get('/:id', async (req, res) => {
   console.log(`Fetching template with ID: ${templateId}`);
   
   try {
+    // Check cache first
+    if (TEMPLATE_CACHE[templateId]) {
+      console.log(`Using cached template for ${templateId}`);
+      return res.json({
+        success: true,
+        templateId,
+        content: TEMPLATE_CACHE[templateId],
+        source: 'cache'
+      });
+    }
+    
     let templateContent = null;
+    let source = 'unknown';
     
     // First try Google Cloud Storage
     if (storage) {
@@ -204,10 +241,12 @@ router.get('/:id', async (req, res) => {
               console.log(`Found template in GCS at: ${gcsPath}`);
               const [content] = await file.download();
               templateContent = content.toString('utf8');
+              source = 'gcs';
               break;
             }
           } catch (pathError) {
             // Continue to try next path
+            console.log(`GCS path ${gcsPath} not found or error:`, pathError.message);
           }
         }
       } catch (gcsError) {
@@ -225,9 +264,11 @@ router.get('/:id', async (req, res) => {
         ];
         
         for (const localPath of possibleLocalPaths) {
+          console.log(`Checking local path: ${localPath}`);
           if (fs.existsSync(localPath)) {
             console.log(`Found template locally at: ${localPath}`);
             templateContent = fs.readFileSync(localPath, 'utf8');
+            source = 'local';
             break;
           }
         }
@@ -238,17 +279,28 @@ router.get('/:id', async (req, res) => {
     
     // If still not found, use default template
     if (!templateContent) {
-      console.log(`Template not found anywhere, using default template`);
+      console.log(`Template not found anywhere, using default template for ${templateId}`);
       templateContent = getDefaultTemplate();
+      source = 'default';
     }
+    
+    // Validate template content format
+    if (templateContent && !templateContent.includes('<div') && !templateContent.includes('<h1')) {
+      console.warn('Template content may be invalid - missing expected HTML tags');
+    }
+    
+    // Cache the template for future requests
+    TEMPLATE_CACHE[templateId] = templateContent;
     
     return res.json({
       success: true,
       templateId,
-      content: templateContent
+      content: templateContent,
+      source: source
     });
   } catch (error) {
     console.error(`Error processing template ${templateId}:`, error);
+    console.error('Stack trace:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve template',

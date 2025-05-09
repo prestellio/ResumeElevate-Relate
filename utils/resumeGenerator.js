@@ -22,12 +22,16 @@ async function generateCompleteResume(resumeId, templateId) {
       throw new Error(`Resume with ID ${resumeId} not found`);
     }
     
+    console.log(`Found resume data for ${resumeData.name || 'unknown'}`);
+    
     // Step 2: Get template HTML from API
     const templateResponse = await axios.get(`http://localhost:${process.env.PORT || 3000}/api/templates/${templateId}`);
     
     if (!templateResponse.data.success || !templateResponse.data.content) {
       throw new Error('Failed to retrieve template content');
     }
+    
+    console.log(`Successfully retrieved template with ID ${templateId}, length: ${templateResponse.data.content.length}`);
     
     const templateHtml = templateResponse.data.content;
     
@@ -37,6 +41,7 @@ async function generateCompleteResume(resumeId, templateId) {
     return result;
   } catch (error) {
     console.error('Error generating complete resume:', error);
+    console.error('Stack trace:', error.stack);
     throw error;
   }
 }
@@ -56,7 +61,7 @@ async function generateEnhancedResume(resumeId, templateId, templateHtml) {
       throw new Error(`Resume with ID ${resumeId} not found`);
     }
     
-    console.log(`Found resume data for ${resumeData.name}`);
+    console.log(`Found resume data for ${resumeData.name || 'unknown'}`);
     
     // Step 2: Try to get questionnaire answers that match this resume
     let questionnaireData = null;
@@ -85,11 +90,24 @@ async function generateEnhancedResume(resumeId, templateId, templateHtml) {
     // Step 3: Combine data from both sources
     const combinedData = createCombinedData(resumeData, questionnaireData);
     
+    console.log('Combined data created with fields:', Object.keys(combinedData).join(', '));
+    
     // Step 4: Get AI enhancement from Claude
+    console.log('Requesting AI enhancement from Claude...');
     const enhancedContent = await enhanceWithClaudeAI(combinedData);
+    
+    console.log('Received AI enhancement, applying to template...');
+    console.log('Enhancement summary:', {
+      hasSummary: !!enhancedContent.summary,
+      experienceCount: enhancedContent.experience?.length || 0,
+      educationCount: enhancedContent.education?.length || 0,
+      skillsCount: Object.keys(enhancedContent.skills || {}).length
+    });
     
     // Step 5: Apply the enhanced content to the template
     const populatedHTML = populateTemplate(templateHtml, resumeData, enhancedContent);
+    
+    console.log(`Successfully populated template, HTML length: ${populatedHTML.length}`);
     
     return {
       success: true,
@@ -100,6 +118,7 @@ async function generateEnhancedResume(resumeId, templateId, templateHtml) {
     };
   } catch (error) {
     console.error('Error generating enhanced resume:', error);
+    console.error('Stack trace:', error.stack);
     throw error;
   }
 }
@@ -184,6 +203,12 @@ function createCombinedData(resumeData, questionnaireData) {
 async function enhanceWithClaudeAI(resumeData) {
   try {
     console.log('Calling Claude API for resume enhancement...');
+    console.log('User data summary:', {
+      name: resumeData.personalInfo?.name,
+      field: resumeData.careerField,
+      experienceCount: resumeData.experience?.length || 0,
+      projectCount: resumeData.projects?.length || 0
+    });
     
     // Check for API key
     if (!process.env.CLAUDE_API_KEY) {
@@ -191,51 +216,71 @@ async function enhanceWithClaudeAI(resumeData) {
       return generateFallbackContent(resumeData);
     }
     
+    if (!process.env.CLAUDE_API_KEY.startsWith('sk-')) {
+      console.warn('CLAUDE_API_KEY appears to be in invalid format');
+      return generateFallbackContent(resumeData);
+    }
+    
     // Generate prompt for Claude
     const prompt = generatePrompt(resumeData);
     
-    // Make API request to Claude
-    const response = await axios.post(
-      'https://api.anthropic.com/v1/messages',
-      {
-        model: "claude-3-haiku-20240307", // Use the fastest model for quicker response
-        max_tokens: 4000,
-        messages: [
-          { role: "user", content: prompt }
-        ]
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.CLAUDE_API_KEY,
-          'anthropic-version': '2023-06-01'
+    try {
+      // Make API request to Claude
+      const response = await axios.post(
+        'https://api.anthropic.com/v1/messages',
+        {
+          model: "claude-3-haiku-20240307", // Use the fastest model for quicker response
+          max_tokens: 4000,
+          messages: [
+            { role: "user", content: prompt }
+          ]
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.CLAUDE_API_KEY,
+            'anthropic-version': '2023-06-01'
+          },
+          timeout: 30000 // 30 second timeout
         }
+      );
+      
+      // Extract and parse Claude's response
+      const aiResponseText = response.data.content[0].text;
+      console.log('Claude API response received, length:', aiResponseText.length);
+      
+      // Try to find a JSON object in the response
+      const jsonMatch = aiResponseText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          const parsedData = JSON.parse(jsonMatch[0]);
+          console.log('Successfully parsed AI response');
+          return parsedData;
+        } catch (parseError) {
+          console.error('Error parsing JSON from Claude response:', parseError);
+          console.log('JSON match found but failed to parse, content snippet:', 
+                     jsonMatch[0].substring(0, 200) + '...');
+          return generateFallbackContent(resumeData);
+        }
+      } else {
+        console.warn('No JSON found in Claude response, content snippet:', 
+                   aiResponseText.substring(0, 200) + '...');
+        return generateFallbackContent(resumeData);
       }
-    );
-    
-    // Extract and parse Claude's response
-    const aiResponseText = response.data.content[0].text;
-    
-    // Try to find a JSON object in the response
-    const jsonMatch = aiResponseText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsedData = JSON.parse(jsonMatch[0]);
-      console.log('Successfully parsed AI response');
-      return parsedData;
-    } else {
-      console.warn('No JSON found in Claude response');
-      throw new Error('Invalid response format from Claude API');
+    } catch (error) {
+      console.error('Error calling Claude API:', error.message);
+      
+      // Log more details for troubleshooting
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
+      
+      // Return fallback content
+      return generateFallbackContent(resumeData);
     }
   } catch (error) {
-    console.error('Error calling Claude API:', error.message);
-    
-    // Log more details for troubleshooting
-    if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response data:', error.response.data);
-    }
-    
-    // Return fallback content
+    console.error('Error in enhanceWithClaudeAI:', error);
     return generateFallbackContent(resumeData);
   }
 }
@@ -361,20 +406,39 @@ function generatePrompt(resumeData) {
 function generateFallbackContent(resumeData) {
   console.log('Generating fallback enhanced content');
   
+  // Ensure we can process both objects and arrays safely
+  const makeArray = (item) => {
+    if (Array.isArray(item)) return item;
+    if (typeof item === 'string') return item.split(',').map(s => s.trim());
+    return [];
+  };
+  
+  // Ensure we have an array with at least one item
+  const ensureArray = (arr, fallback) => {
+    if (Array.isArray(arr) && arr.length > 0) return arr;
+    return [fallback];
+  };
+  
   // Create a basic enhanced version of the resume data
-  return {
+  const enhancedContent = {
     summary: resumeData.summary || 
       `Results-driven ${resumeData.careerField || 'professional'} with a proven track record of delivering high-quality solutions. Combines technical expertise with excellent communication skills to collaborate effectively with cross-functional teams.`,
     
-    education: resumeData.education.map(edu => ({
+    education: resumeData.education ? ensureArray(resumeData.education, {}).map(edu => ({
       university: edu.university || "University",
       degree: edu.degree || "Degree",
       graduationDate: edu.graduationDate || "Graduation Date",
       gpa: edu.gpa || "GPA",
       relevantCourses: edu.relevantCourses || "Relevant coursework in key areas of study"
-    })),
+    })) : [{
+      university: "University",
+      degree: "Degree Program",
+      graduationDate: "2024",
+      gpa: "3.5/4.0",
+      relevantCourses: "Relevant coursework in key areas of study"
+    }],
     
-    experience: resumeData.experience.map(exp => ({
+    experience: resumeData.experience ? ensureArray(resumeData.experience, {}).map(exp => ({
       companyName: exp.companyName || "Company",
       jobTitle: exp.jobTitle || "Position",
       location: exp.location || "Location",
@@ -386,27 +450,31 @@ function generateFallbackContent(resumeData) {
           `Collaborated with cross-functional teams to achieve objectives`,
           `Implemented innovative solutions to complex problems`
         ]
-    })),
+    })) : [{
+      companyName: "Company Name",
+      jobTitle: "Professional Position",
+      location: "City, State",
+      dates: "2022 - Present",
+      responsibilities: [
+        "Led key initiatives that improved processes and outcomes",
+        "Collaborated with cross-functional teams to achieve objectives",
+        "Implemented innovative solutions to complex problems"
+      ]
+    }],
     
     skills: {
-      technical: typeof resumeData.skills?.technical === 'string' ? 
-        resumeData.skills.technical.split(',').map(s => s.trim()) : 
+      technical: makeArray(resumeData.skills?.technical) || 
         ["Technical skill 1", "Technical skill 2", "Technical skill 3"],
       
-      soft: typeof resumeData.skills?.soft === 'string' ? 
-        resumeData.skills.soft.split(',').map(s => s.trim()) : 
+      soft: makeArray(resumeData.skills?.soft) || 
         ["Communication", "Problem-solving", "Teamwork", "Leadership"],
       
-      languages: typeof resumeData.skills?.languages === 'string' ? 
-        resumeData.skills.languages.split(',').map(s => s.trim()) : 
-        [],
+      languages: makeArray(resumeData.skills?.languages) || [],
       
-      certifications: typeof resumeData.skills?.certifications === 'string' ? 
-        resumeData.skills.certifications.split(',').map(s => s.trim()) : 
-        []
+      certifications: makeArray(resumeData.skills?.certifications) || []
     },
     
-    projects: resumeData.projects.map(proj => ({
+    projects: resumeData.projects ? ensureArray(resumeData.projects, {}).map(proj => ({
       projectName: proj.projectName || "Project",
       dates: proj.dates || "Dates",
       description: typeof proj.description === 'string' ? 
@@ -415,17 +483,50 @@ function generateFallbackContent(resumeData) {
           "Developed solution that addressed key business needs",
           "Implemented using industry best practices and modern technologies"
         ]
-    }))
+    })) : [{
+      projectName: "Project Name",
+      dates: "2023",
+      description: [
+        "Developed solution that addressed key business needs",
+        "Implemented using industry best practices and modern technologies"
+      ]
+    }]
   };
+  
+  return enhancedContent;
 }
 
 /**
  * Populates template HTML with user data and AI-enhanced content
  */
 function populateTemplate(templateHtml, userData, enhancedContent) {
+  // Add debug logging
+  console.log('Populating template with:', {
+    templateLength: templateHtml.length,
+    userData: `${userData.name || 'Unknown'} (${userData.email || 'no email'})`,
+    enhancedContentAvailable: !!enhancedContent
+  });
+  
   // Create a DOM document from the HTML string
   const dom = new JSDOM(templateHtml);
   const document = dom.window.document;
+  
+  // Log template structure for debugging
+  console.log('Template HTML structure:', {
+    h1Count: document.querySelectorAll('h1').length,
+    sectionCount: document.querySelectorAll('.section,.resume-section').length,
+    experienceItemsCount: document.querySelectorAll('.resume-item,.experience-item').length
+  });
+  
+  // First, ensure enhancedContent is properly formatted
+  if (typeof enhancedContent === 'string') {
+    try {
+      enhancedContent = JSON.parse(enhancedContent);
+      console.log('Parsed enhancedContent from string');
+    } catch(e) {
+      console.error('Failed to parse enhancedContent from string:', e);
+    }
+  }
   
   // Helper function to update text content if element exists
   const updateElementText = (selector, content) => {
@@ -443,19 +544,28 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
   
   // Helper function to create list items from array
   const createListItems = (items) => {
-    if (!items || !Array.isArray(items)) return '';
+    if (!items || !Array.isArray(items)) {
+      // Handle if items is a string
+      if (typeof items === 'string') {
+        // Split by newlines or commas
+        const splitItems = items.split(/[,\n]+/).map(s => s.trim()).filter(s => s);
+        return splitItems.map(item => `<li>${item}</li>`).join('');
+      }
+      return '';
+    }
     return items.map(item => `<li>${item}</li>`).join('');
   };
   
-  // Update personal information - try multiple possible selectors
-  const nameSelectors = ['h1', '.name', '.resume-header h1', 'header h1', '.header .name'];
-  const contactSelectors = ['.contact', '.resume-header p', 'header p', '.contact-info'];
+  // More robust selector matching for name/contact fields
+  const nameSelectors = ['h1', '[class*="name"]', '[id*="name"]', '.resume-header h1', 'header h1', '.header h1'];
+  const contactSelectors = ['[class*="contact"]', '.resume-header p', 'header p', '.contact-info', '.header p'];
   
   // Try each selector for name
   let nameUpdated = false;
   for (const selector of nameSelectors) {
     if (updateElementText(selector, userData.name)) {
       nameUpdated = true;
+      console.log(`Updated name using selector: ${selector}`);
       break;
     }
   }
@@ -464,7 +574,10 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
   if (!nameUpdated) {
     const h1Elements = document.querySelectorAll('h1');
     if (h1Elements.length > 0) {
-      h1Elements[0].textContent = userData.name;
+      h1Elements[0].textContent = userData.name || 'Your Name';
+      console.log('Updated name using first h1 element');
+    } else {
+      console.warn('Could not find any element to update name');
     }
   }
   
@@ -485,9 +598,11 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
           element.textContent.includes('phone') || 
           element.textContent.includes('123') || 
           element.textContent.includes('example.com') ||
-          element.textContent.includes('City, State')) {
+          element.textContent.includes('City, State') ||
+          element.textContent.includes('youremail')) {
         element.textContent = contactLine;
         contactUpdated = true;
+        console.log(`Updated contact info using selector: ${selector}`);
         break;
       }
     }
@@ -502,14 +617,20 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
       contactElement.className = 'contact';
       contactElement.textContent = contactLine;
       nameElement.parentNode.insertBefore(contactElement, nameElement.nextSibling);
+      console.log('Added new contact element after name');
+    } else {
+      console.warn('Could not find any element to update contact info');
     }
   }
   
   // Update professional summary - find the section by keyword
-  const sectionTitles = document.querySelectorAll('.section-title, h2, .resume-section-title');
+  const sectionTitles = document.querySelectorAll('.section-title, h2, .resume-section-title, .section h2');
+  let summaryUpdated = false;
+  
   for (const element of sectionTitles) {
     if (element.textContent.toLowerCase().includes('summary') || 
-        element.textContent.toLowerCase().includes('profile')) {
+        element.textContent.toLowerCase().includes('profile') ||
+        element.textContent.toLowerCase().includes('objective')) {
       // Found the summary section, now find the paragraph to update
       const parentSection = element.closest('.section') || 
                           element.closest('.resume-section') || 
@@ -519,10 +640,16 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
         const summaryParagraph = parentSection.querySelector('p');
         if (summaryParagraph) {
           summaryParagraph.textContent = enhancedContent.summary || userData.summary || 'Professional summary';
+          summaryUpdated = true;
+          console.log('Updated summary section');
         }
       }
       break;
     }
+  }
+  
+  if (!summaryUpdated) {
+    console.warn('Could not find summary section to update');
   }
   
   // Update education section
@@ -548,101 +675,89 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
         if (text.includes('university name') || 
             text.includes('degree') || 
             text.includes('gpa') ||
-            text.includes('graduation')) {
+            text.includes('graduation') ||
+            // Common placeholder text
+            text.includes('your degree') ||
+            text.includes('your university')) {
           shouldClearItems = true;
           break;
         }
       }
       
-      if (shouldClearItems) {
+      if (shouldClearItems && educationItems.length > 0) {
+        console.log('Clearing placeholder education items');
         for (const item of educationItems) {
           item.remove();
         }
         
         // Create new education section based on the first education item structure
-        if (educationItems.length > 0) {
-          const templateItem = educationItems[0].cloneNode(true);
+        const templateItem = educationItems[0].cloneNode(true);
+        
+        // Add enhanced education items
+        enhancedContent.education.forEach(edu => {
+          const educationItem = templateItem.cloneNode(true);
           
-          // Add enhanced education items
-          enhancedContent.education.forEach(edu => {
-            const educationItem = templateItem.cloneNode(true);
-            
-            // Try to update university name, degree, etc.
-            const universityElements = educationItem.querySelectorAll('.resume-item-title, .entry-title');
-            if (universityElements.length > 0) {
-              universityElements[0].textContent = edu.university;
-            }
-            
-            const degreeElements = educationItem.querySelectorAll('.resume-item-subtitle');
-            if (degreeElements.length > 0) {
-              degreeElements[0].textContent = edu.degree;
-            } else {
-              // If no subtitle element, try to find a div with text that looks like a degree
-              const divs = educationItem.querySelectorAll('div');
-              for (const div of divs) {
-                if (div.textContent.includes('Bachelor') || 
-                    div.textContent.includes('Master') ||
-                    div.textContent.includes('Degree')) {
-                  div.textContent = edu.degree;
-                  break;
-                }
-              }
-            }
-            
-            // Update graduation date
-            const dateElements = educationItem.querySelectorAll('.resume-item-date');
-            if (dateElements.length > 0) {
-              dateElements[0].textContent = edu.graduationDate;
-            }
-            
-            // Update GPA
-            const gpaElements = educationItem.querySelectorAll('div');
-            for (const div of gpaElements) {
-              if (div.textContent.includes('GPA')) {
-                div.textContent = `GPA: ${edu.gpa}`;
+          // Try to update university name, degree, etc.
+          const universityElements = educationItem.querySelectorAll('.resume-item-title, .entry-title');
+          if (universityElements.length > 0) {
+            universityElements[0].textContent = edu.university || 'University';
+          }
+          
+          const degreeElements = educationItem.querySelectorAll('.resume-item-subtitle');
+          if (degreeElements.length > 0) {
+            degreeElements[0].textContent = edu.degree || 'Degree';
+          } else {
+            // If no subtitle element, try to find a div with text that looks like a degree
+            const divs = educationItem.querySelectorAll('div');
+            for (const div of divs) {
+              if (div.textContent.includes('Bachelor') || 
+                  div.textContent.includes('Master') ||
+                  div.textContent.includes('Degree')) {
+                div.textContent = edu.degree || 'Degree';
                 break;
               }
             }
-            
-            // Update courses in a list if one exists
-            const ulElements = educationItem.querySelectorAll('ul');
-            if (ulElements.length > 0) {
-              ulElements[0].innerHTML = `<li>Relevant coursework: ${edu.relevantCourses}</li>`;
+          }
+          
+          // Update graduation date
+          const dateElements = educationItem.querySelectorAll('.resume-item-date');
+          if (dateElements.length > 0) {
+            dateElements[0].textContent = edu.graduationDate || 'Graduation Date';
+          }
+          
+          // Update GPA
+          const gpaElements = educationItem.querySelectorAll('div');
+          for (const div of gpaElements) {
+            if (div.textContent.includes('GPA')) {
+              div.textContent = `GPA: ${edu.gpa || '3.5/4.0'}`;
+              break;
             }
-            
-            educationSection.appendChild(educationItem);
-          });
-        } else {
-          // Create a simple education item
-          enhancedContent.education.forEach(edu => {
-            const educationItem = document.createElement('div');
-            educationItem.className = 'resume-item';
-            educationItem.innerHTML = `
-              <div class="resume-item-header">
-                <div class="resume-item-title">${edu.university}</div>
-                <div class="resume-item-date">${edu.graduationDate}</div>
-              </div>
-              <div class="resume-item-subtitle">${edu.degree}</div>
-              <div>GPA: ${edu.gpa}</div>
-              <ul>
-                <li>Relevant coursework: ${edu.relevantCourses}</li>
-              </ul>
-            `;
-            educationSection.appendChild(educationItem);
-          });
-        }
+          }
+          
+          // Update courses in a list if one exists
+          const ulElements = educationItem.querySelectorAll('ul');
+          if (ulElements.length > 0) {
+            ulElements[0].innerHTML = `<li>Relevant coursework: ${edu.relevantCourses || 'Core curriculum'}</li>`;
+          }
+          
+          educationSection.appendChild(educationItem);
+        });
+        console.log('Added enhanced education items');
       } else {
         // Just update existing education item content
+        console.log('Updating existing education content');
         const universityElements = educationSection.querySelectorAll('.resume-item-title, .entry-title');
         if (universityElements.length > 0 && enhancedContent.education[0]) {
-          universityElements[0].textContent = enhancedContent.education[0].university;
+          universityElements[0].textContent = enhancedContent.education[0].university || 'University';
         }
         
         const degreeElements = educationSection.querySelectorAll('.resume-item-subtitle');
         if (degreeElements.length > 0 && enhancedContent.education[0]) {
-          degreeElements[0].textContent = enhancedContent.education[0].degree;
+          degreeElements[0].textContent = enhancedContent.education[0].degree || 'Degree';
         }
       }
+    } else {
+      console.warn('Could not find education section to update');
     }
   }
   
@@ -671,7 +786,10 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
         if (text.includes('job title') || 
             text.includes('company name') || 
             text.includes('position') ||
-            text.includes('responsibilities')) {
+            text.includes('responsibilities') ||
+            // Common placeholder text
+            text.includes('your company') ||
+            text.includes('your position')) {
           shouldClearItems = true;
           break;
         }
@@ -679,64 +797,48 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
       
       if (shouldClearItems && experienceItems.length > 0) {
         // Clear out existing placeholder items
+        console.log('Clearing placeholder experience items');
         for (const item of experienceItems) {
           item.remove();
         }
         
         // Add enhanced experience items
-        if (experienceItems.length > 0) {
-          // Use the first item as a template
-          const templateItem = experienceItems[0].cloneNode(true);
+        // Use the first item as a template
+        const templateItem = experienceItems[0].cloneNode(true);
+        
+        enhancedContent.experience.forEach(exp => {
+          const experienceItem = templateItem.cloneNode(true);
           
-          enhancedContent.experience.forEach(exp => {
-            const experienceItem = templateItem.cloneNode(true);
-            
-            // Update job title
-            const titleElements = experienceItem.querySelectorAll('.resume-item-title, .experience-title, .entry-title');
-            if (titleElements.length > 0) {
-              titleElements[0].textContent = exp.jobTitle;
-            }
-            
-            // Update company and location
-            const subtitleElements = experienceItem.querySelectorAll('.resume-item-subtitle');
-            if (subtitleElements.length > 0) {
-              subtitleElements[0].textContent = `${exp.companyName}, ${exp.location}`;
-            }
-            
-            // Update dates
-            const dateElements = experienceItem.querySelectorAll('.resume-item-date');
-            if (dateElements.length > 0) {
-              dateElements[0].textContent = exp.dates;
-            }
-            
-            // Update responsibilities
-            const ulElements = experienceItem.querySelectorAll('ul');
-            if (ulElements.length > 0) {
-              ulElements[0].innerHTML = createListItems(exp.responsibilities);
-            }
-            
-            experienceSection.appendChild(experienceItem);
-          });
-        } else {
-          // Create simple experience items
-          enhancedContent.experience.forEach(exp => {
-            const experienceItem = document.createElement('div');
-            experienceItem.className = 'resume-item';
-            experienceItem.innerHTML = `
-              <div class="resume-item-header">
-                <div class="resume-item-title">${exp.jobTitle}</div>
-                <div class="resume-item-date">${exp.dates}</div>
-              </div>
-              <div class="resume-item-subtitle">${exp.companyName}, ${exp.location}</div>
-              <ul>
-                ${createListItems(exp.responsibilities)}
-              </ul>
-            `;
-            experienceSection.appendChild(experienceItem);
-          });
-        }
-      } else {
+          // Update job title
+          const titleElements = experienceItem.querySelectorAll('.resume-item-title, .experience-title, .entry-title');
+          if (titleElements.length > 0) {
+            titleElements[0].textContent = exp.jobTitle || 'Job Title';
+          }
+          
+          // Update company and location
+          const subtitleElements = experienceItem.querySelectorAll('.resume-item-subtitle');
+          if (subtitleElements.length > 0) {
+            subtitleElements[0].textContent = `${exp.companyName || 'Company'}, ${exp.location || 'Location'}`;
+          }
+          
+          // Update dates
+          const dateElements = experienceItem.querySelectorAll('.resume-item-date');
+          if (dateElements.length > 0) {
+            dateElements[0].textContent = exp.dates || 'Dates';
+          }
+          
+          // Update responsibilities
+          const ulElements = experienceItem.querySelectorAll('ul');
+          if (ulElements.length > 0) {
+            ulElements[0].innerHTML = createListItems(exp.responsibilities);
+          }
+          
+          experienceSection.appendChild(experienceItem);
+        });
+        console.log('Added enhanced experience items');
+      } else if (experienceItems.length > 0) {
         // Just update existing content
+        console.log('Updating existing experience content');
         const experienceArray = Array.from(experienceItems);
         enhancedContent.experience.forEach((exp, index) => {
           if (index < experienceArray.length) {
@@ -745,19 +847,19 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
             // Update job title
             const titleElements = item.querySelectorAll('.resume-item-title, .experience-title, .entry-title');
             if (titleElements.length > 0) {
-              titleElements[0].textContent = exp.jobTitle;
+              titleElements[0].textContent = exp.jobTitle || 'Job Title';
             }
             
             // Update company and location
             const subtitleElements = item.querySelectorAll('.resume-item-subtitle');
             if (subtitleElements.length > 0) {
-              subtitleElements[0].textContent = `${exp.companyName}, ${exp.location}`;
+              subtitleElements[0].textContent = `${exp.companyName || 'Company'}, ${exp.location || 'Location'}`;
             }
             
             // Update dates
             const dateElements = item.querySelectorAll('.resume-item-date');
             if (dateElements.length > 0) {
-              dateElements[0].textContent = exp.dates;
+              dateElements[0].textContent = exp.dates || 'Dates';
             }
             
             // Update responsibilities
@@ -767,7 +869,28 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
             }
           }
         });
+      } else {
+        console.warn('No experience items found to update or use as templates');
+        // Create simple experience items
+        enhancedContent.experience.forEach(exp => {
+          const experienceItem = document.createElement('div');
+          experienceItem.className = 'resume-item';
+          experienceItem.innerHTML = `
+            <div class="resume-item-header">
+              <div class="resume-item-title">${exp.jobTitle || 'Job Title'}</div>
+              <div class="resume-item-date">${exp.dates || 'Dates'}</div>
+            </div>
+            <div class="resume-item-subtitle">${exp.companyName || 'Company'}, ${exp.location || 'Location'}</div>
+            <ul>
+              ${createListItems(exp.responsibilities)}
+            </ul>
+          `;
+          experienceSection.appendChild(experienceItem);
+        });
+        console.log('Created new experience items from scratch');
       }
+    } else {
+      console.warn('Could not find experience section to update');
     }
   }
   
@@ -820,8 +943,13 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
       
       if (skillsHtml) {
         skillsList.innerHTML = skillsHtml;
+        console.log('Updated skills list');
       }
+    } else {
+      console.warn('No skills list found to update');
     }
+  } else {
+    console.warn('Could not find skills section to update');
   }
   
   // Update projects section
@@ -845,65 +973,52 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
       const text = item.textContent.toLowerCase();
       if (text.includes('project name') || 
           text.includes('project description') || 
-          text.includes('description point')) {
+          text.includes('description point') ||
+          // Common placeholder text
+          text.includes('your project')) {
         shouldClearItems = true;
         break;
       }
     }
     
-    if (shouldClearItems) {
+    if (shouldClearItems && projectItems.length > 0) {
       // Clear existing items
+      console.log('Clearing placeholder project items');
       for (const item of projectItems) {
         item.remove();
       }
       
       // Add enhanced project items
-      if (projectItems.length > 0) {
-        // Use the first item as a template
-        const templateItem = projectItems[0].cloneNode(true);
+      // Use the first item as a template
+      const templateItem = projectItems[0].cloneNode(true);
+      
+      enhancedContent.projects.forEach(project => {
+        const projectItem = templateItem.cloneNode(true);
         
-        enhancedContent.projects.forEach(project => {
-          const projectItem = templateItem.cloneNode(true);
-          
-          // Update project title
-          const titleElements = projectItem.querySelectorAll('.resume-item-title, .project-title, .entry-title');
-          if (titleElements.length > 0) {
-            titleElements[0].textContent = project.projectName;
-          }
-          
-          // Update dates
-          const dateElements = projectItem.querySelectorAll('.resume-item-date');
-          if (dateElements.length > 0) {
-            dateElements[0].textContent = project.dates;
-          }
-          
-          // Update description
-          const ulElements = projectItem.querySelectorAll('ul');
-          if (ulElements.length > 0) {
-            ulElements[0].innerHTML = createListItems(project.description);
-          }
-          
-          projectsSection.appendChild(projectItem);
-        });
-      } else {
-        // Create simple project items
-        enhancedContent.projects.forEach(project => {
-          const projectItem = document.createElement('div');
-          projectItem.className = 'resume-item';
-          projectItem.innerHTML = `
-            <div class="resume-item-header">
-              <div class="resume-item-title">${project.projectName}</div>
-              <div class="resume-item-date">${project.dates}</div>
-            </div>
-            <ul>
-              ${createListItems(project.description)}
-            </ul>
-          `;
-          projectsSection.appendChild(projectItem);
-        });
-      }
-    } else {
+        // Update project title
+        const titleElements = projectItem.querySelectorAll('.resume-item-title, .project-title, .entry-title');
+        if (titleElements.length > 0) {
+          titleElements[0].textContent = project.projectName || 'Project Name';
+        }
+        
+        // Update dates
+        const dateElements = projectItem.querySelectorAll('.resume-item-date');
+        if (dateElements.length > 0) {
+          dateElements[0].textContent = project.dates || 'Dates';
+        }
+        
+        // Update description
+        const ulElements = projectItem.querySelectorAll('ul');
+        if (ulElements.length > 0) {
+          ulElements[0].innerHTML = createListItems(project.description);
+        }
+        
+        projectsSection.appendChild(projectItem);
+      });
+      console.log('Added enhanced project items');
+    } else if (projectItems.length > 0) {
       // Just update existing content
+      console.log('Updating existing project content');
       const projectArray = Array.from(projectItems);
       enhancedContent.projects.forEach((project, index) => {
         if (index < projectArray.length) {
@@ -912,13 +1027,13 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
           // Update project title
           const titleElements = item.querySelectorAll('.resume-item-title, .project-title, .entry-title');
           if (titleElements.length > 0) {
-            titleElements[0].textContent = project.projectName;
+            titleElements[0].textContent = project.projectName || 'Project Name';
           }
           
           // Update dates
           const dateElements = item.querySelectorAll('.resume-item-date');
           if (dateElements.length > 0) {
-            dateElements[0].textContent = project.dates;
+            dateElements[0].textContent = project.dates || 'Dates';
           }
           
           // Update description
@@ -928,7 +1043,27 @@ function populateTemplate(templateHtml, userData, enhancedContent) {
           }
         }
       });
+    } else {
+      console.warn('No project items found to update or use as templates');
+      // Create simple project items
+      enhancedContent.projects.forEach(project => {
+        const projectItem = document.createElement('div');
+        projectItem.className = 'resume-item';
+        projectItem.innerHTML = `
+          <div class="resume-item-header">
+            <div class="resume-item-title">${project.projectName || 'Project Name'}</div>
+            <div class="resume-item-date">${project.dates || 'Dates'}</div>
+          </div>
+          <ul>
+            ${createListItems(project.description)}
+          </ul>
+        `;
+        projectsSection.appendChild(projectItem);
+      });
+      console.log('Created new project items from scratch');
     }
+  } else if (enhancedContent.projects && enhancedContent.projects.length > 0) {
+    console.warn('No projects section found but have project data');
   }
   
   // Return the serialized HTML
