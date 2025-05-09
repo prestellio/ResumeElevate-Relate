@@ -31,8 +31,8 @@ function initTemplateSelection() {
         }
         
         try {
-            // Fetch templates from our backend API
-            const response = await fetch(apiEndpoint);
+            // Fetch templates from our backend API with the career field as a query parameter
+            const response = await fetch(`${apiEndpoint}?career=${careerField}`);
             
             if (!response.ok) {
                 throw new Error(`API responded with status: ${response.status}`);
@@ -50,36 +50,26 @@ function initTemplateSelection() {
                 templateList.innerHTML = '';
             }
             
-            // Filter templates based on career field if specified
-            let filteredTemplates = data.templates;
+            // Use the templates returned by the API
+            const templates = data.templates;
             
-            if (careerField) {
-                // Filter templates by career field
-                filteredTemplates = data.templates.filter(template => {
-                    const templateName = template.name.toLowerCase();
-                    const templateId = template.id.toLowerCase();
-                    return templateName.includes(careerField.toLowerCase()) || 
-                           templateId.includes(careerField.toLowerCase()) ||
-                           templateId.includes('general') || 
-                           true; // Show all templates for now
-                });
-            }
-            
-            // Create template options from the filtered templates
-            if (filteredTemplates.length === 0) {
+            if (templates.length === 0) {
                 if (templateList) {
-                    templateList.innerHTML = '<p>No templates found for this career field. Please select from our general templates:</p>';
+                    templateList.innerHTML = '<p>No templates found. Please try a different career field or contact support.</p>';
                 }
-                // If no templates match the filter, show all templates
-                filteredTemplates = data.templates;
+                return;
             }
             
             if (templateList) {
-                filteredTemplates.forEach(template => {
+                templates.forEach(template => {
                     const listItem = document.createElement('li');
+                    
+                    // Use the URL provided by the API directly
+                    const imageUrl = template.url;
+                    
                     listItem.innerHTML = `
                         <label>
-                            <img src="${template.url}" alt="${template.name}" class="preview-image" data-template-id="${template.id}">
+                            <img src="${imageUrl}" alt="${template.name}" class="preview-image" data-template-id="${template.id}">
                             <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
                             <span>${template.name}</span>
                         </label>
@@ -157,9 +147,10 @@ function initTemplateSelection() {
             }
             
             // Show the first template by default if any exist
-            if (filteredTemplates.length > 0) {
-                const firstTemplate = filteredTemplates[0];
+            if (templates.length > 0) {
+                const firstTemplate = templates[0];
                 showFullsizeTemplate(firstTemplate.url, firstTemplate.name);
+                
                 // Select the first radio button
                 const firstRadio = document.querySelector('input[name="template-select"]');
                 if (firstRadio) {
@@ -169,8 +160,21 @@ function initTemplateSelection() {
             
         } catch (error) {
             console.error('Error fetching templates:', error);
+            
+            // Show a user-friendly error message
             if (templateList) {
-                templateList.innerHTML = `<p>Error loading templates: ${error.message}. Please try again later.</p>`;
+                templateList.innerHTML = `
+                    <p>Unable to load templates. Please try the direct template selection below.</p>
+                    <div id="template-error-info" style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+                        Technical error: ${error.message}
+                    </div>
+                `;
+            }
+            
+            // Ensure direct links are visible as a fallback
+            const directLinks = document.getElementById('direct-links');
+            if (directLinks) {
+                directLinks.style.display = 'block';
             }
         }
     }

@@ -1,13 +1,13 @@
 // routes/templateRoutes.js
 const express = require('express');
 const router = express.Router();
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 const { Storage } = require('@google-cloud/storage');
 
 // Initialize Google Cloud Storage
 const storage = new Storage();
-const bucketName = process.env.GCS_BUCKET_NAME || 'project-relate'; // Your GCS bucket name
+const bucketName = process.env.GCS_BUCKET_NAME || 'project-relate';
 
 // GET endpoint to list all template images
 router.get('/', async (req, res) => {
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
     // Fallback to local templates if GCS fails
     try {
       const templatesPath = path.join(__dirname, '../public/templates');
-      const templateFiles = await fs.readdir(templatesPath);
+      const templateFiles = await fs.promises.readdir(templatesPath);
       
       // Filter for HTML templates
       const htmlTemplates = templateFiles.filter(file => 
@@ -81,49 +81,136 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Test route to verify template access
+router.get('/test', (req, res) => {
+  try {
+    const templatesDir = path.join(__dirname, '../public/templates');
+    const files = fs.readdirSync(templatesDir);
+    
+    res.json({
+      success: true,
+      message: 'Template directory accessible',
+      templatesDirectory: templatesDir,
+      availableTemplates: files.filter(f => f.endsWith('.html'))
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error accessing templates directory',
+      error: error.message
+    });
+  }
+});
+
 // Route to get a specific template
 router.get('/:id', async (req, res) => {
   const templateId = req.params.id;
   
+  console.log(`Attempting to fetch template with ID: ${templateId}`);
+  
   try {
-    console.log(`Fetching template ${templateId} from GCS`);
-    
-    // Try to get the template from GCS
-    const templateFile = storage.bucket(bucketName).file(`templates/${templateId}.html`);
-    const [exists] = await templateFile.exists();
-    
-    if (exists) {
-      const [content] = await templateFile.download();
-      res.json({
-        success: true,
-        templateId,
-        content: content.toString('utf8'),
-        source: 'gcs'
-      });
-    } else {
-      throw new Error(`Template ${templateId} not found in GCS`);
-    }
-  } catch (error) {
-    console.error(`Error reading template file from GCS:`, error);
-    
-    // Try local file as fallback
+    // Try to get from GCS first
     try {
-      const templatePath = path.join(__dirname, `../public/templates/${templateId}.html`);
-      const content = await fs.readFile(templatePath, 'utf8');
+      console.log(`Checking GCS for template: ${templateId}`);
+      const gcsPath = `templates/${templateId}.html`;
+      const file = storage.bucket(bucketName).file(gcsPath);
+      const [exists] = await file.exists();
       
-      res.json({
+      if (exists) {
+        console.log(`Found template ${templateId} in GCS`);
+        const [content] = await file.download();
+        return res.json({
+          success: true,
+          templateId,
+          content: content.toString('utf8'),
+          source: 'gcs'
+        });
+      }
+    } catch (gcsError) {
+      console.log(`GCS error for ${templateId}: ${gcsError.message}`);
+      // Continue to local file check
+    }
+    
+    // Try local file
+    const localPath = path.join(__dirname, `../public/templates/${templateId}.html`);
+    console.log(`Looking for local template at: ${localPath}`);
+    console.log(`File exists: ${fs.existsSync(localPath)}`);
+    
+    if (fs.existsSync(localPath)) {
+      const content = await fs.promises.readFile(localPath, 'utf8');
+      console.log(`Template content length: ${content.length} bytes`);
+      
+      return res.json({
         success: true,
         templateId,
         content: content,
         source: 'local'
       });
-    } catch (localError) {
-      res.status(500).json({
-        success: false,
-        message: 'Failed to retrieve template from both GCS and local storage',
-        error: error.message
+    } else {
+      console.log(`Template file not found at ${localPath}`);
+      
+      // Use default template if the specified one doesn't exist
+      const defaultTemplate = `
+        <div class="resume-header">
+          <h1>Your Full Name</h1>
+          <p>youremail@example.com | (123) 456-7890 | Wichita, Kansas</p>
+        </div>
+
+        <div class="resume-section">
+          <h2 class="resume-section-title">Professional Summary</h2>
+          <p>Dedicated professional with experience in your field. Skilled in key areas with a proven track record of achievement.</p>
+        </div>
+
+        <div class="resume-section">
+          <h2 class="resume-section-title">Education</h2>
+          <div class="resume-item">
+            <div class="resume-item-header">
+              <div class="resume-item-title">University Name</div>
+              <div class="resume-item-date">Graduation Date</div>
+            </div>
+            <div class="resume-item-subtitle">Degree</div>
+            <div>GPA: 3.8/4.0</div>
+          </div>
+        </div>
+
+        <div class="resume-section">
+          <h2 class="resume-section-title">Experience</h2>
+          <div class="resume-item">
+            <div class="resume-item-header">
+              <div class="resume-item-title">Job Title</div>
+              <div class="resume-item-date">Date Range</div>
+            </div>
+            <div class="resume-item-subtitle">Company Name, Location</div>
+            <ul>
+              <li>Key responsibility or achievement</li>
+              <li>Key responsibility or achievement</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="resume-section">
+          <h2 class="resume-section-title">Skills</h2>
+          <ul>
+            <li><strong>Category:</strong> Skill 1, Skill 2, Skill 3</li>
+            <li><strong>Category:</strong> Skill 1, Skill 2, Skill 3</li>
+          </ul>
+        </div>
+      `;
+      
+      return res.json({
+        success: true,
+        templateId: 'default',
+        content: defaultTemplate,
+        source: 'default'
       });
     }
+  } catch (error) {
+    console.error(`Error processing template ${templateId}:`, error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve template',
+      error: error.message
+    });
   }
 });
 

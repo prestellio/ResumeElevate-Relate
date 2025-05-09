@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema; // Added Schema import
 
 const resumeSchema = new mongoose.Schema({
   name: String,
@@ -12,7 +13,7 @@ const resumeSchema = new mongoose.Schema({
       location: String,
       degree: String,
       gpa: String,
-      relevantCourses: String,
+      relevantCourses: Schema.Types.Mixed, // Changed from String to Mixed to handle arrays
       graduationDate: String,
   },
   technicalSkills: {
