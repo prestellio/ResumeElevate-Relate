@@ -1,17 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const Resume = require('../models/Resume');
-const Answer = require('../models/Answer');
-const fs = require('fs').promises;
-const path = require('path');
 require('dotenv').config();
 
 // Endpoint to generate AI-enhanced resume content from questionnaire/resume data
 router.post('/generate-resume', async (req, res) => {
   try {
     const userData = req.body;
-    const resumeId = userData.resumeId;
     
     console.log('Resume generation request received:', userData.careerField);
     
@@ -23,36 +18,9 @@ router.post('/generate-resume', async (req, res) => {
       });
     }
     
-    // If a resumeId is provided, fetch additional data from MongoDB
-    let combinedData = {...userData};
-    if (resumeId) {
-      try {
-        // Fetch resume data
-        const resumeData = await Resume.findById(resumeId);
-        
-        // Fetch matching questionnaire data if available
-        const questionnaireData = await Answer.findOne({
-          'personalInfo.name': resumeData.name,
-          'personalInfo.email': resumeData.email
-        });
-        
-        // Combine the data, with userData taking precedence
-        combinedData = {
-          ...questionnaireData?.toObject(),
-          ...resumeData?.toObject(),
-          ...userData // This will override any fields already set
-        };
-        
-        console.log('Enhanced with database data. Using combined profile for:', combinedData.name);
-      } catch (dbError) {
-        console.warn('Error fetching additional data from MongoDB:', dbError);
-        // Continue with just the user data
-      }
-    }
-    
     // Try to get AI-enhanced content
     try {
-      const enhancedContent = await callClaudeAPI(combinedData);
+      const enhancedContent = await callClaudeAPI(userData);
       
       // Return the enhanced content
       return res.status(200).json({
@@ -63,7 +31,7 @@ router.post('/generate-resume', async (req, res) => {
       console.error('Error calling Claude API:', apiError);
       
       // Generate fallback content if API call fails
-      const fallbackContent = generateFallbackContent(combinedData);
+      const fallbackContent = generateFallbackContent(userData);
       
       return res.status(200).json({
         success: true,
@@ -80,7 +48,6 @@ router.post('/generate-resume', async (req, res) => {
     });
   }
 });
-
 
 /**
  * Calls Claude API to enhance resume content
