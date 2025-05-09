@@ -4,140 +4,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../images/RelateLogo_proto_cirlce.png" type="image/x-icon"></link>
+    <link rel="icon" href="../images/RelateLogo_proto_circle.png" type="image/x-icon">
     <title>Template Selection | ResumeElevate</title>
     <link rel="stylesheet" href="../styles.css">
     
     <style>
-        .preview-image {
-            width: 100%;
-            margin-bottom: 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: transform 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .preview-image:hover {
-            transform: scale(1.03);
-        }
-        
-        .fullsize-image {
-            max-width: 100%;
-            max-height: 80vh;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
-        
-        .image-title {
-            margin-top: 10px;
-            font-size: 18px;
-            color: white;
-            font-weight: bold;
-            font-size: larger;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-        }
-        
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 30px;
-            cursor: pointer;
-        }
-        
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100px;
-            color: white;
-            font-weight: bold;
-        }
-        
-        #template-select-ul {
+        body {
+            margin: 0;
             padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #9ba2ff;
+            color: white;
+            overflow: hidden;
         }
         
-        #template-select-ul li {
-            list-style: none;
-            margin-bottom: 15px;
-        }
-        
-        #template-select-ul li label {
-            display: block;
-            position: relative;
-        }
-        
-        #template-select-ul li input[type="radio"] {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-        }
-        
-        main div {
+        .template-page-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 100vh;
             flex-direction: column;
         }
         
         .template-header {
-            color: #225bb2;
+            color: #8b92ef;
+            padding: 10px 20px;
             font-size: 1.8rem;
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            border-bottom: 2px solid #9ba2ff;
+            background-color: #1a1a1a;
+            margin: 0;
+            border-bottom: 1px solid #444;
         }
         
-        .continue-btn {
+        .templates-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .template-grid-container {
+            width: 50%;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #9ba2ff;
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 10px;
+        }
+        
+        .template-item {
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .template-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .template-item.selected {
+            border: 3px solid #225bb2;
+            box-shadow: 0 0 0 3px rgba(34, 91, 178, 0.5);
+        }
+        
+        .template-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .template-name {
+            padding: 8px;
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+            font-size: 0.9rem;
+            background-color: #f8f8f8;
+            border-top: 1px solid #eee;
+        }
+        
+        .template-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .template-preview {
+            width: 50%;
+            background-color: #9ba2ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .preview-container {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: auto;
+        }
+        
+        .fullsize-image {
+            max-width: 90%;
+            max-height: 90%;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .template-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(34, 91, 178, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .navigation-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #8b92ef;
+        }
+        
+        .nav-button {
+            padding: 8px 15px;
             background-color: #225bb2;
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 1.2rem;
-            border-radius: 10px;
+            border-radius: 4px;
             cursor: pointer;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            max-width: 300px;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
         }
         
-        .continue-btn:hover {
+        .nav-button:hover {
             background-color: #1a4585;
+        }
+        
+        .nav-button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        
+        .select-button {
+            padding: 10px 20px;
+            background-color: #225bb2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            margin: 15px 0;
+        }
+        
+        .select-button:hover {
+            background-color: #1a4585;
+        }
+        
+        #fallback-selection {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            color: #333;
         }
         
         .fallback-button {
             background-color: #225bb2;
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 8px 16px;
             margin: 5px;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.3s ease;
             text-decoration: none;
             display: inline-block;
         }
@@ -146,166 +208,70 @@
             background-color: #1a4585;
         }
         
-        .fallback-templates {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
+        .loading, .error-message {
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 1rem;
         }
         
-        #template-error-info {
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #666;
+        @media (max-width: 768px) {
+            .templates-content {
+                flex-direction: column;
+            }
+            
+            .template-grid-container, .template-preview {
+                width: 100%;
+                height: 50vh;
+            }
         }
     </style>
 </head>
 
-<body class="template-page-grid">
-    <header>
-        <a href="index.html">    
-            <img src="../images/RelateLogo_proto_square.png" alt="Resume Relate Logo: green and blue peacock">
-        </a>
-    </header>
-
-    <aside>
-        <form>
-            <ul class="template-page-grid-aside" id="template-select-ul">
-                <!-- Template thumbnails will be loaded here by JavaScript -->
-                <div class="loading">Loading templates...</div>
-            </ul>
-        </form>
-    </aside>
-
-    <main>
-        <div id="fullsizeContainer">
-            <img src="../images/RelateLogo_proto_circle.png" alt="Resume preview" id="fullsizeImage" style="width:300px">
-            <div class="image-title">Select a template to view it in full size</div>
+<body>
+    <div class="template-page-container">
+        <h1 id="career-field-header" class="template-header">Resume Templates</h1>
+        
+        <div class="templates-content">
+            <!-- Left side: Template thumbnails grid -->
+            <div class="template-grid-container">
+                <div id="template-grid" class="template-grid">
+                    <div class="loading">Loading templates...</div>
+                </div>
+            </div>
+            
+            <!-- Right side: Template preview -->
+            <div class="template-preview">
+                <div id="preview-container" class="preview-container">
+                    <!-- Preview image will be displayed here -->
+                    <img id="fullsize-image" class="fullsize-image" src="../images/RelateLogo_proto_square.png" alt="Select a template to preview">
+                </div>
+                <div id="template-indicator" class="template-indicator">Template 1</div>
+                
+                <form id="template-form" action="editor.html" method="GET">
+                    <input type="hidden" id="resumeId-input" name="resumeId">
+                    <input type="hidden" id="template-input" name="template">
+                    <button type="submit" class="select-button" id="continue-btn">Use Selected Template</button>
+                </form>
+            </div>
         </div>
-    </main>
-
+        
+        <div class="navigation-controls">
+            <button id="prev-btn" class="nav-button" disabled>← Previous</button>
+            <button id="next-btn" class="nav-button">Next →</button>
+        </div>
+    </div>
+    
     <!-- Fallback Template Selection -->
-    <div id="fallback-selection" style="position: fixed; bottom: 20px; left: 0; right: 0; background-color: rgba(255,255,255,0.9); padding: 20px; text-align: center; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: none;">
+    <div id="fallback-selection" style="display: none;">
         <h3>Quick Template Selection</h3>
         <p>Choose a template to continue:</p>
-        <div id="fallback-templates" class="fallback-templates">
+        <div id="fallback-templates">
             <!-- Fallback template buttons will be added here -->
         </div>
     </div>
-
-    <!-- Modal for extra large view -->
-    <div id="imageModal" class="modal">
-        <span class="modal-close" id="modalClose">&times;</span>
-        <img class="modal-content" id="modalImage">
-    </div>
-
+    
     <script src="../js/common.js"></script>
     <script src="../js/templateselection.js"></script>
-    <script>
-        // Add this to ensure fallback templates are available
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Template selection page loaded');
-            
-            // Get parameters from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const resumeId = urlParams.get('resumeId');
-            const careerField = urlParams.get('career') || '';
-            
-            if (!resumeId) {
-                console.error('No resumeId provided in URL parameters');
-                alert('Error: No resume ID provided. Please complete the questionnaire first.');
-                window.location.href = 'questionnaire.html';
-                return;
-            }
-            
-            // Setup fallback templates
-            const fallbackTemplates = [
-                { id: 'template1', name: 'Classic Professional' },
-                { id: 'template2', name: 'Modern Design' },
-                { id: 'template3', name: 'Minimal Style' },
-                { id: 'template4', name: 'Creative Format' },
-                { id: 'template5', name: 'Technical Layout' },
-                { id: 'template6', name: 'Executive Template' }
-            ];
-            
-            const fallbackContainer = document.getElementById('fallback-templates');
-            
-            if (fallbackContainer) {
-                fallbackContainer.innerHTML = ''; // Clear existing content
-                
-                fallbackTemplates.forEach(template => {
-                    const button = document.createElement('a');
-                    button.href = `editor.html?resumeId=${resumeId}&template=${template.id}`;
-                    button.className = 'fallback-button';
-                    button.textContent = template.name;
-                    
-                    button.addEventListener('mouseover', function() {
-                        this.style.backgroundColor = '#1a4585';
-                    });
-                    
-                    button.addEventListener('mouseout', function() {
-                        this.style.backgroundColor = '#225bb2';
-                    });
-                    
-                    fallbackContainer.appendChild(button);
-                });
-            }
-            
-            // Check for template loading issues after 5 seconds
-            setTimeout(function() {
-                const templateItems = document.querySelectorAll('#template-select-ul li');
-                const loadingElement = document.querySelector('#template-select-ul .loading');
-                
-                if ((templateItems.length === 0 && loadingElement) || document.querySelector('#template-error-info')) {
-                    console.log('No templates loaded after timeout, showing fallback options');
-                    document.getElementById('fallback-selection').style.display = 'block';
-                }
-            }, 5000);
-            
-            // Setup modal functionality
-            const modal = document.getElementById('imageModal');
-            const modalClose = document.getElementById('modalClose');
-            const fullsizeImage = document.getElementById('fullsizeImage');
-            
-            if (fullsizeImage && modal && modalClose) {
-                fullsizeImage.addEventListener('click', function() {
-                    const modalImg = document.getElementById('modalImage');
-                    modal.style.display = "flex";
-                    modalImg.src = this.src;
-                });
-                
-                modalClose.addEventListener('click', function() {
-                    modal.style.display = "none";
-                });
-            }
-        });
-        
-        // Debug log when templates are loaded
-        window.addEventListener('load', function() {
-            console.log('All resources finished loading!');
-            
-            // Verify GCS image loading
-            const images = document.querySelectorAll('img');
-            console.log(`Total images on page: ${images.length}`);
-            
-            images.forEach((img, index) => {
-                console.log(`Image ${index}: ${img.src} - Complete: ${img.complete}`);
-                
-                if (!img.complete) {
-                    img.addEventListener('load', function() {
-                        console.log(`Image loaded: ${this.src}`);
-                    });
-                    
-                    img.addEventListener('error', function() {
-                        console.error(`Failed to load image: ${this.src}`);
-                    });
-                }
-            });
-        });
-    </script>
 </body>
 </html>

@@ -2,118 +2,175 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { Storage } = require('@google-cloud/storage');
 const fs = require('fs');
+const { Storage } = require('@google-cloud/storage');
 
 // Initialize Google Cloud Storage
-const storage = new Storage();
+let storage;
+try {
+  storage = new Storage();
+} catch (error) {
+  console.warn('Google Cloud Storage initialization failed:', error.message);
+  console.warn('Falling back to local file system for templates');
+}
+
 const bucketName = process.env.GCS_BUCKET_NAME || 'project-relate';
 
 // GET endpoint to list all templates
 router.get('/', async (req, res) => {
   try {
-    console.log('Fetching templates from Google Cloud Storage bucket:', bucketName);
+    console.log('Fetching templates...');
+    let templates = [];
     
-    // Get all files from the bucket
-    const [files] = await storage.bucket(bucketName).getFiles();
-    console.log(`Total files in bucket: ${files.length}`);
+    // First try Google Cloud Storage
+    if (storage) {
+      try {
+        console.log('Attempting to fetch from GCS bucket:', bucketName);
+        const [files] = await storage.bucket(bucketName).getFiles();
+        
+        // Filter for template image files and HTML files
+        const imageFiles = files.filter(file => 
+          file.name.toLowerCase().endsWith('.jpg') || 
+          file.name.toLowerCase().endsWith('.jpeg') || 
+          file.name.toLowerCase().endsWith('.png')
+        );
+        
+        const htmlFiles = files.filter(file => 
+          file.name.toLowerCase().endsWith('.html') &&
+          !file.name.includes('index') // Exclude index.html
+        );
+        
+        console.log(`Found ${imageFiles.length} template images and ${htmlFiles.length} HTML templates in GCS`);
+        
+        // Map image files to template objects
+        if (imageFiles.length > 0) {
+          templates = imageFiles.map(file => {
+            const filename = path.basename(file.name);
+            const id = filename.replace(/\.(jpg|jpeg|png)$/i, '');
+            
+            // Find matching HTML file
+            const htmlFile = htmlFiles.find(f => {
+              const htmlBasename = path.basename(f.name).toLowerCase();
+              const idLower = id.toLowerCase();
+              return htmlBasename.replace('.html', '') === idLower;
+            });
+            
+            // Create public URL for the files
+            const url = `https://storage.googleapis.com/${bucketName}/${file.name}`;
+            const htmlUrl = htmlFile ? 
+              `https://storage.googleapis.com/${bucketName}/${htmlFile.name}` : '';
+            
+            return {
+              id: id,
+              name: `Template ${id.replace(/template/i, '').replace(/[^0-9]/g, '')}`,
+              url: url,
+              htmlUrl: htmlUrl
+            };
+          });
+        }
+      } catch (gcsError) {
+        console.error('Error fetching from GCS:', gcsError);
+      }
+    }
     
-    // Debug: List all files to see what's available
-    files.forEach(file => {
-      console.log(`File in bucket: ${file.name}`);
-    });
-    
-    // Filter for JPG/JPEG/PNG files only - without restricting to a specific folder
-    const imageFiles = files.filter(file => 
-      file.name.toLowerCase().endsWith('.jpg') || 
-      file.name.toLowerCase().endsWith('.jpeg') || 
-      file.name.toLowerCase().endsWith('.png')
-    );
-    
-    // Filter for HTML template files
-    const htmlFiles = files.filter(file => 
-      file.name.toLowerCase().endsWith('.html') &&
-      !file.name.includes('index') // Exclude index.html
-    );
-    
-    console.log(`Found ${imageFiles.length} template images`);
-    console.log(`Found ${htmlFiles.length} HTML templates`);
-    
-    // Map image files to template objects
-    const templates = imageFiles.map(file => {
-      const filename = path.basename(file.name);
-      
-      // Extract template ID (remove file extension)
-      const id = filename.replace(/\.(jpg|jpeg|png)$/i, '');
-      
-      // Find matching HTML file
-      const htmlFile = htmlFiles.find(f => {
-        const htmlBasename = path.basename(f.name).toLowerCase();
-        const idLower = id.toLowerCase();
-        return htmlBasename.replace('.html', '') === idLower;
-      });
-      
-      // Create public URL for the files
-      const url = `https://storage.googleapis.com/${bucketName}/${file.name}`;
-      const htmlUrl = htmlFile ? 
-        `https://storage.googleapis.com/${bucketName}/${htmlFile.name}` : '';
-      
-      return {
-        id: id,
-        name: `Template ${id.replace(/template/i, '')}`,
-        url: url,
-        htmlUrl: htmlUrl
-      };
-    });
+    // If no templates found from GCS, try local files
+    if (templates.length === 0) {
+      try {
+        console.log('Falling back to local templates');
+        const templatesDir = path.join(__dirname, '../public/templates');
+        
+        // Create templates directory if it doesn't exist
+        if (!fs.existsSync(templatesDir)) {
+          fs.mkdirSync(templatesDir, { recursive: true });
+          console.log('Created templates directory');
+        }
+        
+        const templateFiles = fs.readdirSync(templatesDir);
+        
+        // Filter for image and HTML files
+        const imageTemplates = templateFiles.filter(file => 
+          file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.png')
+        );
+        
+        const htmlTemplates = templateFiles.filter(file => 
+          file.endsWith('.html')
+        );
+        
+        console.log(`Found ${imageTemplates.length} local template images`);
+        
+        // If no image templates found, create fallback templates
+        if (imageTemplates.length === 0) {
+          // Create three default templates
+          templates = [
+            {
+              id: 'template1',
+              name: 'Classic Professional',
+              url: '/images/template1-thumbnail.jpg',
+              htmlUrl: '/templates/template1.html'
+            },
+            {
+              id: 'template2',
+              name: 'Modern Design',
+              url: '/images/template2-thumbnail.jpg',
+              htmlUrl: '/templates/template2.html'
+            },
+            {
+              id: 'template3',
+              name: 'Technical Layout',
+              url: '/images/template3-thumbnail.jpg',
+              htmlUrl: '/templates/template3.html'
+            }
+          ];
+        } else {
+          // Map image files to template objects
+          templates = imageTemplates.map(file => {
+            const id = file.replace(/\.(jpg|jpeg|png)$/i, '');
+            const htmlFile = htmlTemplates.find(h => h.replace('.html', '') === id);
+            
+            return {
+              id: id,
+              name: `Template ${id.replace('template', '')}`,
+              url: `/templates/${file}`,
+              htmlUrl: htmlFile ? `/templates/${htmlFile}` : ''
+            };
+          });
+        }
+      } catch (localError) {
+        console.error('Error with local templates:', localError);
+        
+        // Create fallback templates if all else fails
+        templates = [
+          {
+            id: 'template1',
+            name: 'Classic Professional',
+            url: '/images/RelateLogo_proto_square.png',
+            htmlUrl: ''
+          },
+          {
+            id: 'template2',
+            name: 'Modern Design',
+            url: '/images/RelateLogo_proto_square.png',
+            htmlUrl: ''
+          },
+          {
+            id: 'template3',
+            name: 'Technical Layout',
+            url: '/images/RelateLogo_proto_square.png',
+            htmlUrl: ''
+          }
+        ];
+      }
+    }
     
     console.log(`Returning ${templates.length} templates`);
-    templates.forEach(template => {
-      console.log(`Template: ${template.id}, URL: ${template.url}`);
-    });
-    
     res.json({ success: true, templates });
   } catch (error) {
-    console.error('Error fetching templates from GCS:', error);
-    
-    // Fallback to local templates if GCS fails
-    try {
-      console.log('Falling back to local templates');
-      const templatesPath = path.join(__dirname, '../public/templates');
-      const templateFiles = fs.readdirSync(templatesPath);
-      
-      // Filter for template files
-      const imageTemplates = templateFiles.filter(file => 
-        file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.png')
-      );
-      
-      const htmlTemplates = templateFiles.filter(file => 
-        file.endsWith('.html')
-      );
-      
-      // Create template objects
-      const templates = imageTemplates.map(file => {
-        const id = file.replace(/\.(jpg|jpeg|png)$/i, '');
-        const htmlFile = htmlTemplates.find(h => h.replace('.html', '') === id);
-        
-        return {
-          id: id,
-          name: `Template ${id.replace('template', '')}`,
-          url: `/templates/${file}`,
-          htmlUrl: htmlFile ? `/templates/${htmlFile}` : ''
-        };
-      });
-      
-      console.log(`Falling back to ${templates.length} local templates`);
-      res.json({ success: true, templates });
-    } catch (localError) {
-      console.error('Error with local fallback:', localError);
-      res.status(500).json({ 
-        success: false, 
-        message: 'Failed to fetch templates from both GCS and local storage',
-        error: error.message,
-        localError: localError.message
-      });
-    }
+    console.error('Error fetching templates:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch templates',
+      error: error.message
+    });
   }
 });
 
@@ -121,63 +178,74 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const templateId = req.params.id;
   
-  console.log(`Attempting to fetch template with ID: ${templateId}`);
+  console.log(`Fetching template with ID: ${templateId}`);
   
   try {
-    // Try to find the template HTML in different locations in GCS
-    const possiblePaths = [
-      `${templateId}.html`,                // Root level
-      `templates/${templateId}.html`,      // templates/ folder
-      `public/templates/${templateId}.html` // public/templates/ folder
-    ];
+    let templateContent = null;
     
-    // Try each possible path in GCS
-    for (const gcsPath of possiblePaths) {
+    // First try Google Cloud Storage
+    if (storage) {
       try {
-        console.log(`Checking GCS for path: ${gcsPath}`);
-        const file = storage.bucket(bucketName).file(gcsPath);
-        const [exists] = await file.exists();
+        // Try different possible paths in GCS
+        const possiblePaths = [
+          `${templateId}.html`,
+          `templates/${templateId}.html`,
+          `public/templates/${templateId}.html`
+        ];
         
-        if (exists) {
-          console.log(`Found template ${templateId} at path: ${gcsPath}`);
-          const [content] = await file.download();
-          return res.json({
-            success: true,
-            templateId,
-            content: content.toString('utf8'),
-            source: 'gcs',
-            path: gcsPath
-          });
+        // Try each path
+        for (const gcsPath of possiblePaths) {
+          try {
+            console.log(`Checking GCS for path: ${gcsPath}`);
+            const file = storage.bucket(bucketName).file(gcsPath);
+            const [exists] = await file.exists();
+            
+            if (exists) {
+              console.log(`Found template in GCS at: ${gcsPath}`);
+              const [content] = await file.download();
+              templateContent = content.toString('utf8');
+              break;
+            }
+          } catch (pathError) {
+            // Continue to try next path
+          }
         }
-      } catch (pathError) {
-        console.log(`Error checking path ${gcsPath}:`, pathError.message);
-        // Continue to try next path
+      } catch (gcsError) {
+        console.warn('Error fetching from GCS:', gcsError.message);
       }
     }
     
     // If not found in GCS, try local file
-    const localPath = path.join(__dirname, `../public/templates/${templateId}.html`);
-    console.log(`Looking for local template at: ${localPath}`);
-    
-    if (fs.existsSync(localPath)) {
-      const content = fs.readFileSync(localPath, 'utf8');
-      console.log(`Found local template. Content length: ${content.length} bytes`);
-      
-      return res.json({
-        success: true,
-        templateId,
-        content: content,
-        source: 'local'
-      });
+    if (!templateContent) {
+      try {
+        // Try looking in /templates and /public/templates
+        const possibleLocalPaths = [
+          path.join(__dirname, `../public/templates/${templateId}.html`),
+          path.join(__dirname, `../templates/${templateId}.html`)
+        ];
+        
+        for (const localPath of possibleLocalPaths) {
+          if (fs.existsSync(localPath)) {
+            console.log(`Found template locally at: ${localPath}`);
+            templateContent = fs.readFileSync(localPath, 'utf8');
+            break;
+          }
+        }
+      } catch (localError) {
+        console.warn('Error reading local template:', localError.message);
+      }
     }
     
-    // If template not found anywhere, use default template
-    console.log(`Template ${templateId} not found in any location, using default`);
+    // If still not found, use default template
+    if (!templateContent) {
+      console.log(`Template not found anywhere, using default template`);
+      templateContent = getDefaultTemplate();
+    }
+    
     return res.json({
       success: true,
-      templateId: 'default',
-      content: getDefaultTemplate(),
-      source: 'default'
+      templateId,
+      content: templateContent
     });
   } catch (error) {
     console.error(`Error processing template ${templateId}:`, error);

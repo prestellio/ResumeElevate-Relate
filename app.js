@@ -44,47 +44,29 @@ app.use('/api/ai/assistant', resumeAssistantRoutes);
 
 
 // API endpoint to generate a complete resume
-app.get('/api/generate-resume/:resumeId/:templateId', async (req, res) => {
-    try {
-        const { resumeId, templateId } = req.params;
-        
-        // Validate parameters
-        if (!resumeId || !templateId) {
-            return res.status(400).json({
-                success: false,
-                message: 'Missing resumeId or templateId'
-            });
-        }
-        
-        // Get the template HTML
-        const templateResponse = await fetch(`http://localhost:${process.env.PORT || 3000}/api/templates/${templateId}`);
-        
-        if (!templateResponse.ok) {
-            throw new Error(`Failed to fetch template: ${templateResponse.status}`);
-        }
-        
-        const templateData = await templateResponse.json();
-        
-        if (!templateData.success || !templateData.content) {
-            throw new Error('Invalid template data');
-        }
-        
-        // Generate the enhanced resume
-        const result = await generateEnhancedResume(
-            resumeId,
-            templateId,
-            templateData.content
-        );
-        
-        res.json(result);
-    } catch (error) {
-        console.error('Error generating resume:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to generate resume',
-            error: error.message
-        });
+app.get('/api/generate-complete-resume/:resumeId/:templateId', async (req, res) => {
+  try {
+    const { resumeId, templateId } = req.params;
+    
+    if (!resumeId || !templateId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing resumeId or templateId'
+      });
     }
+    
+    const { generateCompleteResume } = require('./utils/resumeGenerator');
+    const result = await generateCompleteResume(resumeId, templateId);
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Error generating complete resume:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to generate complete resume',
+      error: error.message
+    });
+  }
 });
 
 

@@ -1,3 +1,4 @@
+// routes/aiRoutes.js
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
@@ -8,7 +9,7 @@ router.post('/generate-resume', async (req, res) => {
   try {
     const userData = req.body;
     
-    console.log('Resume generation request received:', userData.careerField);
+    console.log('Resume generation request received for:', userData.careerField);
     
     // Validate required user data
     if (!userData) {
@@ -64,11 +65,13 @@ async function callClaudeAPI(userData) {
     // Create the prompt for Claude
     const prompt = generatePrompt(userData);
     
+    console.log('Calling Claude API...');
+    
     // Call the Claude API with the latest API version
     const response = await axios.post(
       'https://api.anthropic.com/v1/messages',
       {
-        model: "claude-3-haiku-20240307", // Using the haiku model (faster, cheaper)
+        model: "claude-3-haiku-20240307", // Use haiku model (faster, cheaper)
         max_tokens: 4000,
         messages: [{ role: "user", content: prompt }]
       },
@@ -76,13 +79,14 @@ async function callClaudeAPI(userData) {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': process.env.CLAUDE_API_KEY,
-          'anthropic-version': '2023-06-01' // Make sure this is correct
+          'anthropic-version': '2023-06-01'
         }
       }
     );
     
     // Extract the response text
     const aiResponseText = response.data.content[0].text;
+    console.log('Claude API response received');
     
     // Parse the JSON response
     try {
@@ -99,7 +103,7 @@ async function callClaudeAPI(userData) {
       throw new Error('Failed to parse AI response');
     }
   } catch (error) {
-    console.error('Error in Claude API call:', error);
+    console.error('Error in Claude API call:', error.message);
     
     // Log detailed info for API errors
     if (error.response) {
