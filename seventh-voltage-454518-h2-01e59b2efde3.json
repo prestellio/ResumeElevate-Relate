@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "seventh-voltage-454518-h2",
+  "private_key_id": "01e59b2efde36bb3d01a166b94736ddec194e7fb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDajbhRMOo1D5Ti\nXjCnTpDCzXpTqmnG1MdskHlCapxhIxWkrJEirPeH8qlm6OZgHnurbh2JfIXgNiZS\neBJnBYXqH8Mgk7P9mn4/XlcqHSdgzwv0DvI9i8ulnHCr3nl+L3jZazAYtK+sRnN9\nl5189d823MakwBeWHbNdcd/efM5puDMYiUHto5ubcYod4pzanCPB9gACJYvz+NIy\n4cSvLAYmrt2MxVD7J3dvCIC8OdWk3b6JXSC9YwaT1CAkQGYlF0+x1dDT4JLA1F+E\nCqsNxYa5OpYjHRqG1FhjInvh/DeghK/2FCcZLQosd0MSccltLC7bbGzxjCK9ZYZM\nuARICGAfAgMBAAECggEACqbBhuN1ZqSdwvKIOH8xuuy8u3sgsJoKJhZccoozmOBW\n27G1WRVI8w02iFdtct3JdS9mrR6uf6Dj+Tz02KSCREjL/7hzGzb+VCRK5ziIhMVS\nddCMqcc4Y5fePeIX1biGkUISFAIqVaERW9uZx09MU6Yq4DikbaKA7VrxaCx4+tny\nQxJslk2JZ68QEwqDVKgjZYsHKf85A6HZNA57Y7vs1ohp+lV5S5QY+Eon7msJsyWC\nkopz9tMj45u8VmPCD59K755JYxZ5PgRbCrIwG+lTZ5QVzTwI0NYQgERJkDQHEQrt\nh5g5SMHLpaluEo3OIxmnRpEbD57HdqQbNKHUE7zDUQKBgQDzALtUVYf7ThqAuNic\nNkeloZbY4ITmfeTsMtDi+IBVDMvxA/BUQSrGm/uxv2FbqXbvLgaz/gre78YSerh/\n8ebVPXWDKX7NV/M5q+n5Gb3NVCCMCwA1j8JgpeRTOLwsrjb7jPBZeI31I9JszKfC\nuCFBeQM9MXyCqCf1LB7mdSOmEwKBgQDmPji3Map6NooxJBH83HpRv60pnTAx0OYl\nU5uWCMyq+RWyxC/oSLQH1ipySbZSsZD91wHn6ol4X1DnLhd+DeQhai3jb7kbxbnK\nEWqwgKi4hVzvN92SVy4SzbDJkEascZUnJN8fyHMgnnBHmz06F1LfQqQL8e1k+oE5\n3VlrmriPRQKBgFXpUlF0k8jTSidsMpi30AjM4kn2xsW+iKrBJHy6IpTvG0Mwg00m\nZPsmtouW/9KqTTQub4w/KpS67Kon3QbO/S8ytVMT3pK2n3UqRGQfJ61qKr+YPBCz\nrKMCw4BwtIaPaTzyDR90sauTaJeymzUKaCd/oxeFYWHIFahmWt5bV6klAoGBANo9\nEDVU9mpxV/vMXOB5e9gQ/2n6fLw7bmrjHQ7RuG43O8H/BAoBH+RttD4wcIlhljWF\nn2DchwF6F42JuurY7+xcYLK8K5GPkdNfPumeik6c2sJFCdi0mg9ouLHV96ds4hwA\nbx4JOlco1vSIyThO81Z8LFLGNmcIq4TVsvSz60yhAoGALeiifvCPZDjNv0JYAMvH\nf4pJr+n3+UeifKwIcpzy5HwE/JjA9/IHhMf9LAvt0GgiNJpPmaSDi68yYXBuqPQU\nutVu1DT2tbdgHNtSqcqs9p3oOuOfeUsbZWYN362rbseMMTtKMdvH5wYTDxXE/xSN\nrccNRrQhDqPs+ovFR5dZYCM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "project-relate-admin@seventh-voltage-454518-h2.iam.gserviceaccount.com",
+  "client_id": "110699916849372232575",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/project-relate-admin%40seventh-voltage-454518-h2.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

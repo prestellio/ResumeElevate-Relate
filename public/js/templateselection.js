@@ -14,18 +14,10 @@ function initTemplateSelection() {
         return;
     }
     
-    // Add career field as a header
-    const headerElement = document.createElement('h2');
-    headerElement.className = 'template-header';
-    headerElement.textContent = `${careerField ? careerField.charAt(0).toUpperCase() + careerField.slice(1) : 'All'} Resume Templates`;
-    
-    const templateList = document.getElementById('template-select-ul');
-    if (templateList) {
-        templateList.parentNode.insertBefore(headerElement, templateList);
-    }
-    
     // Function to fetch templates
     async function fetchTemplates() {
+        const templateList = document.getElementById('template-select-ul');
+        
         if (templateList) {
             templateList.innerHTML = '<div class="loading">Loading templates...</div>';
         }
@@ -43,11 +35,6 @@ function initTemplateSelection() {
             
             if (!data.success || !data.templates || !Array.isArray(data.templates)) {
                 throw new Error('Invalid response format from API');
-            }
-            
-            // Remove loading message
-            if (templateList) {
-                templateList.innerHTML = '';
             }
             
             // Filter templates based on career field if specified
@@ -74,39 +61,14 @@ function initTemplateSelection() {
                 filteredTemplates = data.templates;
             }
             
-            if (templateList) {
-                filteredTemplates.forEach(template => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `
-                        <label>
-                            <img src="${template.url}" alt="${template.name}" class="preview-image" data-template-id="${template.id}">
-                            <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
-                            <span>${template.name}</span>
-                        </label>
-                    `;
-                    
-                    templateList.appendChild(listItem);
-                });
-            }
-            
-            // Add click events to all template thumbnails
-            document.querySelectorAll('.preview-image').forEach(img => {
-                img.addEventListener('click', function() {
-                    const templateId = this.dataset.templateId;
-                    showFullsizeTemplate(this.src, this.alt);
-                    
-                    // Also select the radio button
-                    const radioBtn = document.querySelector(`input[value="${templateId}"]`);
-                    if (radioBtn) {
-                        radioBtn.checked = true;
-                    }
-                });
-            });
+            // Call our new function to create template items
+            createTemplateItems(filteredTemplates);
             
             // Create a form for proper redirection
             const redirectForm = document.createElement('form');
             redirectForm.action = 'editor.html';
             redirectForm.method = 'GET';
+            redirectForm.className = 'redirect-form';
             
             // Create hidden inputs for resumeId
             const resumeIdInput = document.createElement('input');
@@ -151,9 +113,10 @@ function initTemplateSelection() {
             // Add button to form
             redirectForm.appendChild(continueButton);
             
-            // Add the form to the page
-            if (templateList) {
-                templateList.parentNode.appendChild(redirectForm);
+            // Add the form to the page - putting it outside the scrollable area
+            const asideElement = document.querySelector('aside');
+            if (asideElement) {
+                asideElement.appendChild(redirectForm);
             }
             
             // Show the first template by default if any exist
@@ -169,10 +132,106 @@ function initTemplateSelection() {
             
         } catch (error) {
             console.error('Error fetching templates:', error);
+            const templateList = document.getElementById('template-select-ul');
             if (templateList) {
                 templateList.innerHTML = `<p>Error loading templates: ${error.message}. Please try again later.</p>`;
             }
         }
+    }
+    
+    // Function to create template items with proper structure for scrolling
+    function createTemplateItems(templates) {
+        const templateGrid = document.getElementById('template-select-ul');
+        
+        if (templateGrid) {
+            // Clear previous content including loading message
+            templateGrid.innerHTML = '';
+            
+            // Add header for the templates
+            const headerElement = document.createElement('h2');
+            headerElement.className = 'template-header';
+            headerElement.textContent = `${careerField ? careerField.charAt(0).toUpperCase() + careerField.slice(1) : 'All'} Resume Templates`;
+            
+            // Make sure the templateGrid has the right class for scrolling
+            templateGrid.className = 'template-grid';
+            
+            templates.forEach(template => {
+                const templateCard = document.createElement('div');
+                templateCard.className = 'template-card';
+                
+                templateCard.innerHTML = `
+                    <label>
+                        <img src="${template.url}" alt="${template.name}" class="preview-image" data-fullsize="${template.url}" data-html-url="${template.htmlUrl || ''}" data-template-id="${template.id}">
+                        <div class="template-name">${template.name}</div>
+                        <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
+                    </label>
+                `;
+                
+                templateGrid.appendChild(templateCard);
+            });
+            
+            // Add click events to all template thumbnails
+            document.querySelectorAll('.preview-image').forEach(img => {
+                img.addEventListener('click', function() {
+                    const fullsizeUrl = this.dataset.fullsize;
+                    const templateName = this.alt;
+                    const templateId = this.dataset.templateId;
+                    
+                    showFullsizeTemplate(fullsizeUrl, templateName);
+                    
+                    // Also select the radio button
+                    const radioBtn = this.nextElementSibling.nextElementSibling;
+                    if (radioBtn) {
+                        radioBtn.checked = true;
+                    }
+                });
+            });
+            
+            // Add navigation controls if needed
+            setupNavigationControls();
+        }
+    }
+
+    // Function to set up navigation controls
+    function setupNavigationControls() {
+        // Create navigation controls
+        const controls = document.createElement('div');
+        controls.className = 'template-nav-controls';
+        controls.innerHTML = `
+            <button id="prev-template" class="nav-btn">← Previous</button>
+            <button id="next-template" class="nav-btn">Next →</button>
+        `;
+        
+        const asideElement = document.querySelector('aside');
+        if (asideElement) {
+            // Insert before the redirect form if it exists
+            const redirectForm = asideElement.querySelector('.redirect-form');
+            if (redirectForm) {
+                asideElement.insertBefore(controls, redirectForm);
+            } else {
+                asideElement.appendChild(controls);
+            }
+        }
+        
+        // Add event listeners
+        let currentIndex = 0;
+        const templates = document.querySelectorAll('.template-card');
+        
+        document.getElementById('prev-template').addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                templates[currentIndex].querySelector('.preview-image').click();
+                templates[currentIndex].scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+        
+        document.getElementById('next-template').addEventListener('click', () => {
+            if (currentIndex < templates.length - 1) {
+                currentIndex++;
+                templates[currentIndex].querySelector('.preview-image').click();
+                templates[currentIndex].scrollIntoView({ behavior: 'smooth' });
+            }
+        });
     }
     
     // Function to display fullsize template
@@ -196,5 +255,107 @@ document.addEventListener('DOMContentLoaded', function() {
     // Template selection page initialization
     if (window.location.pathname.includes('templateselection.html')) {
         initTemplateSelection();
+        
+        // Add necessary CSS for scrolling if not already in the stylesheet
+        const style = document.createElement('style');
+        style.textContent = `
+            .template-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+                max-height: 70vh;
+                overflow-y: auto;
+                padding: 20px;
+                scrollbar-width: thin;
+            }
+            
+            .template-grid::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            .template-grid::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+            }
+            
+            .template-grid::-webkit-scrollbar-thumb {
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 10px;
+            }
+            
+            .template-grid::-webkit-scrollbar-thumb:hover {
+                background: rgba(0, 0, 0, 0.5);
+            }
+            
+            .template-card {
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 10px;
+                text-align: center;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            
+            .template-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+            
+            .template-card img {
+                width: 100%;
+                height: auto;
+                border: 1px solid #eee;
+                margin-bottom: 10px;
+            }
+            
+            .template-name {
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            
+            .template-nav-controls {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px 20px;
+                margin-top: 10px;
+            }
+            
+            .nav-btn {
+                background: #225bb2;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            
+            .nav-btn:hover {
+                background: #1a4585;
+            }
+            
+            .redirect-form {
+                margin: 20px 0;
+                text-align: center;
+            }
+            
+            .continue-btn {
+                background-color: #225bb2;
+                color: white;
+                border: none;
+                padding: 12px 25px;
+                font-size: 1.2rem;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+                width: 80%;
+                max-width: 300px;
+            }
+            
+            .continue-btn:hover {
+                background-color: #1a4585;
+            }
+        `;
+        document.head.appendChild(style);
     }
 });
