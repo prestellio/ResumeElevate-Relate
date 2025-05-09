@@ -1,6 +1,7 @@
+// public/js/templateselection.js
 function initTemplateSelection() {
     // Configuration
-    const apiEndpoint = '/api/templates'; // The endpoint we've defined in routes/templateRoutes.js
+    const apiEndpoint = '/api/templates';
     
     // Get parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -26,13 +27,15 @@ function initTemplateSelection() {
     
     // Function to fetch templates
     async function fetchTemplates() {
+        console.log('Fetching templates from API...');
         if (templateList) {
             templateList.innerHTML = '<div class="loading">Loading templates...</div>';
         }
         
         try {
-            // Fetch templates from our backend API with the career field as a query parameter
-            const response = await fetch(`${apiEndpoint}?career=${careerField}`);
+            // Fetch templates from our backend API
+            console.log(`Requesting templates from ${apiEndpoint}`);
+            const response = await fetch(apiEndpoint);
             
             if (!response.ok) {
                 throw new Error(`API responded with status: ${response.status}`);
@@ -60,16 +63,19 @@ function initTemplateSelection() {
                 return;
             }
             
+            // Log each template for debugging
+            templates.forEach(template => {
+                console.log(`Creating template element: ${template.id} with URL: ${template.url}`);
+            });
+            
             if (templateList) {
                 templates.forEach(template => {
                     const listItem = document.createElement('li');
                     
-                    // Use the URL provided by the API directly
-                    const imageUrl = template.url;
-                    
+                    // Create a template card with image and radio button
                     listItem.innerHTML = `
                         <label>
-                            <img src="${imageUrl}" alt="${template.name}" class="preview-image" data-template-id="${template.id}">
+                            <img src="${template.url}" alt="${template.name}" class="preview-image" data-template-id="${template.id}" onerror="this.onerror=null; this.src='../images/RelateLogo_proto_square.png'; console.error('Failed to load template image: ${template.url}');">
                             <input type="radio" id="${template.id}" name="template-select" value="${template.id}" data-resume-id="${resumeId}">
                             <span>${template.name}</span>
                         </label>
@@ -90,6 +96,11 @@ function initTemplateSelection() {
                     if (radioBtn) {
                         radioBtn.checked = true;
                     }
+                });
+                
+                // Add load event listener for debugging
+                img.addEventListener('load', function() {
+                    console.log(`Successfully loaded image: ${this.src}`);
                 });
             });
             
@@ -164,28 +175,26 @@ function initTemplateSelection() {
             // Show a user-friendly error message
             if (templateList) {
                 templateList.innerHTML = `
-                    <p>Unable to load templates. Please try the direct template selection below.</p>
+                    <p>Unable to load templates from the cloud. Using fallback templates instead.</p>
                     <div id="template-error-info" style="color: #666; font-size: 0.9rem; margin-top: 10px;">
                         Technical error: ${error.message}
                     </div>
                 `;
             }
             
-            // Ensure direct links are visible as a fallback
-            const directLinks = document.getElementById('direct-links');
-            if (directLinks) {
-                directLinks.style.display = 'block';
-            }
+            // Show fallback template selection
+            document.getElementById('fallback-selection').style.display = 'block';
         }
     }
     
     // Function to display fullsize template
     function showFullsizeTemplate(imageUrl, imageName) {
+        console.log(`Showing fullsize template: ${imageUrl}`);
         const fullsizeContainer = document.getElementById('fullsizeContainer');
         
         if (fullsizeContainer) {
             fullsizeContainer.innerHTML = `
-                <img src="${imageUrl}" alt="${imageName}" id="fullsizeImage" class="fullsize-image">
+                <img src="${imageUrl}" alt="${imageName}" id="fullsizeImage" class="fullsize-image" onerror="this.onerror=null; this.src='../images/RelateLogo_proto_square.png'; console.error('Failed to load fullsize image: ${imageUrl}');">
                 <div class="image-title">${imageName}</div>
             `;
         }
@@ -197,8 +206,17 @@ function initTemplateSelection() {
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Template selection page loaded');
+    
     // Template selection page initialization
     if (window.location.pathname.includes('templateselection.html')) {
+        console.log('Initializing template selection...');
         initTemplateSelection();
+        
+        // Ensure fallback section is hidden initially
+        const fallbackSection = document.getElementById('fallback-selection');
+        if (fallbackSection) {
+            fallbackSection.style.display = 'none';
+        }
     }
 });

@@ -32,9 +32,9 @@
         .image-title {
             margin-top: 10px;
             font-size: 18px;
-            color:white;
-            font-weight:bold;
-            font-size:larger;
+            color: white;
+            font-weight: bold;
+            font-size: larger;
         }
         
         .modal {
@@ -69,6 +69,8 @@
             justify-content: center;
             align-items: center;
             height: 100px;
+            color: white;
+            font-weight: bold;
         }
         
         #template-select-ul {
@@ -136,6 +138,8 @@
             cursor: pointer;
             font-weight: bold;
             transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
         
         .fallback-button:hover {
@@ -149,12 +153,21 @@
             gap: 10px;
             margin-top: 15px;
         }
+        
+        #template-error-info {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
     </style>
 </head>
 
 <body class="template-page-grid">
     <header>
-        <a href="../index">    
+        <a href="index.html">    
             <img src="../images/RelateLogo_proto_square.png" alt="Resume Relate Logo: green and blue peacock">
         </a>
     </header>
@@ -193,32 +206,37 @@
     <script src="../js/common.js"></script>
     <script src="../js/templateselection.js"></script>
     <script>
+        // Add this to ensure fallback templates are available
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Template selection page loaded');
+            
             // Get parameters from URL
             const urlParams = new URLSearchParams(window.location.search);
             const resumeId = urlParams.get('resumeId');
             const careerField = urlParams.get('career') || '';
             
             if (!resumeId) {
+                console.error('No resumeId provided in URL parameters');
                 alert('Error: No resume ID provided. Please complete the questionnaire first.');
                 window.location.href = 'questionnaire.html';
                 return;
             }
             
-            // Fallback template selection
+            // Setup fallback templates
             const fallbackTemplates = [
-                { id: 'template1', name: 'Professional' },
-                { id: 'template2', name: 'Modern' },
-                { id: 'template3', name: 'Minimal' },
-                { id: 'template4', name: 'Creative' },
-                { id: 'template5', name: 'Technical' },
-                { id: 'template6', name: 'Executive' }
+                { id: 'template1', name: 'Classic Professional' },
+                { id: 'template2', name: 'Modern Design' },
+                { id: 'template3', name: 'Minimal Style' },
+                { id: 'template4', name: 'Creative Format' },
+                { id: 'template5', name: 'Technical Layout' },
+                { id: 'template6', name: 'Executive Template' }
             ];
             
-            // Always create the fallback buttons
             const fallbackContainer = document.getElementById('fallback-templates');
             
             if (fallbackContainer) {
+                fallbackContainer.innerHTML = ''; // Clear existing content
+                
                 fallbackTemplates.forEach(template => {
                     const button = document.createElement('a');
                     button.href = `editor.html?resumeId=${resumeId}&template=${template.id}`;
@@ -237,100 +255,57 @@
                 });
             }
             
-            // Check if main template selection is empty after 3 seconds
+            // Check for template loading issues after 5 seconds
             setTimeout(function() {
                 const templateItems = document.querySelectorAll('#template-select-ul li');
                 const loadingElement = document.querySelector('#template-select-ul .loading');
-                const errorMessage = document.querySelector('#template-select-ul p');
                 
-                // Show fallback if no templates were loaded or there's an error message
-                if (templateItems.length === 0 || errorMessage || loadingElement) {
+                if ((templateItems.length === 0 && loadingElement) || document.querySelector('#template-error-info')) {
+                    console.log('No templates loaded after timeout, showing fallback options');
                     document.getElementById('fallback-selection').style.display = 'block';
                 }
-            }, 3000);
+            }, 5000);
+            
+            // Setup modal functionality
+            const modal = document.getElementById('imageModal');
+            const modalClose = document.getElementById('modalClose');
+            const fullsizeImage = document.getElementById('fullsizeImage');
+            
+            if (fullsizeImage && modal && modalClose) {
+                fullsizeImage.addEventListener('click', function() {
+                    const modalImg = document.getElementById('modalImage');
+                    modal.style.display = "flex";
+                    modalImg.src = this.src;
+                });
+                
+                modalClose.addEventListener('click', function() {
+                    modal.style.display = "none";
+                });
+            }
+        });
+        
+        // Debug log when templates are loaded
+        window.addEventListener('load', function() {
+            console.log('All resources finished loading!');
+            
+            // Verify GCS image loading
+            const images = document.querySelectorAll('img');
+            console.log(`Total images on page: ${images.length}`);
+            
+            images.forEach((img, index) => {
+                console.log(`Image ${index}: ${img.src} - Complete: ${img.complete}`);
+                
+                if (!img.complete) {
+                    img.addEventListener('load', function() {
+                        console.log(`Image loaded: ${this.src}`);
+                    });
+                    
+                    img.addEventListener('error', function() {
+                        console.error(`Failed to load image: ${this.src}`);
+                    });
+                }
+            });
         });
     </script>
-    <!-- Add this to the bottom of your templateselection.html file -->
-<div id="fallback-selection" style="position: fixed; bottom: 20px; left: 0; right: 0; background-color: rgba(255,255,255,0.9); padding: 20px; text-align: center; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: none;">
-    <h3>Quick Template Selection</h3>
-    <p>Choose a template to continue:</p>
-    <div id="fallback-templates" class="fallback-templates">
-        <!-- Fallback template buttons will be added here -->
-    </div>
-</div>
-
-<script>
-// Add this to your existing script or at the bottom of the page
-document.addEventListener('DOMContentLoaded', function() {
-    // Get parameters from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const resumeId = urlParams.get('resumeId');
-    
-    if (resumeId) {
-        // Create fallback template options
-        const fallbackTemplates = [
-            { id: 'template1', name: 'Template 1' },
-            { id: 'template2', name: 'Template 2' },
-            { id: 'template3', name: 'Template 3' },
-            { id: 'template4', name: 'Template 4' },
-            { id: 'template5', name: 'Template 5' },
-            { id: 'template6', name: 'Template 6' }
-        ];
-        
-        const fallbackContainer = document.getElementById('fallback-templates');
-        
-        if (fallbackContainer) {
-            fallbackTemplates.forEach(template => {
-                const button = document.createElement('a');
-                button.href = `editor.html?resumeId=${resumeId}&template=${template.id}`;
-                button.className = 'fallback-button';
-                button.style.backgroundColor = '#225bb2';
-                button.style.color = 'white';
-                button.style.padding = '8px 15px';
-                button.style.margin = '5px';
-                button.style.borderRadius = '5px';
-                button.style.textDecoration = 'none';
-                button.style.fontWeight = 'bold';
-                button.textContent = template.name;
-                
-                fallbackContainer.appendChild(button);
-            });
-        }
-        
-        // Show fallback section if templates don't load after 3 seconds
-        setTimeout(function() {
-            const templateItems = document.querySelectorAll('#template-select-ul li');
-            if (templateItems.length === 0) {
-                document.getElementById('fallback-selection').style.display = 'block';
-            }
-        }, 3000);
-    }
-});
-</script>
-
-<style>
-.fallback-button {
-    background-color: #225bb2;
-    color: white;
-    padding: 8px 15px;
-    margin: 5px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.fallback-button:hover {
-    background-color: #1a4585;
-}
-
-.fallback-templates {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 15px;
-}
-</style>
 </body>
 </html>
