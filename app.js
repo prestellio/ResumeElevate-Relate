@@ -87,30 +87,6 @@ app.get('/api/generate-resume/:resumeId/:templateId', async (req, res) => {
     }
 });
 
-app.get('/api/generate-complete-resume/:resumeId/:templateId', async (req, res) => {
-    try {
-      const { resumeId, templateId } = req.params;
-      
-      if (!resumeId || !templateId) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing resumeId or templateId'
-        });
-      }
-      
-      const { generateCompleteResume } = require('./utils/resumeGenerator');
-      const result = await generateCompleteResume(resumeId, templateId);
-      
-      res.json(result);
-    } catch (error) {
-      console.error('Error generating complete resume:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to generate complete resume',
-        error: error.message
-      });
-    }
-  });
 
 // Add a test route to verify the server is working
 app.get('/api/test', (req, res) => {
